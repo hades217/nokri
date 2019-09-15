@@ -137,14 +137,6 @@ class authentication
 		}
 }
 }
-
-
-
-
-
-
-
-
 // Ajax handler for Login User
 add_action( 'wp_ajax_sb_login_user', 'nokri_login_user' );
 add_action( 'wp_ajax_nopriv_sb_login_user', 'nokri_login_user' );
@@ -263,9 +255,6 @@ function nokri_register_user()
 	}
 }
 
-
-
-
 if (! function_exists ( 'nokri_auto_login' )) {
 function nokri_auto_login($username, $password, $remember )
 {
@@ -292,7 +281,6 @@ function nokri_auto_login($username, $password, $remember )
 	}
 }
 }
-
 
 
 
@@ -483,6 +471,17 @@ function nokri_do_register($email= '', $password = '')
 }
 }
 
+if( ! function_exists( 'nokri_do_register_without_login' ) )
+{
+	function nokri_do_register_without_login($email= '',$user_name = '', $password = '')
+	{
+		$uid =	wp_create_user( $user_name, $password, $email );
+		wp_update_user( array( 'ID' => $uid, 'display_name' => $user_name ) );
+		update_user_meta($uid, '_user_profile_status', 'pub');
+		nokri_auto_login($email, $password, true );
+		return $uid;
+	}
+}
 /************************************/
 /* Ajax handler for Saving Empoyer Profile   */
 /************************************/
@@ -529,6 +528,7 @@ function nokri_emp_profiles()
 	$emp_map_location = $params['sb_user_address'];
 	$emp_postal_address = $params['sb_user_postal'];
 	$emp_cat 		=  	$params['emp_cat'];
+	$emp_video 		=  	$params['emp_video'];
 	/* Updating Values In User Meta Of Current User */
 	if ($emp_name != '')
 	{
@@ -565,6 +565,10 @@ function nokri_emp_profiles()
 	if ($emp_cat != '')
 	{
 		update_user_meta( $user_id, '_emp_skills', ($emp_cat));
+	}
+	if ($emp_video != '')
+	{
+		update_user_meta( $user_id, '_emp_video', sanitize_text_field($emp_video));
 	}
 	
 	/*If allowed */
@@ -728,7 +732,7 @@ if ( ! function_exists( 'nokri_add_to_cart' ) ) {
 function nokri_add_to_cart()
 {
 	global $nokri;
-	$user_id = get_current_user_id();
+	$user_id   = get_current_user_id();
 	$user_type = get_user_meta($user_id, '_sb_reg_type', true);
 	
 	if( $user_id == "" )
@@ -737,27 +741,22 @@ function nokri_add_to_cart()
 		die();	
 	}
 	
-	if( $user_type == 0 )
-	{
-		echo '5|' . __( "Candidates Can't Purchase Packages", 'nokri' ) .'|' . get_the_permalink();
-		die();
-	}
-	
-	/*demo check */
-	$is_demo =  nokri_demo_mode();
-	if($is_demo)
-	{ 
-		echo '6|' . __( "Editing not allowed in demo mode", 'nokri' ) .'|' . get_the_permalink();
-		die(); 
-	}
-	
-	
-	
 	
 	
 	$product_id	  = 	$_POST['product_id'];
 	$is_avail     = 	get_user_meta( $user_id, 'avail_free_package', true); 
     $is_pkg_free  = 	get_post_meta($product_id, 'op_pkg_typ',true );
+	$is_pkg_for   = 	get_post_meta($product_id, 'op_pkg_for',true );
+	
+	
+	if( $user_type == '0' && $is_pkg_for == '1' )
+	{
+		echo '5|' . __( "This is employer package", 'nokri' );
+		die();
+	}
+	
+	
+	
 	
 	if ($is_avail == 1 && $_POST['is_free'] == 1)
 	{
@@ -768,6 +767,79 @@ function nokri_add_to_cart()
 	if ($_POST['is_free'] == 1 &&  $is_pkg_free == 1 )
 	{
 		 nokri_free_package($product_id);
+		 update_user_meta( get_current_user_id(), 'avail_free_package', (int)'1');	
+		 echo '3|' . __( "Success", 'nokri') .'|' . get_the_permalink( $nokri['sb_post_ad_page'] );
+		 die();
+	}
+	$qty	=	$_POST['qty'];
+	global $woocommerce;
+	if( $woocommerce->cart->add_to_cart($product_id, $qty) )
+	{
+		echo '1|' . __( "Added to cart.", 'nokri' ) .'|' . $woocommerce->cart->get_cart_url();
+	}
+	else
+	{
+		echo '1|' . __( "Already in your cart.", 'nokri' ) .'|' . $woocommerce->cart->get_cart_url();
+	}
+	die();
+}
+}
+
+/************************************************/
+// Ajax handler for add to cart for candidate    //
+/**********************************************/
+add_action( 'wp_ajax_sb_add_cart_cand', 'nokri_add_to_cart_cand' );
+add_action('nokri_add_to_cart_cand', 'nokri_add_to_cart_cand');
+if ( ! function_exists( 'nokri_add_to_cart_cand' ) ) {
+function nokri_add_to_cart_cand()
+{
+	global $nokri;
+	$user_id   = get_current_user_id();
+	$user_type = get_user_meta($user_id, '_sb_reg_type', true);
+	
+	if( $user_id == "" )
+	{
+		echo '0|' . __( "You must need to logged in.", 'nokri' );
+		die();	
+	}
+	
+	
+	
+	/*demo check */
+	$is_demo =  nokri_demo_mode();
+	if($is_demo)
+	{ 
+		echo '6|' . __( "Editing not allowed in demo mode", 'nokri' ) .'|' . get_the_permalink();
+		die(); 
+	}
+
+	
+	$product_id	  = 	$_POST['product_id'];
+	$is_avail     = 	get_user_meta( $user_id, 'avail_free_package', true); 
+    $is_pkg_free  = 	get_post_meta($product_id, 'op_pkg_typ',true );
+	$is_pkg_for   = 	get_post_meta($product_id, 'op_pkg_for',true );
+	
+	
+	
+	
+	
+	if( $user_type == 1 && $is_pkg_for == 0 )
+	{
+		echo '7|' . __( "This is candidate package", 'nokri' );
+		die();
+	}
+	
+	
+	
+	if ($is_avail == 1 && $_POST['is_free'] == 1)
+	{
+		echo '4|' . __( "You have already availed free package", 'nokri') .'|' . get_the_permalink( $nokri['package_page'] );
+		die();
+	}
+	
+	if ($_POST['is_free'] == 1 &&  $is_pkg_free == 1 )
+	{
+		 nokri_free_package_for_candidate($product_id);
 		 update_user_meta( get_current_user_id(), 'avail_free_package', (int)'1');	
 		 echo '3|' . __( "Success", 'nokri') .'|' . get_the_permalink( $nokri['sb_post_ad_page'] );
 		 die();
@@ -1859,5 +1931,180 @@ if ( ! function_exists( 'nokri_email_this_job' ) )
 		  echo '1';
 		  die(); 
 	   }
+	}
+}
+
+
+/************************************/
+/* Ajax handler for Adding Gallery */
+/************************************/
+
+add_action('wp_ajax_nokri_upload_comp_image', 'nokri_upload_comp_image');
+
+if ( ! function_exists( 'nokri_upload_comp_image' ) ) {
+function nokri_upload_comp_image(){
+    global $nokri;
+	$user_id	     =	get_current_user_id();
+	/*demo check */
+	$is_demo =  nokri_demo_mode();
+	if($is_demo)
+	{ 
+		echo '0|' . esc_html__( "Edit in demo user not allowed", 'nokri' );
+		die(); 
+	}
+	require_once ABSPATH . 'wp-admin/includes/image.php';
+	require_once ABSPATH . 'wp-admin/includes/file.php';
+	require_once ABSPATH . 'wp-admin/includes/media.php';
+	
+	$size_arr	    =	explode( '-', $nokri['sb_comp_img_size'] );
+	$display_size	=	$size_arr[1];
+	$actual_size	=	$size_arr[0];
+	
+	// Allow certain file formats
+	$imageFileType	   =	strtolower(end( explode('.', $_FILES['my_file_upload']['name'] ) ));
+	if($imageFileType !=    "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+	&& $imageFileType != "gif" )
+	{
+		echo '0|' . esc_html__( "Sorry, only JPG, JPEG, PNG & GIF files are allowed.", 'nokri' );
+		die();
+	}
+	 
+	 // Check file size
+	if ($_FILES['my_file_upload']['size'] > $actual_size) 
+	{
+		echo '0|' . esc_html__( "Max allowd image size is", 'nokri' ) . " " . $display_size;
+		die();
+	}
+	
+	
+	
+	// Check max image limit
+     $user_portfolio	 =	get_user_meta( $user_id, '_comp_gallery', true );
+     if( $user_portfolio != "" )
+     {
+      $media =  explode( ',', $user_portfolio );
+      if( count($media) >= $nokri['sb_comp_img_limit'] )
+      {
+       echo '0|' . esc_html__( "You can not upload more than ", 'nokri' ) . " " . $nokri['sb_comp_img_limit']." ".esc_html__( "images ", 'nokri' );
+       die();
+      }
+     }
+
+	
+	$attachment_id  =   media_handle_upload( 'my_file_upload', 0 );
+	
+	if(!is_wp_error( $attachment_id ))
+	{
+		
+		$user_portfolio	 =	get_user_meta( $user_id, '_comp_gallery', true );
+		if( $user_portfolio != "" )
+		{
+			$updated_portfolio	=	$user_portfolio . ',' . $attachment_id;
+		}
+		else
+		{
+			$updated_portfolio	=	$attachment_id;
+		}
+		
+		update_user_meta( $user_id, '_comp_gallery', sanitize_text_field($updated_portfolio) );
+	}
+	else
+	{
+		echo '0|' . esc_html__( "Some thing went wrong", 'nokri' );
+		die();
+	}
+	
+	echo($attachment_id);
+	die();
+    
+}}
+
+/************************************/
+/* Ajax handler for Getting Gallery */
+/************************************/
+add_action('wp_ajax_get_uploaded_company_images', 'nokri_get_uploaded_portfolio_images');
+if ( ! function_exists( 'nokri_get_uploaded_portfolio_images' ) ) {
+function nokri_get_uploaded_portfolio_images()
+{
+	$user_id	     =	get_current_user_id();
+	$ids	         =	get_user_meta ( $user_id, '_comp_gallery', true );
+	
+	
+	if( !$ids ) return '';
+	
+	$ids_array	=	explode( ',', $ids );
+	
+	$result	=	array();
+	foreach( $ids_array as $m )
+	{
+		$obj	=	array();
+		$obj['name'] = get_the_guid($m);
+		$obj['size'] = filesize( get_attached_file( $m ) );
+		$obj['id'] = $m;
+		$result[] = $obj;	
+	}
+	header('Content-type: text/json');
+	header('Content-type: application/json');
+	echo json_encode($result);
+	die();
+}
+}
+
+/************************************/
+/* Ajax handler for Del Gallery */
+/************************************/
+add_action('wp_ajax_delete_comp_image', 'nokri_delete_ad_image');
+if ( ! function_exists( 'nokri_delete_ad_image' ) ) {
+function nokri_delete_ad_image()
+{
+	$user_crnt_id = get_current_user_id();
+	if( $user_crnt_id == "" )
+		die();
+		/*demo check */
+		$is_demo =  nokri_demo_mode();
+		if($is_demo)
+		{ 
+			echo '2';
+			die(); 
+		}
+	    $attachmentid	=	trim($_POST['img']);
+		wp_delete_attachment( $attachmentid, true );
+		if( get_user_meta( $user_crnt_id, '_comp_gallery', true ) != "" )
+		 {
+			$ids	=    get_user_meta( $user_crnt_id, '_comp_gallery', true );
+			$res	=	 str_replace($attachmentid, "", $ids);
+			$res	=	 str_replace(',,', ",", $res);
+			$img_ids= trim($res,',');
+			update_user_meta( $user_crnt_id, '_comp_gallery', sanitize_text_field($img_ids) );
+		 }	
+		 echo "1"; 
+		die();
+}  
+}
+/*******************************************/
+/* Ajax handler for emp deleting candidate */
+/******************************************/
+add_action('wp_ajax_del_this_candidate', 'nokri_del_this_candidate');
+add_action('nokri_del_this_candidate', 'nokri_del_this_candidate');
+if ( ! function_exists( 'nokri_del_this_candidate' ) )
+{
+function nokri_del_this_candidate()  
+{
+	global $nokri;
+	/*demo check */
+	$is_demo =  nokri_demo_mode();
+	if($is_demo)
+	{ 
+		echo '2';
+		die(); 
+	}	
+	$cand_id                =   $_POST['cand_id'];
+	$job_id                 =   $_POST['job_id'];
+	delete_post_meta($job_id, '_job_applied_resume_'.$cand_id);
+	delete_post_meta($job_id, '_job_applied_cover_'.$cand_id);
+	delete_post_meta($job_id, '_job_applied_status_'.$cand_id);
+	delete_post_meta($job_id, '_job_applied_date_'.$cand_id);
+    echo "1";
+	die();
 	}
 }

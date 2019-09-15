@@ -114,8 +114,18 @@ extract(shortcode_atts(array(
 		'prcing_bg_img' => '', 
 		'product_bg_img' => '',
 	) , $atts));
-
-
+	
+$user_id     =  get_current_user_id();
+$user_type   =  get_user_meta($user_id, '_sb_reg_type', true);	
+$pkg_updated =  get_user_meta($user_id, 'pkg_updated',true);
+/* Is applying job package base*/
+global $nokri;
+$is_apply_pkg_base = ( isset($nokri['job_apply_package_base']) && $nokri['job_apply_package_base'] != ""  ) ? $nokri['job_apply_package_base'] : false;
+if($is_apply_pkg_base && !$pkg_updated && $user_type != '0')
+{
+	/*update products */
+	echo nokri_update_products();
+}
 /*Section Job text */
 $section_title_for_job = (isset($section_job_txt) && $section_job_txt != "") ? $section_job_txt : esc_html__( 'Jobs', 'nokri' );	
 /* product image */
@@ -153,6 +163,7 @@ $product_img = ( $product_imgeURL != "" ) ? ' \\s\\t\\y\\l\\e="background:  url(
 						$li.= '<li>'.__('Validity','nokri').': '.get_post_meta( $row['product'], 'package_expiry_days', true ) . ' ' . __('Days','nokri').'</li>';
 					}
 					
+					/* Getting candidate search */
 					if (get_post_meta( $row['product'], 'is_candidates_search', true ))
 					{
 						if(get_post_meta( $row['product'], 'candidate_search_values', true ) == '-1')

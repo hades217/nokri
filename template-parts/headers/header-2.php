@@ -135,12 +135,14 @@ if(wp_basename(get_page_template()) == 'page-search.php' &&  $search_page_layout
 if(basename(get_page_template()) == 'page-dashboard.php' || $is_map) 
 {
 	$dashboard_class = 'n-admin-header';
-	$dashboard_fluid = '-fluid'; 
+	$dashboard_fluid = '-fluid';
+	$is_dashboard_page = true; 
 }
 else
 {
 	$dashboard_class = 'mega-menu fa-change-black'; 
 	$dashboard_fluid = '';
+	$is_dashboard_page = false;
 }
 
 /* Dashboard logo  */
@@ -198,3 +200,4 @@ if(basename(get_page_template()) == 'page-dashboard.php')
   }
  ?> 
 <div class="clearfix"></div>
+<input type="hidden" id="is_dashboard_page" value="<?php echo esc_attr($is_dashboard_page);?> ">

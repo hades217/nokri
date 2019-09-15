@@ -26,15 +26,15 @@ $job_currency              =      wp_get_post_terms($job_id, 'job_currency', arr
 $job_currency	           =	  isset( $job_currency[0] ) ? $job_currency[0] : '';
 $job_shift                 =      wp_get_post_terms($job_id, 'job_shift', array("fields" => "ids"));
 $job_shift	               =	  isset( $job_shift[0] ) ? $job_shift[0] : '';
-$job_skills                 =      wp_get_post_terms($job_id, 'job_skills', array("fields" => "ids"));
-$ad_mapLocation	 =     get_post_meta($job_id, '_job_address', true);
-$ad_map_lat	     =     get_post_meta($job_id, '_job_lat', true);
-$ad_map_long	 =     get_post_meta($job_id, '_job_long', true);
-$job_phone	     =     get_post_meta($job_id, '_job_phone', true);
-$job_vacancy	 =     get_post_meta($job_id, '_job_posts', true);
-$job_video	     =     get_post_meta($job_id, '_job_video', true);
-$cats	         =	   nokri_get_ad_cats ( $job_id, 'ID' );
-$post_date       =     get_the_date(' M j ,Y' ); 
+$job_skills                =      wp_get_post_terms($job_id, 'job_skills', array("fields" => "ids"));
+$ad_mapLocation	 		   =      get_post_meta($job_id, '_job_address', true);
+$ad_map_lat	     		   =      get_post_meta($job_id, '_job_lat', true);
+$ad_map_long	 		   =      get_post_meta($job_id, '_job_long', true);
+$job_phone	     		   =      get_post_meta($job_id, '_job_phone', true);
+$job_vacancy	 		   =      get_post_meta($job_id, '_job_posts', true);
+$job_video	     		   =      get_post_meta($job_id, '_job_video', true);
+$cats	         		   =	  nokri_get_ad_cats ( $job_id, 'ID' );
+$post_date       		   =      get_the_date(' M j ,Y' ); 
 /* Jobs aplly with */
 $job_apply_with	     =     get_post_meta($job_id, '_job_apply_with', true);
 $job_apply_url	     =     get_post_meta($job_id, '_job_apply_url', true); 
@@ -59,7 +59,6 @@ if( count((array)  $single_job_badges ) > 0)
 			$term_vals =  get_term_meta($val);
 			$bg_color  =  get_term_meta( $val, '_job_class_term_color_bg', true );
 			 $color    =  get_term_meta( $val, '_job_class_term_color', true );
-			
 			$style_color = '';
 			if($color != "" )
 			{
@@ -147,8 +146,6 @@ if( get_post_meta( $job_id, '_job_attachment', true ) != "" )
 					$file_icon = 'pdf';
 				}
 				$job_attachments    .=  '<li><a href="'.esc_url(wp_get_attachment_url($portfolio)).'"  target="_blank"><img src="'.get_template_directory_uri().'/images/icons/'.$file_icon.'.png" alt="'.esc_attr__( 'portfolio image', 'nokri' ).'"></a></li>';
-				
-				
 			}
 	}
  }	
@@ -197,7 +194,6 @@ if( isset( $nokri['single_job_advert_switch']) && $nokri['single_job_advert_swit
 	{
 		$advert_down = '<div class="n-advert-box">'.$nokri['single_job_advert_down'].'</div>';
 	}
-	
 }
 /* Check author profile status*/
 $emp_profile_status	= get_user_meta($post_author_id, '_user_profile_status', true);
@@ -223,3 +219,11 @@ if(isset($_GET['src']))
 }
 /*Is email job*/
 $is_email_job = isset($nokri['email_job_anyone_switch']) ? $nokri['email_job_anyone_switch']  : false;
+/* Is job alerts*/
+$job_alerts = ( isset($nokri['job_alerts_switch']) && $nokri['job_alerts_switch'] != ""  ) ? $nokri['job_alerts_switch'] : false;
+/* Job alert title*/
+$job_alerts_title = ( isset($nokri['job_alerts_title']) && $nokri['job_alerts_title'] != ""  ) ? $nokri['job_alerts_title'] : '';
+/* Job alert tagline*/
+$job_alerts_tagline = ( isset($nokri['job_alerts_tagline']) && $nokri['job_alerts_tagline'] != ""  ) ? $nokri['job_alerts_tagline'] : '';
+/* Job alert btn*/
+$job_alerts_btn = ( isset($nokri['job_alerts_btn']) && $nokri['job_alerts_btn'] != ""  ) ? $nokri['job_alerts_btn'] : '';

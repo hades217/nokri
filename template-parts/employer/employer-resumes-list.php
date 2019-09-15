@@ -16,9 +16,9 @@ $user_id   =   get_current_user_id();
 $apllied_actions =  nokri_canidate_apply_status();
 $options         =  '';
 foreach( $apllied_actions as $val => $key )
-  {
-	  $options .= '<option value="'.esc_attr($val).'">'.esc_html($key).'</option>';
-  }
+{
+  $options .= '<option value="'.esc_attr($val).'">'.esc_html($key).'</option>';
+}
 
 
 $cand_msg = esc_html__( 'No candidate sorted with this status', 'nokri' );  
@@ -123,6 +123,7 @@ if ($authors)
 	   $job_date	      =   get_post_meta( $job_id, '_job_applied_date_'.$candidate_id, true);
 	   $cand_cover	      =   get_post_meta( $job_id, '_job_applied_cover_'.$candidate_id, true);
 	   $cand_intro_vid    =   get_user_meta( $candidate_id, '_cand_intro_vid', true);
+	   $user_job_key      =   $candidate_id.'|'.$job_id;
 	   $array_data	      =	  explode( '|',  $cand_resume );
 	   $attachment_id     =	  $array_data[1];
 	   /*Resume status colours*/
@@ -204,7 +205,8 @@ if ($authors)
 								<a href="javascript:void(0)" class="label label-success candidate_resume_action" data-applierId="'.esc_attr($candidate_id).'" data-jobid="'.esc_attr($job_id).'"  data-toggle="modal" data-target="#myModal"><i class="la la-files-o"></i></a></li>
 													
                                                     	<li class="tool-tip candidate_short_det" title="'.esc_attr__('Application Details','nokri').'" data-applierId="'.esc_attr($candidate_id).'" data-jobid="'.esc_attr($job_id).'" data-attachid="'.esc_attr($attachment_id).'" ><a href="" class="label label-info" data-toggle="modal" data-target="#short-detail-modal" ><i class="la la-edit"></i></a></li>
-														<li class="tool-tip" title="'.esc_attr__('View Video','nokri').'"><a class="bla-1" href="'.esc_html($cand_intro_vid).'"><i class="la la-file-video-o"></i></a></li>
+														'.$video_pop.'
+														<li class="tool-tip del-this-resume" data-resume-id="'.esc_attr($user_job_key).'" title="'.esc_attr__('Delete Resume','nokri').'"><i class="la la la-trash"></i></li>
 						</ul>
 					</div>';
 	   $sr_no++;

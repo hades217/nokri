@@ -259,7 +259,14 @@ if( isset( $nokri['search_job_advert_switch']) && $nokri['search_job_advert_swit
 	}
 	
 }
-
+/* Is job alerts*/
+$job_alerts = ( isset($nokri['job_alerts_switch']) && $nokri['job_alerts_switch'] != ""  ) ? $nokri['job_alerts_switch'] : false;
+/* Job alert title*/
+$job_alerts_title = ( isset($nokri['job_alerts_title']) && $nokri['job_alerts_title'] != ""  ) ? $nokri['job_alerts_title'] : '';
+/* Job alert tagline*/
+$job_alerts_tagline = ( isset($nokri['job_alerts_tagline']) && $nokri['job_alerts_tagline'] != ""  ) ? $nokri['job_alerts_tagline'] : '';
+/* Job alert btn*/
+$job_alerts_btn = ( isset($nokri['job_alerts_btn']) && $nokri['job_alerts_btn'] != ""  ) ? $nokri['job_alerts_btn'] : '';
 
 ?>
 <div class="search-page-with-map sidebars">
@@ -284,6 +291,17 @@ if( isset( $nokri['search_job_advert_switch']) && $nokri['search_job_advert_swit
                       </div>
                    </div>
                     <?php echo ($advert_up); ?>
+                      <?php if($job_alerts) { ?>
+                           <div class="jobs-alert-box">
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                   <span><?php echo esc_html($job_alerts_title); ?></span>
+                                   <p><?php echo esc_html($job_alerts_tagline); ?></p>
+                                </div>
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                    <a href="javascript:void(0)" class="btn n-btn-flat job_alert"><?php echo esc_html($job_alerts_title); ?></a>
+                                </div>
+                             </div>
+                    	 <?php } ?>
                    <div class="n-search-listing n-featured-jobs featured">
                       <div class="n-featured-job-boxes">
                         <?php
@@ -313,13 +331,13 @@ if( isset( $nokri['search_job_advert_switch']) && $nokri['search_job_advert_swit
                       <div class="n-featured-job-boxes">
                          <?php
 						 	/* Regular Search Query */
+							      $map_listings = '';
 								  $marker	= trailingslashit( get_template_directory_uri () ) . 'images/map-loacation.png';
 								  if( isset( $nokri['map_marker_img']['url'] ) && $nokri['map_marker_img']['url'] != "" )
 									{
 										$marker1 = array($nokri['map_marker_img']['url']);
 										$marker  = 	$marker1[0];
 									}
-								   $map_listings = '';
 								   if ( $results->have_posts() ) {
 									$map_listings = '<script>
 									 var addressPoints = [';
@@ -378,7 +396,7 @@ if( isset( $nokri['search_job_advert_switch']) && $nokri['search_job_advert_swit
     <?php echo $map_listings; ?>
 <script>
 
-jQuery(document).ready(function () {
+jQuery( window ).load(function() {
 var ps = new PerfectScrollbar('.side-filters');
 var ps = new PerfectScrollbar('.side-listings');
 });

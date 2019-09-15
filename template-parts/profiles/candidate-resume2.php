@@ -19,7 +19,6 @@ $registered        =  $author->user_registered;
 $cand_skills   = $cand_skills_values = array();
 $cand_skills_values	= get_user_meta($user_crnt_id, '_cand_skills_values', true);
 $cand_skills	= get_user_meta($user_crnt_id, '_cand_skills', true);
-
 if( isset($cand_skills) && !empty($cand_skills) &&  count($cand_skills) > 0 )
 {
 	foreach($cand_skills as $key => $csv )
@@ -36,12 +35,10 @@ if( isset($cand_skills) && !empty($cand_skills) &&  count($cand_skills) > 0 )
 					$skill_lavel = $cand_skills_values[$key];
 				}
 			}			
-			
 			$array_skills[] = array("name" => $term->name, "value" => $skill_lavel);	
 		}
 	}
 }
-	
 $skills_bar = '';
 if(isset($array_skills) && !empty($array_skills))
 {
@@ -142,6 +139,8 @@ if( isset( $nokri['cand_search_mode'] ) && $nokri['cand_search_mode'] == "2" && 
 }
 /*Social links hide/show*/
 $social_links = isset($nokri['user_contact_social']) ? $nokri['user_contact_social']  : true;
+/* Advertisment */
+$cand_advertisment = isset($nokri['cand_advertisment']) ? $nokri['cand_advertisment']  : '';
 ?>
 <section class="n-breadcrumb-big" <?php echo nokri_section_bg_url(); ?>>
          <div class="container">
@@ -187,7 +186,6 @@ $social_links = isset($nokri['user_contact_social']) ? $nokri['user_contact_soci
 								update_user_meta($current_user_id, '_sb_cand_search_value', (int)$remaining_searches - 1);
 							}
 						  }
-						
 					}
 				}
 			 ?>
@@ -286,7 +284,14 @@ $social_links = isset($nokri['user_contact_social']) ? $nokri['user_contact_soci
                                     <button type="submit" class="btn n-btn-flat btn-mid btn-block contact_me"><?php echo esc_html__( 'Message', 'nokri' ); ?></button>
                                  </form>
                      </div>
-                      <?php } ?>
+            <?php } ?>
+              <?php if(isset($cand_advertisment) && $cand_advertisment != '') { ?>
+             <div class="n-candidate-info">
+              <h4 class="widget-heading"><?php echo esc_html__( 'Advertisement', 'nokri' ); ?></h4>
+              <?php echo ($cand_advertisment); ?>
+               </div>
+               <?php } ?>
+                      
                   </aside>
                </div>
                <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12 col-lg-pull-3 col-md-pull-4">

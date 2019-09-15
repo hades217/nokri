@@ -19,10 +19,19 @@ if( get_user_meta( $user_crnt_id, '_cand_portfolio', true ) != "" )
  }
 /* Getting Count Apllied Jobs */	 
  $args  = array(
-'post_type'  => 'job_post',
-'orderby'    => 'date',
-'order'      => 'DESC',
-'meta_query' => array( array( 'key'   => '_job_applied_resume_'.$user_crnt_id)),
+'post_type'   => 'job_post',
+'orderby'     => 'date',
+'order'       => 'DESC',
+'post_status' => array('publish'), 
+'meta_query'  => array(
+'relation'    => 'AND',
+				array( 'key'   => '_job_applied_resume_'.$user_crnt_id),
+				array(
+					'key'     => '_job_status',
+					'value'   => 'active',
+					'compare' => '='
+				),
+				),
 );
 $query = new WP_Query( $args );
 $applied_jobs = $query->found_posts;
@@ -44,6 +53,7 @@ if($cand_skills != '')
 
 	}
 $intro = get_user_meta($user_crnt_id, '_cand_intro', true);
+$cand_video	    = get_user_meta($user_crnt_id, '_cand_video', true);
 /* Low profile txt*/
 $profile_percent = get_user_meta($user_crnt_id, '_cand_profile_percent', true);
 $user_low_profile_txt = ( isset($nokri['user_low_profile_txt']) && $nokri['user_low_profile_txt'] != ""  ) ? $nokri['user_low_profile_txt'] : ""; 	
@@ -179,6 +189,22 @@ $certi_detail	= (isset($certification['certification_desc']))  ? '<div class="in
                    </ul>
                 </div>
              </div>
+             <?php }
+			  if(!empty($cand_video)){ 
+			  $rx = '~
+			  ^(?:https?://)?                           # Optional protocol
+			   (?:www[.])?                              # Optional sub-domain
+			   (?:youtube[.]com/watch[?]v=|youtu[.]be/) # Mandatory domain name (w/ query string in .com)
+			   ([^&]{11})                               # Video id of 11 characters as capture group 1
+				~x';
+				$valid = preg_match($rx, $cand_video, $matches);
+				$cand_video = $matches[1];  ?>
+				<div class="timeline-box">
+				<h4><?php echo esc_html__( 'Portfolio video:', 'nokri' ); ?>  </h4>
+				<div class="n-my-portfolio">
+				   <iframe width="830" height="380" src="https://www.youtube.com/embed/<?php echo "".($cand_video); ?>" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+				</div>
+			 </div>
              <?php } ?>
           </div>
        </div>

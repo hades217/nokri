@@ -2202,6 +2202,8 @@ if ( ! function_exists( 'nokri_static_strings' ) )
 	 'action_remove'    => esc_html__( 'Remove File', 'nokri' ),
 	 'browse_btn'       => esc_html__( 'Browse', 'nokri' ),
 	 'remove_btn'       => esc_html__( 'Remove', 'nokri' ),
+	 'new_btn'          => esc_html__( 'New', 'nokri' ),
+	 'showNumber'       => esc_html__( 'Show Number', 'nokri' ),
 	 /* For Regteration Email */
 	 'rgstr_info'       => esc_html__( 'Information', 'nokri' ),
 	 'rgstr_resend'    	=> esc_html__( 'Resend email', 'nokri' ), 
@@ -2217,6 +2219,11 @@ if ( ! function_exists( 'nokri_static_strings' ) )
 	 'degpercntplc' 	=> esc_html__( 'Only digits allowed without % sign e.g 80.0', 'nokri' ),
 	 'deggradplc'   	=> esc_html__( 'Only grade letter e.g A+,B,C', 'nokri' ),
 	 'degdesc' 			=> esc_html__( 'Description', 'nokri' ),
+	 'degremov' 		=> esc_html__( 'Remove', 'nokri' ),
+	  /* For Skills */
+	 'skillshead' 		=> esc_html__( 'Add another skill (new)', 'nokri' ),
+	 'skilltitle' 		=> esc_html__( 'Skill Title', 'nokri' ),
+	 'skillvalue' 		=> esc_html__( 'Skill Value', 'nokri' ),
 	 'degremov' 		=> esc_html__( 'Remove', 'nokri' ),
 	 /* For Profession */
 	 'projthead' 		=> esc_html__( 'Profession additional field', 'nokri' ),
@@ -2485,9 +2492,9 @@ if ( ! function_exists( 'nokri_radius_search_theme' ) )
    $distance     = $nearby_data['distance'];
    
    $lat      = $original_lat; //latitude
-   $lon    = $original_long; //longitude
+   $lon      = $original_long; //longitude
    $distance = $distance; //your distance in KM
-   $R     = 6371.009; //constant earth radius. You can add precision here if you wish
+   $R        = 6371.009; //constant earth radius. You can add precision here if you wish
    
    $maxLat = $lat + rad2deg($distance/$R);
    $minLat = $lat - rad2deg($distance/$R);
@@ -2509,4 +2516,174 @@ if ( ! function_exists( 'nokri_radius_search_theme' ) )
   
   return $data;
  }
+}
+
+/* ======================================== */
+/* Getting candiates job alerts Frequency   */
+/* ======================================== */
+
+if ( ! function_exists( 'nokri_get_candidates_job_alerts_freq' ) )
+ {
+	function nokri_get_candidates_job_alerts_freq($getvalue = '' )
+	 {
+		$frequency_array = array(
+			"1" 		=> __( "Daily", 'nokri' ),
+			"7" 	    => __( "Weekly", 'nokri' ),
+			"15" 		=> __( "Fortnightly", 'nokri' ),
+			"30" 		=> __( "Monthly", 'nokri' ),
+			"12" 		=> __( "Yearly", 'nokri' ),
+		);
+	  return ( $getvalue == "" ) ? $frequency_array : $frequency_array["$getvalue"];
+	}
+}
+
+/*==============================*/
+/* Getting candiates job alerts */
+/*===============================*/
+
+if ( ! function_exists( 'nokri_get_candidates_job_alerts' ) ) 
+{
+	function nokri_get_candidates_job_alerts($user_id = '')
+	{
+		global $wpdb;
+		/* Query For Getting All Resumes Against Job */
+		$query	= "SELECT meta_key, meta_value FROM $wpdb->usermeta WHERE user_id = '$user_id' AND meta_key like '_cand_alerts_$user_id%' ";
+		$resumes = $wpdb->get_results( $query );
+		$data = array();
+		foreach ( $resumes as $resume ) 
+		{
+			$value = json_decode( $resume->meta_value, true );
+			$data["$resume->meta_key"] = $value;
+		}
+		return $data;
+	}
+}
+
+/*======================================*/
+/* Getting candidates alerts categories */
+/*======================================*/
+if ( ! function_exists( 'nokri_get_alerts_category_subscription' ) ) 
+{
+	function nokri_get_alerts_category_subscription($user_id = '')
+	{
+		$job_alert = nokri_get_candidates_job_alerts($user_id);
+		if(isset($job_alert) && !empty($job_alert))
+		{
+			$terms = array();
+			foreach( $job_alert as $key => $val )
+			{
+				$terms[]     =   $val['alert_category'];
+			}
+		}
+		return $terms;
+	}
+}
+
+
+/*==============================*/
+/* Query sending job alerts*/
+/*===============================*/
+
+if ( ! function_exists( 'nokri_send_alerts_jobs' ) ) 
+{
+	function nokri_send_alerts_jobs($user_id = '')
+	{
+		$today = getdate();
+		$current_id   =  $user_id;
+		$query = array(
+						   'post_type'      => 'job_post',
+						   'post_status'    => 'publish',
+						   'posts_per_page' => -1,
+						   'orderby'        => 'date',
+						   'order'          => 'DESC',
+						   'date_query'     => array(
+							array(
+							  'year'  => $today['year'],
+							  'month' => $today['mon'],
+							  'day'   => $today['mday'],
+							),
+						  ),
+						   );  
+		$loop             = new WP_Query($query);
+		$notification     = '';
+		while ( $loop->have_posts() ) 
+		{ 
+			$loop->the_post();
+			$job_id         =  	get_the_ID();
+			$job_skills     =   wp_get_post_terms($job_id, 'job_category', array("fields" => "ids"));
+			$post_author_id =  	get_post_field( 'post_author', $job_id );
+	        $company_name   = 	get_the_author_meta( 'display_name', $post_author_id ); 
+			$cand_skills	= 	nokri_get_alerts_category_subscription($current_id);
+			if (is_array($job_skills) && is_array($cand_skills))
+			{
+				$final_array = array_intersect($job_skills, $cand_skills);
+				if (count($final_array) > 0) 
+				{
+					$notification = $job_id;
+				}
+			}
+		}
+		wp_reset_postdata();
+		return $notification;
+	}
+}
+
+/*==============================*/
+/* Sending automatic scheduled email*/
+/*===============================*/
+
+if (!wp_next_scheduled('nokri_job_alerts'))
+{
+       wp_schedule_event(time(), 'daily', 'nokri_job_alerts');
+}
+add_action('nokri_job_alerts', 'nokri_job_alerts_function');
+function nokri_job_alerts_function() 
+{
+    $args   = 	array (
+			   'order' 		   =>  'DESC',
+			   'meta_query'    =>  array(
+			   'relation'      =>  'AND',
+				array(
+					'key'      => '_sb_reg_type',
+					'value'    => '0',
+					'compare'  => '='
+				),
+				array(
+					 'key'     => '_cand_alerts_en',
+					 'value'   => '',
+					 'compare' => '!='
+				       ),
+			    ),
+				);
+	$user_query = new WP_User_Query($args);	
+	$candidates = $user_query->get_results();
+	$required_user_html = '';
+	if (!empty($candidates))
+	{
+		foreach ($candidates as $candidate)
+		{
+			$user_id   =  $candidate->ID;
+			$job_alert =  nokri_get_candidates_job_alerts($user_id);
+			if(isset($job_alert) && !empty($job_alert))
+			{
+				foreach( $job_alert as $key => $val )
+				{
+					$alert_name       =  $val['alert_name'];
+					$alert_category   =  $val['alert_category'];
+					$alert_email      =  $val['alert_email'];
+					$alert_freq       =  $val['alert_frequency'];
+					$alert_start      =  $val['alert_start'];
+					$date_to_sent     =  date('Y/m/d', strtotime($alert_start . "+$alert_freq days"));
+					$today            =  date('Y/m/d');
+					if($date_to_sent  == $today )
+					{
+						$val['alert_start'] = $date_to_sent;
+						$my_alert = json_encode($val);
+						nokri_email_job_alerts($job_id,$user_email);
+						update_user_meta( $user_id, $key, ($my_alert));
+					}
+				}
+			}
+		}
+	}
 }

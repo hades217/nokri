@@ -121,49 +121,7 @@ $user_profile_dashboard_txt = ( isset($nokri['user_profile_dashboard_txt']) && $
                                 </div>
                         <a href="javascript:void(0)" class="menu-dashboard"> <i class="ti-menu-alt"></i></a>
                         <ul id="accordion" class="accordion">
-                          <li>
-                             <a href="<?php echo get_the_permalink(); ?>"> <span class="fa fa-dashboard"></span><?php echo esc_html__( 'Dashboard', 'nokri' ); ?></a>
-                          </li>
-                          <li>
-                            <a href="<?php echo get_the_permalink(); ?>?tab-data=edit-profile"> <span class="fa fa-list"></span><?php echo esc_html__( 'Update Profile', 'nokri' ); ?></a>
-                          </li>
-                          <li>
-                            <a href="<?php echo esc_url(get_author_posts_url($user_id)); ?>"> <span class="fa fa-user"></span><?php echo esc_html__( 'View My Profile', 'nokri' ); ?></a>
-                          </li>
-                          <li>
-                            <div class="profile-menu-link">
-                              <span class="fa fa-file-archive-o"></span><?php echo esc_html__( 'My Jobs', 'nokri' ); ?><i class="fa fa-angle-down"></i>
-                            </div>
-                            <ul class="submenu">
-                              <li><a href="<?php echo get_the_permalink(); ?>?tab-data=active-jobs"><?php echo esc_html__( ' Active Jobs', 'nokri' ); ?></a></li>
-                              <li><a href="<?php echo get_the_permalink(); ?>?tab-data=inactive-jobs"><?php echo esc_html__( ' In-Active Jobs', 'nokri' ); ?></a></li>
-                              <li><a href="<?php echo get_the_permalink(); ?>?tab-data=pending-jobs"><?php echo esc_html__( 'Pending Jobs', 'nokri' ); ?></a></li>
-                            </ul>
-                          </li>
-                          <li>
-                            <div class="profile-menu-link">
-                              <span class="fa fa-envelope-o"></span><?php echo esc_html__( 'Email Templates', 'nokri' ); ?><i class="fa fa-angle-down"></i>
-                            </div>
-                            <ul class="submenu">
-                              <li><a href="<?php echo get_the_permalink(); ?>?tab-data=email-templates"><?php echo esc_html__( 'Add Email Template', 'nokri' ); ?></a></li>
-                              <li><a href="<?php echo get_the_permalink(); ?>?tab-data=email-templates-list"><?php echo esc_html__( 'Email Templates', 'nokri' ); ?></a></li>
-                            </ul>
-                          </li>
-                          <li>
-                            <a href="<?php echo get_the_permalink(); ?>?tab-data=saved-resumes"> <span class="fa fa-newspaper-o"></span><?php echo esc_html__( 'Saved Resumes', 'nokri' ); ?></a>
-                          </li>
-                          <li>
-                            <a href="<?php echo get_the_permalink(); ?>?tab-data=our-followers"> <span class="fa fa-users"></span><?php echo esc_html__( ' Followers', 'nokri' ); ?></a>
-                          </li>
-                          <li>
-                            <a href="<?php echo get_the_permalink(); ?>?tab-data=my-packages"> <span class="fa fa-file-archive-o"></span><?php echo esc_html__( 'My Package', 'nokri' ); ?></a>
-                          </li>
-                          <li>
-                            <a href="<?php echo get_the_permalink(); ?>?tab-data=my-orders"> <span class="fa fa-file-text-o"></span><?php echo esc_html__( 'My Orders', 'nokri' ); ?></a>
-                          </li>
-                          <li>
-                            <a href="<?php echo wp_logout_url( home_url() ); ?>"><span class="fa fa-sign-out"></span><?php echo esc_html__( ' Logout', 'nokri' ); ?></a>
-                          </li>
+                        <?php echo nokri_employer_menu_sorter($user_id); ?>
                         </ul>
                     </div>
                 </div>
@@ -225,4 +183,6 @@ $user_profile_dashboard_txt = ( isset($nokri['user_profile_dashboard_txt']) && $
             </div>
         </div>
     </div>
+    <input type="hidden" id="is_accordion" value="1">
 </section>
+

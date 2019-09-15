@@ -69,6 +69,16 @@
                      <h4><?php echo esc_html__('Job Description', 'nokri' ); ?></h4>
                      <?php   the_content();?>
                   </div>
+                  <div class="jobs-alert-box">
+                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                           <span><?php echo esc_html($job_alerts_title); ?></span>
+                           <p><?php echo esc_html($job_alerts_tagline); ?></p>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                            <a href="javascript:void(0)" class="btn n-btn-flat job_alert"><?php echo esc_html($job_alerts_title); ?></a>
+                        </div>
+                     </div>
+                  
                   <div class="n-skills">
                      <h5><i class="fa fa-tags"></i><?php echo nokri_feilds_label('skills_txt',esc_html__( 'Job skills', 'nokri' )); ?></h5>
                      <div class="n-skills-tags">
@@ -116,7 +126,7 @@
                         
                         <?php } else if ($job_apply_with == 'mail') { ?>
                         
-                        <a href=mailto:"<?php echo esc_url($job_apply_mail) ?>" class="btn n-btn-flat btn-mid btn-clear"><?php echo esc_html__('Apply now', 'nokri' ); ?></a>
+                        <a href=mailto:"<?php echo ($job_apply_mail) ?>" class="btn n-btn-flat btn-mid btn-clear"><?php echo esc_html__('Apply now', 'nokri' ); ?></a>
                         
                          
                          <?php } else  { ?>
@@ -151,6 +161,8 @@
 						}
 					}
 					 } else { ?><a href="javascript:void(0)" class="btn n-btn-flat btn-mid btn-clear"><?php echo esc_html__('Job Expired', 'nokri' ); ?></a> <?php } } ?>
+                     
+                     <a class="btn btn-block n-btn-custom-two save_job" href="javascript:void(0)" data-value=<?php echo esc_attr($job_id);?>><?php echo esc_html__('Save This Job', 'nokri' ); ?> </a>
                      
                      <?php if($is_email_job) { ?>
                      

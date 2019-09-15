@@ -1,7 +1,7 @@
 /*
 Theme Name: Nokri - Job Board WordPress Theme
 Author: ScriptsBundle
-Version: 1.1.4
+Version: 1.1.6
 Designed and Development by: ScriptsBundle
 
 ====================================
@@ -155,6 +155,7 @@ Designed and Development by: ScriptsBundle
 	position: relative;
 	overflow: hidden;
 	max-width: 70px;
+	max-height: 70px;
 	background-color: #FFF;
 	border:3px solid #FFF;	
 }
@@ -183,7 +184,6 @@ Designed and Development by: ScriptsBundle
 	box-shadow: 1px 0px 20px rgba(0,0,0,0.07);
 	width: 220px;
 	position: fixed;
-	overflow:auto;
 }
 .dashboard-new .profile-menu .accordion {
 	width: 100%;
@@ -191,6 +191,7 @@ Designed and Development by: ScriptsBundle
 	background: #FFF;
 	margin-bottom: 0;
 	margin-top:10px;
+	height: 500px;
 }
 .dashboard-new .profile-menu .accordion .profile-menu-link {
 	width: 100%;
@@ -2126,14 +2127,33 @@ Designed and Development by: ScriptsBundle
 /*ADD MORE BUTTONS*/
 .dashboard-new .main-body .dashboard-edit-profile .ad-more-btn {
 	position: absolute;
-	right: 148px;
-	bottom: 10px;	
+	right: 18px;
+	bottom: 0;
+	width:auto;	
 }
 .dashboard-new .main-body .dashboard-edit-profile .remove-btn {
-	position: absolute;
 	left: 15px;
-	bottom: -40px;
+    bottom: -50px;
+    width: auto;
+    position: absolute;
 }
+.dashboard-new .main-body .dashboard-edit-profile .ad_more_box #professional_fields .remove-btn {
+    bottom: 0;
+}
+.dashboard-new .main-body .dashboard-edit-profile .ad_more_box .form-group {
+	position:relative;
+	overflow:hidden;	
+}
+/*.dashboard-new .main-body .dashboard-edit-profile .ad_more_box .removeclass_edu {
+    position: relative;
+    background-color: #f9f9f9;
+    padding: 30px;
+    margin-top: 20px;
+}
+.dashboard-new .main-body .dashboard-edit-profile .ad_more_box .ad-more-btn {
+    right: 45px;
+    bottom: 30px;
+}*/
 .dashboard-new .main-body .dashboard-edit-profile .ad-more-btn .btn, .dashboard-new .main-body .dashboard-edit-profile .remove-btn .btn {
 	border-radius:3px;
 }
@@ -2141,10 +2161,13 @@ Designed and Development by: ScriptsBundle
 	position:relative;
 }
 .ad-more-box-single {
-	margin-bottom:50px;
+	margin-bottom:70px;
 	position:relative;
 	float:left;	
 	width:100%;
+}
+.ad-more-box-single:first-child {
+	margin-bottom:50px;	
 }
 /*HOW IT WORKS*/
 .how-it-works {

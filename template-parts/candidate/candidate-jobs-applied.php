@@ -47,52 +47,56 @@ if(isset($_GET['job_name']))
  //pagination
 $paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
 $args  = array(
-	'post_type'  => 'job_post',
-	's'          => $job_name,
-	'paged'      => $paged,
-	'posts_per_page' => get_option( 'posts_per_page' ),
-	'meta_key' => '_job_applied_date_'.$current_id,	
-	'orderby' => 'meta_value',
-	'order'      => 'date',
-	'meta_query' => array(
-								
-								array( 'key'   => '_job_applied_resume_'.$current_id)
-						)
-);
+		'post_type'  		=> 'job_post',
+		's'          		=> $job_name,
+		'paged'      		=> $paged,
+		'posts_per_page' 	=> get_option( 'posts_per_page' ),
+		'meta_key' 			=> '_job_applied_date_'.$current_id,	
+		'orderby' 			=> 'meta_value',
+		'order'      		=> 'date',
+		'meta_query'        => array(
+        'relation'          => 'AND',
+								array( 'key'   => '_job_applied_resume_'.$current_id),
+								array(
+									'key' => '_job_status',
+									'value' => 'active',
+									'compare' => '='
+								),
+    							),
+									);
 $query = new WP_Query( $args );
-	if ( $query->have_posts() )
-	{
- $count = 1;
-  while ( $query->have_posts() )
-  { 
+if ( $query->have_posts() )
+{
+	  $count = 1;
+	  while ( $query->have_posts() )
+	  { 
 		$query->the_post();
 		$query->post_author;
-		
-$job_id           =     get_the_id();
-$post_author_id   =     get_post_field( 'post_author', $job_id );
-$company_name     =     get_the_author_meta( 'display_name', $post_author_id );	
-$job_type       = wp_get_post_terms($job_id, 'job_type', array("fields" => "ids"));
-$job_type	    = isset( $job_type[0] ) ? $job_type[0] : '';
-$job_salary     =  wp_get_post_terms($job_id, 'job_salary', array("fields" => "ids"));
-$job_salary	    =  isset( $job_salary[0] ) ? $job_salary[0] : '';
-$job_currency   =  wp_get_post_terms($job_id, 'job_currency', array("fields" => "ids"));
-$job_currency	=  isset( $job_currency[0] ) ? $job_currency[0] : '';
-$job_salary_type =  wp_get_post_terms($job_id, 'job_salary_type', array("fields" => "ids"));
-$job_salary_type =	isset( $job_salary_type[0] ) ? $job_salary_type[0] : '';
-$job_date	      =     get_post_meta($job_id, '_job_applied_date_'.$current_id, true);
-$job_date	      =     date_i18n(get_option('date_format'), strtotime($job_date));
-$job_cvr		  =     get_post_meta($job_id, '_job_applied_resume_'.$current_id, true);
-/* Getting Company  Profile Photo */
-$image_link[0] =  get_template_directory_uri(). '/images/candidate-dp.jpg';
-if( isset( $nokri['nokri_user_dp']['url'] ) && $nokri['nokri_user_dp']['url'] != "" )
-{
-	$image_link = array($nokri['nokri_user_dp']['url']);	
-}
-if( get_user_meta($post_author_id, '_sb_user_pic', true ) != "" )
-{
-	$attach_id =	get_user_meta($post_author_id, '_sb_user_pic', true );
-	$image_link = wp_get_attachment_image_src( $attach_id, 'nokri_job_post_single' );
-}			
+		$job_id           =     get_the_id();
+		$post_author_id   =     get_post_field( 'post_author', $job_id );
+		$company_name     =     get_the_author_meta( 'display_name', $post_author_id );	
+		$job_type         =     wp_get_post_terms($job_id, 'job_type', array("fields" => "ids"));
+		$job_type	      =     isset( $job_type[0] ) ? $job_type[0] : '';
+		$job_salary       =     wp_get_post_terms($job_id, 'job_salary', array("fields" => "ids"));
+		$job_salary	      =     isset( $job_salary[0] ) ? $job_salary[0] : '';
+		$job_currency     =     wp_get_post_terms($job_id, 'job_currency', array("fields" => "ids"));
+		$job_currency	  =     isset( $job_currency[0] ) ? $job_currency[0] : '';
+		$job_salary_type  =     wp_get_post_terms($job_id, 'job_salary_type', array("fields" => "ids"));
+		$job_salary_type  =	    isset( $job_salary_type[0] ) ? $job_salary_type[0] : '';
+		$job_date	      =     get_post_meta($job_id, '_job_applied_date_'.$current_id, true);
+		$job_date	      =     date_i18n(get_option('date_format'), strtotime($job_date));
+		$job_cvr		  =     get_post_meta($job_id, '_job_applied_resume_'.$current_id, true);
+		/* Getting Company  Profile Photo */
+		$image_link[0] =  get_template_directory_uri(). '/images/candidate-dp.jpg';
+		if( isset( $nokri['nokri_user_dp']['url'] ) && $nokri['nokri_user_dp']['url'] != "" )
+		{
+			$image_link = array($nokri['nokri_user_dp']['url']);	
+		}
+		if( get_user_meta($post_author_id, '_sb_user_pic', true ) != "" )
+		{
+			$attach_id =	get_user_meta($post_author_id, '_sb_user_pic', true );
+			$image_link = wp_get_attachment_image_src( $attach_id, 'nokri_job_post_single' );
+		}			
 ?>
  <div class="posted-job-list jobs-saved">
     <ul class="list-inline">

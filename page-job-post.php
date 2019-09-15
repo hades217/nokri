@@ -652,7 +652,7 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
                             <input type="text" id="tags_tag_job" name="job_tags"  value="<?php echo ($tags); ?>" class="form-control" data-role="tagsinput"  <?php echo nokri_feilds_operat('allow_job_tags', 'required'); ?>/>
                          </div>
                       </div>
-                      <?php } } if($job_attachment) { ?>
+                      <?php } } if($job_attachment && $job_post_form == '0' ) { ?>
                       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                          <div class="form-group">
                          <label><?php echo esc_html__( 'Job Attachments', 'nokri' ); ?></label>
@@ -663,18 +663,20 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
                    </div>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                <?php if( nokri_feilds_operat('allow_job_countries', 'show')) { ?>
                    <div class="post-job-heading">
                       <h3><?php echo esc_html($job_country_level_heading); ?></h3>
                    </div>
                    <!--job country -->
                    <div class="form-group">
                     <label><?php echo esc_html($job_country_level_1 ); ?></label>
-                      <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo esc_attr($job_country_level_1 ); ?>" id="ad_country" name="ad_country">
+                      <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo esc_attr($job_country_level_1 ); ?>" id="ad_country" name="ad_country" <?php echo nokri_feilds_operat('allow_job_countries', 'required'); ?>>
                          <option value="0"><?php echo esc_html__( 'Select an option', 'nokri' ); ?></option>
                           <?php echo "".($country_html);?>
                       </select>
                       <input type="hidden" name="ad_country_id" id="ad_country_id" value="" />
                    </div>
+                   <?php } ?>
                     <!--job state -->
                    <div class="form-group" id="ad_country_sub_div">
                    <label><?php echo esc_html($job_country_level_2 ); ?></label>

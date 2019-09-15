@@ -76,7 +76,7 @@ function nokri_register_required_plugins()
             'slug' => 'nokri_framework',
             'source' => get_template_directory_uri() . '/required-plugins/nokri_framework.zip',
             'required' => true,
-            'version' => '1.1.4',
+            'version' => '1.2.0',
             'force_activation' => false,
             'force_deactivation' => false,
             'external_url' => '',
@@ -90,7 +90,7 @@ function nokri_register_required_plugins()
             'version' => '',
             'force_activation' => false,
             'force_deactivation' => false,
-            'external_url' => 'https://downloads.wordpress.org/plugin/contact-form-7.5.1.3.zip',
+            'external_url' => 'https://downloads.wordpress.org/plugin/contact-form-7.5.1.4.zip',
             'is_callable' => ''
         ),	
 		array(
@@ -101,7 +101,7 @@ function nokri_register_required_plugins()
             'version' => '',
             'force_activation' => false,
             'force_deactivation' => false,
-            'external_url' => 'https://downloads.wordpress.org/plugin/post-views-counter.1.2.14.zip',
+            'external_url' => 'https://downloads.wordpress.org/plugin/post-views-counter.1.3.1.zip',
             'is_callable' => ''
         ),
 		
@@ -125,7 +125,7 @@ function nokri_register_required_plugins()
             'version' => '',
             'force_activation' => false,
             'force_deactivation' => false,
-            'external_url' => 'https://downloads.wordpress.org/plugin/one-click-demo-import.2.5.1.zip',
+            'external_url' => 'https://downloads.wordpress.org/plugin/one-click-demo-import.2.5.2.zip',
             'is_callable' => ''
         ),
 		
@@ -137,7 +137,7 @@ function nokri_register_required_plugins()
 			'version'            => '', // E.g. 1.0.0. If set, the active plugin must be this version or higher. If the plugin version is higher than the plugin version installed, the user will be notified to update the plugin.
 			'force_activation'   => false, // If true, plugin is activated upon theme activation and cannot be deactivated until theme switch.
 			'force_deactivation' => false, // If true, plugin is deactivated upon theme switch, useful for theme-specific plugins.   
-			'external_url'       => esc_url( 'https://downloads.wordpress.org/plugin/woocommerce.3.6.4.zip'
+			'external_url'       => esc_url( 'https://downloads.wordpress.org/plugin/woocommerce.3.7.0.zip'
 			 ), // If set, overrides default API URL and points to an external URL.
 			'is_callable'        => '', // If set, this callable will be be checked for availability to determine if a plugin is active.
 		),

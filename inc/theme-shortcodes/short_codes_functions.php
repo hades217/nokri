@@ -334,6 +334,79 @@ if ( ! function_exists( 'nokri_top_employers_lists_shortcodes' ) )
 	}
 }
 
+/* =============================== */
+/*   Get All featured candidates   */
+/* ============================== */
+
+if ( ! function_exists( 'nokri_get_featured_candidates' ) )
+ {
+	function nokri_get_featured_candidates()
+	 {
+		   /* WP User Query */
+			$args 			= 	array (
+			'order' 		=> 	'DESC',
+			'meta_query'    =>  array(
+			'relation'      =>  'AND',
+				array(
+					'key'     => '_sb_reg_type',
+					'value'   => '0',
+					'compare' => '='
+				),
+				array(
+					'key'     => '_candidate_feature_profile',
+					'value'   => 'null',
+					'compare' => '!='
+				),
+			  ),
+		);
+		$user_query   = new WP_User_Query($args);	
+		$authors      = $user_query->get_results();
+		$count_res    = count($authors);
+		$employers_array = array();
+		if (!empty($authors))
+		{
+			$employers_array	= array();
+			if( count((array)  $authors ) > 0 && $authors != "" )
+			{
+				foreach( $authors as $author )
+				{
+					$employers_array[$author->display_name]	=	$author->ID;
+				}
+			}
+				return $employers_array;
+		}
+	}
+}
+
+
+
+// Update Products
+if ( ! function_exists( 'nokri_update_products' ) ) 
+{
+	function nokri_update_products()
+	{
+		    $user_id   = get_current_user_id();
+			$args	    =  array(
+			'post_type' => 'product',
+			'post_status' => 'publish',
+			'posts_per_page' => -1,
+			'order'=> 'DESC',
+			'orderby' => 'ID',
+			'meta_query' => array(array('key' => 'op_pkg_for','compare' => 'NOT EXISTS',),),);
+			$products	= array('Select Product' => '' );
+			$packages   = new WP_Query( $args );
+			if ( $packages->have_posts() )
+			{
+				while ( $packages->have_posts() )
+				{
+					$packages->the_post();
+					$product_id	=	get_the_ID();
+					update_post_meta($product_id, 'op_pkg_for',1);
+					update_user_meta($user_id, 'pkg_updated',1);
+				}
+			}
+	}
+}
 
 
 // Get Products
@@ -349,10 +422,39 @@ function nokri_get_products()
 	'post_status' => 'publish',
 	'posts_per_page' => -1,
 	'order'=> 'DESC',
-	'orderby' => 'ID'
-	);
+	'orderby' => 'ID',
+	'meta_query' => array(array('key' => 'op_pkg_for','value' => '1','compare' => '=',),),);
 	$products	= array('Select Product' => '' );
-	$packages = new WP_Query( $args );
+	$packages   = new WP_Query( $args );
+	if ( $packages->have_posts() )
+	{
+		while ( $packages->have_posts() )
+		{
+			$packages->the_post();
+			$products[get_the_title()]	=	get_the_ID();
+		}
+	}
+	return $products;
+}
+}
+
+// Get Products for candidate
+if ( ! function_exists( 'nokri_get_products_cand' ) ) {
+function nokri_get_products_cand()
+{
+	if ( !class_exists( 'WooCommerce' ) ) 
+	{
+		return;
+	}
+	$args	=	array(
+	'post_type' => 'product',
+	'post_status' => 'publish',
+	'posts_per_page' => -1,
+	'order'=> 'DESC',
+	'orderby' => 'ID',
+	'meta_query' => array(array('key' => 'op_pkg_for','value' => '0','compare' => '=',),),);
+	$products	= array('Select Product' => '' );
+	$packages   = new WP_Query( $args );
 	if ( $packages->have_posts() )
 	{
 		while ( $packages->have_posts() )

@@ -107,7 +107,9 @@ $user_profile_dashboard_txt = ( isset($nokri['user_profile_dashboard_txt']) && $
 /* Low profile txt*/
 $user_low_profile_txt_btn = ( isset($nokri['user_low_profile_txt_btn']) && $nokri['user_low_profile_txt_btn'] != ""  ) ? $nokri['user_low_profile_txt_btn'] : false;
 $profile_percent = get_user_meta($user_crnt_id, '_cand_profile_percent', true);
-$user_low_profile_txt = ( isset($nokri['user_low_profile_txt']) && $nokri['user_low_profile_txt'] != ""  ) ? $nokri['user_low_profile_txt'] : ""; 
+$user_low_profile_txt = ( isset($nokri['user_low_profile_txt']) && $nokri['user_low_profile_txt'] != ""  ) ? $nokri['user_low_profile_txt'] : "";
+/* Is applying job package base*/
+$is_apply_pkg_base = ( isset($nokri['job_apply_package_base']) && $nokri['job_apply_package_base'] != ""  ) ? $nokri['job_apply_package_base'] : false; 
  ?>
  <section class="dashboard-new candidate-dashboard">
             <div class="container-fluid">
@@ -134,31 +136,7 @@ $user_low_profile_txt = ( isset($nokri['user_low_profile_txt']) && $nokri['user_
                                 </div>
                              	<a href="javascript:void(0)" class="menu-dashboard"> <i class="ti-menu-alt"></i></a>
                                 <ul id="accordion" class="accordion">
-                                  <li>
-                                     <a href="<?php echo get_the_permalink(); ?>"> <span class="fa fa-dashboard"></span><?php echo esc_html__('Dashboard','nokri'); ?></a>
-                                  </li>
-                                  <li>
-                                    <a href="<?php echo get_the_permalink(); ?>?candidate-page=edit-profile"> <span class="fa fa-edit"></span><?php echo esc_html__('Update Profile','nokri'); ?></a>
-                                  </li>
-                                  <li>
-                                    <a href="<?php echo esc_url(get_author_posts_url($user_crnt_id)); ?>"> <span class="fa fa-user"></span><?php echo esc_html__( 'View My Profile', 'nokri' ); ?></a>
-                                  </li>
-                                  <li>
-                                    <a href="<?php echo get_the_permalink(); ?>?candidate-page=resumes-list"> <span class="fa fa-file-archive-o"></span><?php echo esc_html__('My Resumes','nokri'); ?></a>
-                                  </li>
-                                  <li>
-                                    <a href="<?php echo get_the_permalink(); ?>?candidate-page=jobs-applied"> <span class="fa fa-newspaper-o"></span><?php echo esc_html__('Jobs Applied','nokri'); ?></a>
-                                  </li>
-                                  
-                                  <li>
-                                    <a href="<?php echo get_the_permalink(); ?>?candidate-page=saved-jobs"> <span class="fa fa-heart-o"></span><?php echo esc_html__('Saved Jobs','nokri'); ?></a>
-                                  </li>
-                                   <li>
-                                    <a href="<?php echo get_the_permalink(); ?>?candidate-page=followed-companies"> <span class="fa fa-briefcase"></span><?php echo esc_html__('Followed Companies','nokri'); ?></a>
-                                  </li>
-                                  <li>
-                                    <a href="<?php echo wp_logout_url( home_url() ); ?>"><span class="fa fa-sign-out"></span><?php echo esc_html__('Logout','nokri'); ?></a>
-                                  </li>
+                                <?php echo nokri_candidate_menu_sorter($user_crnt_id); ?>
                                 </ul>
                             </div>
                         </div>
@@ -252,4 +230,5 @@ $user_low_profile_txt = ( isset($nokri['user_low_profile_txt']) && $nokri['user_
                    </div>
               </div>
           </div>
+          <input type="hidden" id="is_accordion" value="1">
 </section>

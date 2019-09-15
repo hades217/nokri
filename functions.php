@@ -71,6 +71,7 @@ if ( ! function_exists( 'nokri_setup' ) ) :
 	/* ------------------------------------------------ */
 	require trailingslashit( get_template_directory () )  . 'inc/theme-shortcodes/classes/candidate.php';
 	
+	
 	//Add Nokri Functionality to VC/*
  	if (class_exists('WPBakeryVisualComposerAbstract') ) {
 		function nokri_add_to_vc(){
@@ -79,7 +80,7 @@ if ( ! function_exists( 'nokri_setup' ) ) :
 		add_action('init','nokri_add_to_vc', 5);
 	
 	} 
-													}
+}
 	endif;
 	/* ------------------------------------------------ */
  	/*      Main Resources Functions                   */ 
@@ -137,6 +138,8 @@ if ( ! function_exists( 'nokri_setup' ) ) :
 	wp_enqueue_script( 'jquery-appear', trailingslashit( get_template_directory_uri () ) . 'js/jquery.appear.js', false, false, true );
 	/* Jquery-tipsy */
 	wp_enqueue_script( 'jquery-tipsy', trailingslashit( get_template_directory_uri () ) . 'js/jquery.tipsy.min.js', false, false, true );
+	/* Jquery-multifield */
+	wp_enqueue_script( 'jquery-multifield', trailingslashit( get_template_directory_uri () ) . 'js/jquery.multifield.min.js', false, false, true );
 	/* Icheck Library */
 	wp_enqueue_script( 'icheck', trailingslashit( get_template_directory_uri () ) . 'js/icheck.min.js', false, false, true );
 	/* theia-sticky-sidebar*/
@@ -235,12 +238,11 @@ if ( ! function_exists( 'nokri_setup' ) ) :
 		wp_enqueue_script( 'leaflet-markercluster');
 		wp_enqueue_script( 'leaflet-search');
 	}
-	if(isset( $nokri['search_page_layout'] ) && $nokri['search_page_layout'] == 3)
-	{
+	
 		/* perfect scroller  */
 	wp_enqueue_script( 'perfect-scrollbar', trailingslashit( get_template_directory_uri () ) . 'js/perfect-scrollbar.js', false, false, true );
 	wp_enqueue_style('perfect-scrollbar', get_template_directory_uri() .'/css/perfect-scrollbar.css', false);
-	}
+	
 	
 	if ( is_rtl() )
 	{

@@ -362,7 +362,7 @@ if(isset($login_btns_points) && $login_btns_points == 'pnt' )
 }
 else
 {
-	$final_html = '<div class="social-buttons"> '.($li).'</div>';
+	$final_html = '<div class="social-buttons"><ul> '.($li).'</ul></div>';
 }
 
 

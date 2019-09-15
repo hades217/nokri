@@ -122,6 +122,7 @@ $args = array(
    'number' 	    => $limit,
    'offset'	        => $offset,
    'role'           => 'subscriber',
+   'paged '         => $page,
    'meta_query' 	=> array(
         $type_qry,
 		$cands_qry,
@@ -145,13 +146,14 @@ else
 {
 	$users_found = esc_html__("No candidates found", 'nokri');
 }
-
 /* Search allowed */
 $is_allowed        =  nokri_is_cand_search_allowed();
 if(!$is_allowed)
 {
 	echo nokri_redirect( get_the_permalink($package_page) );
 }
+/* Layout style */
+$style = ( isset($nokri['cand_listing_style']) && $nokri['cand_listing_style'] != ""  ) ? $nokri['cand_listing_style'] : "1";
 ?>
 <section class="n-featured-candidates n-search-page"> 
      <div class="container">
@@ -198,89 +200,20 @@ if(!$is_allowed)
                              <div class="row">
                                 <div class="n-company-grids">
                                    <div class="row">
-                                   <div class="n-featured-candidates-box clear-custom">
-                                   <?php
-									/* Query User results */
-									if (!empty($users))
-									 {
-										// Loop through results
-										foreach ($users as $user) {
-											$cand_id  = $user->ID;
-											$canddata = get_userdata($cand_id);
-											/* Social links */
-											$cand_fb        = get_user_meta($cand_id, '_cand_fb', true);
-											$cand_twiter    = get_user_meta($cand_id, '_cand_twiter', true);
-											$cand_google    = get_user_meta($cand_id, '_cand_google', true);
-											$cand_linked    = get_user_meta($cand_id, '_cand_linked', true);
-											/* Profile Pic  */
-											$image_dp_link[0] =  get_template_directory_uri(). '/images/candidate-dp.jpg';
-											if( isset( $nokri['nokri_user_dp']['url'] ) && $nokri['nokri_user_dp']['url'] != "" )
-											{
-												$image_dp_link = array($nokri['nokri_user_dp']['url']);	
-											}
-											if(get_user_meta($cand_id, '_cand_dp', true ) != '')
-											{
-												$attach_dp_id     =  get_user_meta($cand_id, '_cand_dp', true );
-												$image_dp_link    =  wp_get_attachment_image_src( $attach_dp_id, '' );
-											}
-											if(empty($image_dp_link[0]))
-											{
-												$image_dp_link[0] =  get_template_directory_uri(). '/images/candidate-dp.jpg';
-											}
-											/* Getting Employer Skills  */
-											$emp_skills = get_user_meta($cand_id, '_cand_skills', true);
-											$skill_tags  = '';
-											if((array)$emp_skills  && $emp_skills > 0) 
-											  {
-												$taxonomies = get_terms('job_skills', array('hide_empty' => false , 'orderby'=> 'id', 'order' => 'ASC' ,  'parent'   => 0  ));
-												$total_skills = count($emp_skills) - 3;
-												if(count((array) $taxonomies) > 0)
-												 {
-													foreach($taxonomies as $taxonomy)
-														{
-															 if (in_array( $taxonomy->term_id, $emp_skills ))
-															 {
-																 $skill_tags .=   '<a href="'.get_the_permalink( $nokri['candidates_search_page'] ).'?cand_skills='.$taxonomy->term_id.'">'.esc_html($taxonomy->name).'</a>';
-															 }
-														}
-														if($total_skills > 1)
-														{
-															$skill_tags .=   '<a href="javascript:void(0)">'.$total_skills.'+</a>';
-														}
-													}
-												}
-											$cand_headline  = get_user_meta($cand_id, '_user_headline', true);
-											$emp_address   = get_user_meta($cand_id, '_cand_address', true);
-											$adress_html = '';
-											if($emp_address)
-											{
-												$adress_html = '<i class="fa fa-map-marker"></i><p>'.$emp_address.'</p>';
-											}
-											 ?>
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                           <div class="n-featured-single">
-                              <div class="n-featured-candidates-single-top">
-                                 <div class="n-candidate-title">
-                                    <h4><a href="<?php echo esc_url(get_author_posts_url($cand_id)); ?>"><?php echo esc_html( $user->display_name );  ?></a></h4>
-                                    <p><?php echo esc_html($cand_headline); ?></p>
-                                 </div>
-                                 <div class="n-canididate-avatar">
-                                   <a href="<?php echo esc_url(get_author_posts_url($cand_id)); ?>"><img src="<?php echo esc_url($image_dp_link[0]); ?>" class="img-responsive" alt="<?php echo esc_attr__( "logo", 'nokri' ); ?>"></a>
-                                 </div>
-                                 <div class="n-candidate-location">
-                                   <?php echo "".($adress_html); ?>
-                                 </div>
-                                 <div class="n-candidate-skills">
-                                  <?php echo "".$skill_tags; ?>
-                                 </div>
-                              </div>
-                              <div class="n-candidates-single-bottom">
-                                 <a href="<?php echo esc_url(get_author_posts_url($cand_id)); ?>"><?php echo esc_html__('View Profile','nokri'); ?></a>
-                              </div>
-                           </div>
-                        </div>
-                        				 <?php }  } ?>
-                                   </div>
+                                   <div class="n-featured-candidates-box mansi">
+									   <?php
+                                        /* Query User results */
+                                        if (!empty($users))
+                                         {
+                                            // Loop through results
+                                            foreach ($users as $user) 
+                                            {
+                                                $cand_id  = $user->ID;
+                                                echo nokri_candidates_get_grid_layouts($cand_id,$style);
+                                            } 
+                                        }
+                                       ?>
+                                   	  </div>
                                    </div>
                                 </div>
                              </div>

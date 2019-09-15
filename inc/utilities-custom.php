@@ -225,6 +225,36 @@ if( ! function_exists( 'nokri_employer_package_expire_notify' ) )
 		}
 }
 
+/* Candidate Package Expired Notification*/
+if( ! function_exists( 'nokri_candidate_package_expire_notify' ) )
+{
+	function nokri_candidate_package_expire_notify()
+	{
+		$user_id                =  get_current_user_id();
+		$pkg_message            =  '';
+		$applied_jobs     		=  get_user_meta($user_id, '_candidate_applied_jobs',true);
+		if($applied_jobs == '' || $applied_jobs == '0')
+		{
+			$pkg_message    = 'ae';
+		}
+		$expiry_date        =  get_user_meta($user_id, '_sb_expire_ads',true);
+		$today			    =  date("Y-m-d");
+		$expiry_date_string =  strtotime($expiry_date);
+		$today_string 		=  strtotime($today);
+		if($today_string > $expiry_date_string)
+		{
+			$pkg_message  = 'pe';
+			update_user_meta($user_id, '_candidate_applied_jobs','0');
+			update_user_meta($user_id, '_candidate_feature_profile','');
+		}
+		if($expiry_date == '')
+		{
+			$pkg_message  = 'np';
+		}
+		return $pkg_message;
+	}
+}
+
 
 if ( ! function_exists( 'nokri_randomString' ) ) {
 function nokri_randomString($length = 50) {
@@ -646,29 +676,22 @@ function nokri_search_params( $index, $second = '')
 	if( isset( $param ) )
 	{
 		parse_str($_SERVER['QUERY_STRING'], $vars);
-		
-
 		foreach( $vars as $key => $val )
 		{
-			
 			if ( $key == $index )
 				continue;
-				
 			if($second != "" )
 			{
 				if ( $key == $second )
 					continue;	
 			}
-
 			if(isset($vars['custom']) && count((array) $vars['custom']) > 0 && 'custom' == $key)
-			
 			{
 				foreach($vars['custom'] as $ckey => $cval )
 				{
 					$name = "custom[$ckey]";
 					if ( $name == $index ) {continue;}
 					$res .= '<input type="hidden" name="'.esc_attr($name).'" value="'. esc_attr( $cval ) .'" />';
-					
 				}
 			}
 			else{
@@ -678,7 +701,6 @@ function nokri_search_params( $index, $second = '')
 		}
 	}
 	return $res;
-	
 }
 }
 
@@ -1150,12 +1172,11 @@ if ( ! function_exists( 'nokri_premium_job_class_badges' ) )
 if ( ! function_exists( 'nokri_candidate_skills' ) ) {	
  function nokri_candidate_skills($taxonomy_name = '',$meta_key = '')
  {
- $cand_skills = array();
- $user_info = wp_get_current_user();
- $user_crnt_id = $user_info->ID;
+ $cand_skills    = array();
+ $user_info     = wp_get_current_user();
+ $user_crnt_id  = $user_info->ID;
  $cand_skills	= get_user_meta($user_crnt_id, $meta_key, true);
- $taxonomies = get_terms($taxonomy_name, array('hide_empty' => false , 'orderby'=> 'id', 'order' => 'ASC' ,  'parent'   => 0  )); 
- $option = '';
+ $taxonomies    = get_terms($taxonomy_name, array('hide_empty' => false , 'orderby'=> 'id', 'order' => 'ASC' ,  'parent'   => 0  )); $option = '';
 
 		if( count((array)  $taxonomies ) > 0 )
 		{ 
@@ -1214,7 +1235,79 @@ if ( ! function_exists( 'nokri_job_selected_skills' ) )
 	 }
 }	
 
-
+/*************************/
+/* Candidates grid layouts*/
+/*************************/ 
+if( ! function_exists( 'nokri_candidates_get_grid_layouts' ) )
+{
+	function nokri_candidates_get_grid_layouts( $cand_id = '' , $layout = '')
+	{
+					$cand_data      = get_userdata($cand_id);
+					/* Profile Pic  */
+					$image_dp_link  =  nokri_get_user_profile_pic($cand_id,'_cand_dp');
+					/* Getting Employer Skills  */
+					$skill_tags     = nokri_get_candidates_skills($cand_id);
+					$cand_headline  = get_user_meta($cand_id, '_user_headline', true);
+					$emp_address    = get_user_meta($cand_id, '_cand_address', true);
+					$adress_html = '';
+					if($emp_address)
+					{
+						$adress_html = '<i class="fa fa-map-marker"></i><p>'.$emp_address.'</p>';
+					}
+					
+					if($layout == 1)
+					{
+						return $layout = '<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+						   <div class="n-featured-single">
+							  <div class="n-featured-candidates-single-top">
+								 <div class="n-candidate-title">
+									<h4><a href="'. esc_url(get_author_posts_url($cand_id)).'">'. esc_html( $cand_data->display_name ).'</a></h4>
+									<p>'.esc_html($cand_headline).'</p>
+								 </div>
+								 <div class="n-canididate-avatar">
+								   <a href="'. esc_url(get_author_posts_url($cand_id)).'"><img src="'. esc_url($image_dp_link).'" class="img-responsive" alt="'. esc_attr__( "logo", 'nokri' ).'"></a>
+								 </div>
+								 <div class="n-candidate-location">
+								   '.($adress_html).'
+								 </div>
+								 <div class="n-candidate-skills">
+								  '. "".$skill_tags.'
+								 </div>
+							  </div>
+							  <div class="n-candidates-single-bottom">
+								 <a href="'.esc_url(get_author_posts_url($cand_id)).'">'. esc_html__('View Profile','nokri').'</a>
+							  </div>
+						   </div>
+						</div>';
+					}
+					else
+					{
+						return $layout = '<div class="col-md-6 col-lg-6 col-sm-6 col-xs-12">
+							<div class="candidates-grid">
+								<div class="candidate-meta-box">
+									<a href="'. esc_url(get_author_posts_url($cand_id)).'"><img src="'. esc_url($image_dp_link).'" class="img-responsive" alt="'. esc_attr__( "logo", 'nokri' ).'"></a>
+									<div class="candidate-meta">
+										<div class="cand-name">
+											<a href="'. esc_url(get_author_posts_url($cand_id)).'">'. esc_html( $cand_data->display_name ).'</a>
+										</div>
+										<p>'.esc_html($cand_headline).'</p>
+									</div>
+								</div>
+								<div class="cand-skills">
+									'. "".$skill_tags.'
+								</div>
+								<div class="cand-btns">
+									<ul>
+										<li><a href="'.esc_url(get_author_posts_url($cand_id)).'">'. esc_html__('View Profile','nokri').'</a></li>
+										<li class="cand-fav saving_resume"><a href="javascript:void(0)" data-cand-id="'.esc_attr($cand_id).'"><i class="fa fa-heart-o"></i></a></li>
+									</ul>
+								</div>
+							</div>
+						</div>';
+						
+					}
+	}
+}
 
 
 /******************************************/		
@@ -1425,11 +1518,21 @@ if( !function_exists('nokri_authorization') )
 }
 
 function nokri_redirect_to_request( $redirect_to, $request, $user ){
-    // instead of using $redirect_to we're redirecting back to $request
-    return $request;
+    //is there a user to check?
+    if ( isset( $user->roles ) && is_array( $user->roles ) ) {
+        //check for admins
+        if ( in_array( 'administrator', $user->roles ) ) {
+            // redirect them to the default place
+            return $redirect_to;
+        } else {
+            return home_url();
+        }
+    } else {
+        return $redirect_to;
+    }
 }
-add_filter('login_redirect', 'nokri_redirect_to_request', 10, 3);
 
+	add_filter('login_redirect', 'nokri_redirect_to_request', 10, 3);
 
 
 /* ========================= */
@@ -1486,6 +1589,186 @@ if (! function_exists ( 'nokri_check_user_type' ))
 	}
 }
 
+
+/* ========================= */
+/*  Employer Menu Sorter  */
+/* ========================= */
+if ( ! function_exists( 'nokri_employer_menu_sorter' ) )
+{
+	function nokri_employer_menu_sorter($user_id = '')
+	{
+		global $nokri; 
+		$sorter = '';
+		if(isset($nokri['employer_menu_sorter']) && $nokri['employer_menu_sorter'] !="")
+		{
+			$menus = $nokri['employer_menu_sorter'];
+		}
+			if(count((array)  $menus ) > 0)
+			{
+				foreach($menus as $optn => $valu)
+				{
+					if($optn == 'Dashboard' && $valu != "" )
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'Dashboard', 'nokri' );
+						$sorter .= '<li><a href="'.get_the_permalink().'"><span class="la la-tachometer"></span>'.($valu).'</a></li>';
+					}
+					if($optn == 'udpdate profile' && $valu != "" )
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'Udpdate Profile', 'nokri' );
+						$sorter .= '<li><a href="'.get_the_permalink().'?tab-data=edit-profile"><span class="la la-edit"></span>'.($label).'</a></li>';
+					}
+					if($optn == 'View My Profile' && $valu != "" )
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'View My Profile', 'nokri' );
+						$sorter .= '<li><a href="'.esc_url(get_author_posts_url($user_id)).'"><span class="la la-user"></span>'.($label).'</a></li>';
+					}
+					if($optn == 'My Jobs' && $valu != "" )
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'My Jobs', 'nokri' );
+						$sorter .= '<li>
+                            <div class="profile-menu-link">
+                              <span class="la la-bars"></span>'.($label).'
+                            </div>
+                            <ul class="submenu">
+                              <li><a href="'.get_the_permalink().'?tab-data=active-jobs">'. esc_html__( ' Active Jobs', 'nokri' ).'</a></li>
+                              <li><a href="'.get_the_permalink().'?tab-data=inactive-jobs">'.esc_html__( ' In-Active Jobs', 'nokri' ).'</a></li>
+                              <li><a href="'.get_the_permalink().'?tab-data=pending-jobs">'.esc_html__( 'Pending Jobs', 'nokri' ).'</a></li>
+                            </ul>
+                          </li>';
+					}
+					if($optn == 'Email Templates' && $valu != "" )
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'Email Templates', 'nokri' );
+						$sorter .= '<li>
+                            <div class="profile-menu-link">
+                              <span class="fa fa-envelope-o"></span>'.($label).'<i class="fa fa-angle-down"></i>
+                            </div>
+                            <ul class="submenu">
+                              <li><a href="'. get_the_permalink().'?tab-data=email-templates">'. esc_html__( 'Add Email Template', 'nokri' ).'</a></li>
+                              <li><a href="'.get_the_permalink().'?tab-data=email-templates-list">'. esc_html__( 'Email Templates', 'nokri' ).'</a></li>
+                            </ul>
+                          </li>';
+					}
+					if($optn == 'Matched Resumes' && $valu != "" )
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'Matched Resumes', 'nokri' );
+						$sorter .= '<li><a href="'.get_the_permalink().'?tab-data=matched-resumes"><span class="la la-external-link"></span>'.($label).'</a></li>';
+					}
+					if($optn == 'Saved Resumes' && $valu != "" )
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'Saved Resumes', 'nokri' );
+						$sorter .= '<li><a href="'.get_the_permalink().'?tab-data=saved-resumes"><span class="la la-file-pdf-o"></span>'.($label).'</a></li>';
+					}
+					if($optn == 'Followers' && $valu != "" )
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'Followers', 'nokri' );
+						$sorter .= '<li><a href="'.get_the_permalink().'?tab-data=our-followers"><span class="fa fa-users"></span>'.($label).'</a></li>';
+					}
+					if($optn == 'My Package' && $valu != "" )
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'My Package', 'nokri' );
+						$sorter .= '<li><a href="'.get_the_permalink().'?tab-data=my-packages"><span class="la la-list-alt"></span>'.($label).'</a></li>';
+					}
+					if($optn == 'My Orders' && $valu != "" )
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'My Orders', 'nokri' );
+						$sorter .= '<li><a href="'.get_the_permalink().'?tab-data=my-orders"><span class="la la-check-circle"></span>'.($label).'</a></li>';
+					}
+					if($optn == 'Logout' && $valu != "" )
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'Logout', 'nokri' );
+						$sorter .= '<li><a href="'.wp_logout_url( home_url() ).'"><span class="la la-sign-out"></span>'.($label).'</a></li>';
+					}
+				}
+			}
+				return $sorter;
+	}
+}
+
+/* ========================= */
+/*  Candidate Menu Sorter  */
+/* ========================= */
+if ( ! function_exists( 'nokri_candidate_menu_sorter' ) )
+{
+	function nokri_candidate_menu_sorter($user_id = '')
+	{
+		global $nokri; 
+		$sorter = '';
+		if(isset($nokri['candidate_menu_sorter']) && $nokri['candidate_menu_sorter'] !="")
+		{
+			$menus = $nokri['candidate_menu_sorter'];
+		}
+		/* Is applying job package base*/
+$is_apply_pkg_base = ( isset($nokri['job_apply_package_base']) && $nokri['job_apply_package_base'] != ""  ) ? $nokri['job_apply_package_base'] : false; 
+/* Is job alerts*/
+$job_alerts = ( isset($nokri['job_alerts_switch']) && $nokri['job_alerts_switch'] != ""  ) ? $nokri['job_alerts_switch'] : false; 
+			if(count((array)  $menus ) > 0)
+			{
+				foreach($menus as $optn => $valu)
+				{
+					if($optn == 'Dashboard' && $valu != "" )
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'Dashboard', 'nokri' );
+						$sorter .= '<li><a href="'.get_the_permalink().'"><span class="la la-tachometer"></span>'.($label).'</a></li>';
+					}
+					if($optn == 'udpdate profile' && $valu != "" )
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'Update Profile', 'nokri' );
+						$sorter .= '<li><a href="'.get_the_permalink().'?candidate-page=edit-profile"><span class="la la-edit"></span>'.($label).'</a></li>';
+					}
+					if($optn == 'View My Profile' && $valu != "" )
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'View My Profile', 'nokri' );
+						$sorter .= '<li><a href="'.esc_url(get_author_posts_url($user_id)).'"><span class="la la-user"></span>'.($label).'</a></li>';
+					}
+					if($optn == 'My Resumes' && $valu != "" )
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'My Resumes', 'nokri' );
+						$sorter .=   '<li><a href="'.get_the_permalink().'?candidate-page=resumes-list"><span class="la la-file-pdf-o"></span>'.($label).'</a></li>';
+					}
+					if($optn == 'Jobs Applied' && $valu != "" )
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'Jobs Applied', 'nokri' );
+						$sorter .= '<li><a href="'.get_the_permalink().'?candidate-page=jobs-applied"><span class="la la-bars"></span>'.($label).'</a></li>';
+					}
+					if($optn == 'Saved Jobs' && $valu != "" )
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'Saved Jobs', 'nokri' );
+						$sorter .= '<li><a href="'.get_the_permalink().'?candidate-page=saved-jobs"><span class="la la-bookmark"></span>'.($label).'</a></li>';
+					}
+					if($optn == 'Followed Companies' && $valu != "" )
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'Followed Companies', 'nokri' );
+						$sorter .= '<li><a href="'.get_the_permalink().'?candidate-page=followed-companies"><span class="la la-external-link"></span>'.($label).'</a></li>';
+					}
+					if($optn == 'Job Alerts' && $valu != "" && $job_alerts )
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'Job Alerts', 'nokri' );
+						$sorter .= '<li><a href="'.get_the_permalink().'?candidate-page=job-alerts"><span class="la la-bell"></span>'.($label).'</a></li>';
+					}
+					if($optn == 'My Package' && $valu != ""  && $is_apply_pkg_base)
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'My Package', 'nokri' );
+						$sorter .= '<li><a href="'.get_the_permalink().'?candidate-page=my-packages"><span class="la la-list-alt"></span>'.($label).'</a></li>';
+					}
+					if($optn == 'My Orders' && $valu != "" && $is_apply_pkg_base)
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'My Orders', 'nokri' );
+						$sorter .= '<li><a href="'.get_the_permalink().'?candidate-page=my-orders"><span class="la la-check-circle"></span>'.($label).'</a></li>';
+					}
+					if($optn == 'Logout' && $valu != "" )
+					{
+						$label    =  isset($valu) ? $valu:  esc_html__( 'Logout', 'nokri' );
+						$sorter .= '<li><a href="'.wp_logout_url( home_url() ).'"><span class="la la-sign-out"></span>'.($label).'</a></li>';
+					}
+				}
+			}
+				return $sorter;
+	}
+}
+
+
+
 /* ================================== */
 /*  Return Job Country                */
 /* =================================== */
@@ -1508,16 +1791,15 @@ if ( ! function_exists( 'nokri_job_country' ) )
 				$all_locations[] = $item;
 			}
 			$location_html	=	'';
-				if(count( $all_locations ) > 0 )
+			if(count( $all_locations ) > 0 )
+			{
+				$limit = count( $all_locations ) - 1;
+				for( $i = $limit; $i>=0; $i-- )
 				{
-					$limit = count( $all_locations ) - 1;
-					for( $i = $limit; $i>=0; $i-- )
-					{
-						$location_html	.= '<a href="'.get_the_permalink($nokri['sb_search_page']).'?job_location='.$all_locations[$i]['term_id'].'">'.esc_html( $all_locations[$i]['location'] ).'</a>, ';
-					}
-					
+					$location_html	.= '<a href="'.get_the_permalink($nokri['sb_search_page']).'?job_location='.$all_locations[$i]['term_id'].'">'.esc_html( $all_locations[$i]['location'] ).'</a>, ';
 				}
 				
+			}
 			 return rtrim($location_html, ', ');
 		}
 }
@@ -1857,7 +2139,6 @@ if( ! function_exists( 'nokri_is_cand_search_allowed' ) )
 					}
 				}
 			}
-			
 			return $can_search;
 		}
 }
@@ -1936,19 +2217,67 @@ if( ! function_exists( 'nokri_job_post_feilds_operations' ) )
 }
 
 /******************************/
+/* Getting candidates skills*/
+/*****************************/
+if( ! function_exists( 'nokri_get_candidates_skills' ) )
+{
+	function nokri_get_candidates_skills($user_id = '')
+	{
+		global $nokri;
+		$emp_skills     = get_user_meta($user_id, '_cand_skills', true);
+		$skill_tags     = $total_skills  = '';
+		if((array)$emp_skills  && $emp_skills > 0) 
+		{
+			$taxonomies = get_terms('job_skills', array('hide_empty' => false , 'orderby'=> 'id', 'order' => 'ASC' ,  'parent'   => 0  ));
+			if(count((array) $taxonomies) > 0)
+			 {
+				$count = 0;
+				foreach($taxonomies as $taxonomy)
+					{
+						 if (in_array( $taxonomy->term_id, $emp_skills ))
+						 {
+							 $skill_tags .=   '<a href="'.esc_url(get_the_permalink( $nokri['candidates_search_page'] )).'?cand_skills='.esc_attr($taxonomy->term_id).'">'.esc_html($taxonomy->name).'</a>';
+							 if($count == 2)
+							 {
+								 break;
+							 }
+							 $count++;
+						 }
+					}
+				}
+			}
+			return $skill_tags;
+	}
+}
+/******************************/
+/* Getting Last country value*/
+/*****************************/
+if( ! function_exists( 'nokri_get_candidates_location' ) )
+{
+	function nokri_get_candidates_location($user_id = '')
+	{
+			$job_locations  = array();
+			$last_location  =  '';
+			$job_locations  =  wp_get_object_terms( $pid,  array('ad_location'), array('orderby' => 'term_group') );
+			if ( ! empty( $job_locations ) ) { 
+				foreach($job_locations as $location)
+				{
+				   $last_location = '<a href="'.get_the_permalink($nokri['sb_search_page']).'?job_location='.$location->term_id.'">'.$location->name.'</a>';
+				}
+			}
+	}
+}
+/******************************/
 /* Job post feilds label*/
 /*****************************/
-
 if( ! function_exists( 'nokri_feilds_label' ) )
 {
 	function nokri_feilds_label($key = '',$default = '')
 	{
 		global $nokri;
-		
 		return (!empty($nokri["$key"]) && $nokri["$key"] != '') ?  $nokri["$key"] : $default;
 	}
 }
-
 /* ================================== */
 /*  Getting saved resumes id's   */
 /* =================================== */
@@ -1961,5 +2290,66 @@ if (! function_exists ( 'nokri_emp_saved_resumes_ids' ))
 		 $resumes	       =	get_user_meta( $emp_id,'_emp_saved_resume_'.$emp_id, true );
 		 $resumesArray     =    explode(',', $resumes);
 		 return $resumesArray;
+	}
+}
+
+/* ================================== */
+/*  Getting All candidaites skills  */
+/* =================================== */
+if (! function_exists ( 'nokri_jobs_matches_candidates' )) 
+{
+	function nokri_jobs_matches_candidates($job_id = '')
+	{
+		/* Candidate Job Notifications */
+		$job_skills     =   wp_get_post_terms($job_id, 'job_skills', array("fields" => "ids"));
+		//$skillsz = array();
+		$cands_meta_qry2['relation']  = 'OR';
+		foreach($job_skills as $skill)
+		{ 
+			$cands_meta_qry2[] 	=   array( 'key'  => '_cand_skills', 'value' =>  $skill, 'compare' => 'LIKE' ); 
+		}
+		$cands_meta_qry 	=   array();
+		$cands_meta_qry[]   =   array('key'   => '_sb_reg_type','value'      =>  '0','compare' => '=');
+		$args          		=   array( 'role' => 'subscriber', 'meta_query' =>   array($cands_meta_qry, $cands_meta_qry2) );
+		// Create the WP_User_Query object
+		$wp_user_query =   new WP_User_Query($args);
+		$users         =   $wp_user_query->get_results();
+		$total_users   =   $wp_user_query->get_total();
+		$notification  =   array();
+		if (!empty($users))
+		{
+			 // Loop through results
+			 foreach ($users as $user) 
+			 {
+				$cand_id            =   $user->ID; 
+				$cand_name          =   $user->display_name;
+				$cand_skills_value	= 	get_user_meta($cand_id, '_cand_skills_values', true);
+				$cand_skills_sum	=   array_sum($cand_skills_value);
+				update_user_meta($cand_id, '_cand_skills_sum', sanitize_text_field($cand_skills_sum));
+				$notification[]     =   $cand_id; 
+			}
+		}
+		return $notification;
+	}
+}
+/* ================================== */
+/*  Getting User profile picture  */
+/* =================================== */
+if (! function_exists ( 'nokri_get_user_profile_pic' )) 
+{
+	function nokri_get_user_profile_pic($user_id = '',$user_key = '')
+	{
+		global $nokri;
+		$image_dp_link[0] =  get_template_directory_uri(). '/images/candidate-dp.jpg';
+		if( isset( $nokri['nokri_user_dp']['url'] ) && $nokri['nokri_user_dp']['url'] != "" )
+		{
+			$image_dp_link = array($nokri['nokri_user_dp']['url']);	
+		}
+		if(get_user_meta($user_id, $user_key, true ) != '')
+		{
+			$attach_dp_id     =  get_user_meta($user_id, $user_key, true );
+			$image_dp_link    =  wp_get_attachment_image_src( $attach_dp_id, '' );
+		}
+		 return $image_dp_link[0];
 	}
 }

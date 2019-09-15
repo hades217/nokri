@@ -144,6 +144,8 @@ if( isset( $nokri['cand_search_mode'] ) && $nokri['cand_search_mode'] == "2"  &&
 }
 /*Social links hide/show*/
 $social_links = isset($nokri['user_contact_social']) ? $nokri['user_contact_social']  : true;
+/* Advertisment */
+$cand_advertisment = isset($nokri['cand_advertisment']) ? $nokri['cand_advertisment']  : '';
 ?> 
 <section class="n-breadcrumb-big resume-3-brreadcrumb"<?php echo "".($bg_url); ?>>
          <div class="container">
@@ -291,7 +293,14 @@ $social_links = isset($nokri['user_contact_social']) ? $nokri['user_contact_soci
                             <ul><?php echo "".($portfolio_html); ?></ul>
                             </div>
                         </div>
-                         <?php  } ?>
+                         <?php  } if(isset($cand_advertisment) && $cand_advertisment != '') { ?>
+                         <div class="widget">
+                            <h4 class="widget-heading"><?php echo  esc_html__( 'Advertisement', 'nokri' ); ?></h4>
+                            <div class="resume-3-portfolio">
+                            <?php echo ($cand_advertisment); ?>
+                            </div>
+                        </div>
+                        <?php } ?> 
                     </aside>
                 </div>
                <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
@@ -414,5 +423,5 @@ $social_links = isset($nokri['user_contact_social']) ? $nokri['user_contact_soci
                 </div>
                <?php } ?>
    			 </div>
- 		</div>
+                </div>
 </section>

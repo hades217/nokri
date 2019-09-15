@@ -1,7 +1,7 @@
 /*
 Template Name: Nokri Job Board Theme
 Author: ScriptsBundle
-Version: 1.1.4
+Version: 1.2.0
 Designed and Development by: ScriptsBundle
 
 ====================================
@@ -80,8 +80,19 @@ Designed and Development by: ScriptsBundle
 $( ".search_company" ).change(function() {
 	$('form#company_form').submit();
 });
-
-
+/* add more skills */	
+$('.skills-gen').multifield({
+		section: '.group',
+		btnAdd:'#btnAdd-2',
+		btnRemove:'.btnRemove',
+		locale:{
+          "multiField": {
+            "messages": {
+              "removeConfirmation": get_strings.content,
+            }
+          }
+        }
+});
 /*iCheck for others*/
 $(document).ready(function(){
   $('.input-icheck-others').iCheck({
@@ -203,6 +214,16 @@ $( ".emp_followers_form" ).change(function() {
 	});
  
  
+ 
+    /*--- Employer matched resume  form ---*/
+	$(".emp_matched_resumes_form").change(function () {
+		$('form#emp_matched_resumes_form').submit();
+	});
+	$('.emp_matched_resumes_form').on("click", function () {
+		$('form#emp_matched_resumes_form').submit();
+	}); 
+ 
+ 
   /*--- Employer Resumes  Form ---*/
   
   $('.search_resume').on( "click", function() {
@@ -219,6 +240,129 @@ $( ".resumes_filter" ).change(function() {
 	$('form#order_form').submit();
 });
  
+// Candidate saving job alerts model
+$(".job_alert").click(function(){
+    $("#job-alert-subscribtion").modal();
+	$(".select-generat").select2({
+		placeholder: get_strings.option_select,
+		allowClear: true,
+		maximumSelectionLength: 15,
+	});
+  });
+
+/* Candidate Subscribing job alerts */
+$(document).on('click', '#job_alerts', function () {
+$('#alert_job_form').parsley().on('field:validated', function () {
+		var ok = $('.parsley-error').length === 0;
+	})
+	.on('form:submit', function () {
+		$('.cp-loader').show();
+		// Ajax Submitting Resume
+		$.post(nokri_ajax_url, {
+			action: 'job_alert_subscription',
+			submit_alert_data: $("form#alert_job_form").serialize(),
+		}).done(function (response) {
+			$('.cp-loader').hide();
+			if ($.trim(response) == '1') {
+				$.dialog({
+					title: get_strings.success,
+					content: get_strings.action_success,
+					icon: 'fa fa-smile-o',
+					theme: 'modern',
+					closeIcon: true,
+					animation: 'zoom',
+					closeAnimation: 'scale',
+					type: 'blue',
+				});
+				setTimeout(function () {
+					location.reload();
+				}, 2000);
+			}
+			else if ($.trim(response) == '2') {
+						toastr.warning($('#demo_mode').val(), '', {
+							timeOut: 2500,
+							"closeButton": true,
+							"positionClass": "toast-top-right"
+						});
+					}
+			else if ($.trim(response) == '3') {
+						toastr.warning($('#not_log_in').val(), '', {
+							timeOut: 2500,
+							"closeButton": true,
+							"positionClass": "toast-top-right"
+						});
+					}
+			else if ($.trim(response) == '4') {
+						toastr.warning($('#not_cand').val(), '', {
+							timeOut: 2500,
+							"closeButton": true,
+							"positionClass": "toast-top-right"
+						});
+					}
+			 else {
+				toastr.error(response, '', {
+					timeOut: 2500,
+					"closeButton": true,
+					"positionClass": "toast-top-right"
+				});
+			}
+		});
+		return false;
+	});
+});
+ 
+/* Candidate Deleting Saved alerts */
+$(".del_save_alert").on("click", function () {
+		var alert_id = $(this).attr("data-value");
+		$.confirm({
+			animationBounce: 1.5,
+			closeAnimation: 'rotateXR',
+			title: get_strings.confirmation,
+			content: get_strings.content,
+			type: 'red',
+			buttons: {
+				tryAgain: {
+					text: get_strings.btn_cnfrm,
+					btnClass: 'btn-red',
+					action: function () {
+						$('.cp-loader').show();
+						$.post(nokri_ajax_url, {
+							action: 'del_job_alerts',
+							alert_id: alert_id,
+						}).done(function (response) {
+							$('.cp-loader').hide();
+							if ($.trim(response) == "1") {
+								$.dialog({
+									title: get_strings.success,
+									content: get_strings.action_success,
+									icon: 'fa fa-smile-o',
+									theme: 'modern',
+									closeIcon: true,
+									animation: 'scale',
+									type: 'blue',
+								});
+								$("#alert-box-" + alert_id).remove();
+							} else if ($.trim(response) == '2') {
+								toastr.warning($('#demo_mode').val(), '', {
+									timeOut: 2500,
+									"closeButton": true,
+									"positionClass": "toast-top-right"
+								});
+							} else {
+								toastr.error($('#job_cv_action_fail').val(), '', {
+									timeOut: 2500,
+									"closeButton": true,
+									"positionClass": "toast-top-right"
+								});
+							}
+						});
+					}
+				},
+				close: function () {}
+			}
+		});
+	});
+
 
    /*--- Toggle Value ---*/
   $('input[name="is_opened_all"]').on('switchChange.bootstrapSwitch', function(event, state) {
@@ -322,7 +466,26 @@ $('.n-client-box').owlCarousel({
 				}
 			}
 		});
-		
+	/* ======= Candidate slider ======= */
+	$('.n-candidatel-2').owlCarousel({
+			loop: true,
+			margin:20,
+			rtl:true,
+			nav:false,
+			navText:["<i class='ti-angle-left'></i>","<i class='ti-angle-right'></i>"],
+			dots: true,
+			responsive:{
+				0:{
+					items:1
+				},
+				600:{
+					items:2
+				},
+				1000:{
+					items:3
+				}
+			}
+		});	
 		
 $('.n-owl-testimonial-2').owlCarousel({
 		nav:true,
@@ -620,7 +783,12 @@ if ((!$.isNumeric(tags)) || (tags > 100))
 },
 });
     /* --- SEACRH FIXED---*/
-
+/* Dahsboard scroll */
+var is_accordion = $("#is_accordion").attr('value');
+if(is_accordion)
+{
+  var ps = new PerfectScrollbar('#accordion');
+}
     $(window).scroll(function() {
 
         var scrollTop = $(window).scrollTop();
@@ -871,10 +1039,10 @@ if ((!$.isNumeric(tags)) || (tags > 100))
     }
     sbDropzone_resume();
     /*--- End Drop Zone For Resumes---*/
-	
-	
-	
-	/*--- Drop Zone For Custom feilds---*/
+
+
+
+   /*--- Drop Zone For Custom feilds---*/
 	function sbDropzone_custom() {
 		Dropzone.autoDiscover = false;
 		var acceptedFileTypes = "image/*"; //dropzone requires this param be a comma separated list
@@ -973,9 +1141,8 @@ if ((!$.isNumeric(tags)) || (tags > 100))
 	}
 	sbDropzone_custom();
 	/*--- End Drop Zone For Resumes---*/
-	
-	
-    /* Candidate Deleting  Resumes */
+
+/* Candidate Deleting  Resumes */
 	
     $(".del_my_resume").on("click", function() {
 		var del_val = $('.del_my_resume').attr("value");
@@ -1163,7 +1330,20 @@ if ((!$.isNumeric(tags)) || (tags > 100))
 
     });
 
-
+/* Sticky Menu Option */
+var is_stick          = $('#is_sticky_menu').val();
+var is_dashboard_page = $('#is_dashboard_page').val();
+if (is_stick == 1 && is_dashboard_page != 1)
+{
+	 $(window).scroll(function(){
+	  var limit = 200;
+	  if (jQuery(this).scrollTop()>=limit){
+		jQuery('.mega-menu').addClass('desktopTopFixed');
+	  } else {
+		jQuery('.mega-menu').removeClass('desktopTopFixed');
+	  }
+	});
+}
     // Validating Registration process
     if ($('#sb-signup-form').length > 0) {
 		$('#my-alert').hide();  
@@ -1637,44 +1817,6 @@ if ((!$.isNumeric(tags)) || (tags > 100))
 		
 	
 		
-    });
-
-// Upload canidate  resume
-$('body').on('change', '.sb_files-data-doc', function(e){
-		
-		var fd = new FormData();
-        var files_data = $('.sb_files-data-doc'); 
-     
-        $.each($(files_data), function(i, obj) {
-            $.each(obj.files,function(j,file){
-                fd.append('my_file_upload[' + j + ']', file);
-            });
-        });
-        
-        fd.append('action', 'sb_upload_user_docs');
-		$('#sb_loading').show();
-        $.ajax({
-            type: 'POST',
-            url: nokri_ajax_url,
-            data: fd,
-            contentType: false,
-            processData: false,
-            success: function(res){
-				$('#sb_loading').hide();
-				var res_arr	=	res.split( "|" );
-				if( $.trim(res_arr[0]) == "1" )
-				{
-    				$('#_sb_company_doc').val( res_arr[1] );
-				}
-				else
-				{
-					toastr.error(res_arr[1], '', {timeOut: 4000,"closeButton": true, "positionClass": "toast-top-right"});
-				}
-     
-            }
-        });
-		
-  
     });
 
 
@@ -2194,6 +2336,56 @@ $("#social_login_btn").click(function() {
 
 });
 
+
+/* Employer deleting candidate resume */
+$(".del-this-resume").on("click", function () {
+		var cand_key      = $(this).attr("data-resume-id");
+		var resume_array  = cand_key.split("|");
+		var cand_id       = resume_array[0]; 
+		var job_id        = resume_array[1];
+		 $.confirm({
+			animationBounce: 1.5,
+			closeAnimation: 'rotateXR',
+			title: get_strings.confirmation,
+			content: get_strings.content,
+			type: 'red',
+			buttons: {
+				tryAgain: {
+					text: get_strings.btn_cnfrm,
+					btnClass: 'btn-red',
+					action: function () {
+						$('.cp-loader').show();
+						$.post(nokri_ajax_url, {
+							action: 'del_this_candidate',
+							cand_id: cand_id,
+							job_id: job_id,
+						}).done(function (response) {
+							$('.cp-loader').hide();
+							if ($.trim(response) == 1) {
+								$.dialog({
+									title: get_strings.success,
+									content: get_strings.action_success,
+									icon: 'fa fa-smile-o',
+									theme: 'modern',
+									closeIcon: true,
+									animation: 'scale',
+									type: 'blue',
+								});
+							} else {
+								toastr.error($('#job_cv_action_fail').val(), '', {
+									timeOut: 2500,
+									"closeButton": true,
+									"positionClass": "toast-top-right"
+								});
+							}
+						});
+					}
+				},
+				close: function () {}
+			}
+		});
+	});
+
 /*Make Post on blur of title field*/	
  $('#tags_tag_job').tagEditor({
     placeholder: get_strings.select_jobs_tags,
@@ -2459,48 +2651,99 @@ $("#social_login_btn").click(function() {
 
     }
 
-    /* Candidate Submitting Resume On Job */
-
-    $(document).on('click', '#submit_cv_form_btn', function() {
-
-        $('#submit_cv_form1').parsley().on('field:validated', function() {
-                var ok = $('.parsley-error').length === 0;
-            })
-            .on('form:submit', function() {
-                $('.cp-loader').show();
-				
-                // Ajax Submitting Resume
-                $.post(nokri_ajax_url, {
-                    action: 'submit_cv_action',
-                    submit_cv_data: $("form#submit_cv_form1").serialize(),
-                }).done(function(response) {
-                    $('.cp-loader').hide();
-                    if ($.trim(response) == '1') {
-                           $.dialog({
-					        title: get_strings.success,
-							content: get_strings.action_success,
-                            icon: 'fa fa-smile-o',
-                            theme: 'modern',
-                            closeIcon: true,
-                                animation: 'zoom',
-    							closeAnimation: 'scale',
-                            type: 'blue',
-				});
-				setTimeout(function(){
-					location.reload();
-				},2000);
-                    } else {
-                        toastr.error(response, '', {
-                            timeOut: 2500,
-                            "closeButton": true,
-                            "positionClass": "toast-top-right"
-                        });
-                    }
-                });
-
-                return false;
+// Upload canidate  resume
+$('body').on('change', '.sb_files-data-doc', function(e){
+		
+		var fd = new FormData();
+        var files_data = $('.sb_files-data-doc'); 
+     
+        $.each($(files_data), function(i, obj) {
+            $.each(obj.files,function(j,file){
+                fd.append('my_file_upload[' + j + ']', file);
             });
+        });
+        
+        fd.append('action', 'sb_upload_user_docs');
+		$('#sb_loading').show();
+        $.ajax({
+            type: 'POST',
+            url: nokri_ajax_url,
+            data: fd,
+            contentType: false,
+            processData: false,
+            success: function(res){
+				$('#sb_loading').hide();
+				var res_arr	=	res.split( "|" );
+				if( $.trim(res_arr[0]) == "1" )
+				{
+    				$('#_sb_company_doc').val( res_arr[1] );
+				}
+				else
+				{
+					toastr.error(res_arr[1], '', {timeOut: 4000,"closeButton": true, "positionClass": "toast-top-right"});
+				}
+     
+            }
+        });
+		
+  
     });
+ 
+   
+    /* Candidate Submitting Resume On Job */
+	$(document).on('click', '#submit_cv_form_btn', function () {
+		$('#submit_cv_form1').parsley().on('field:validated', function () {
+				var ok = $('.parsley-error').length === 0;
+			})
+			.on('form:submit', function () {
+				$('.cp-loader').show();
+
+				// Ajax Submitting Resume
+				$.post(nokri_ajax_url, {
+					action: 'submit_cv_action',
+					submit_cv_data: $("form#submit_cv_form1").serialize(),
+				}).done(function (response) {
+					$('.cp-loader').hide();
+					if ($.trim(response) == '1') {
+						$.dialog({
+							title: get_strings.success,
+							content: get_strings.apply_without,
+							icon: 'fa fa-smile-o',
+							theme: 'modern',
+							closeIcon: true,
+							animation: 'zoom',
+							closeAnimation: 'scale',
+							type: 'blue',
+						});
+						setTimeout(function () {
+							location.reload();
+						}, 2000);
+					}
+					else if ($.trim(response) == '2') {
+					toastr.warning($('#upload_doc').val(), '', {
+					timeOut: 2500,
+					"closeButton": true,
+					"positionClass": "toast-top-right"
+				});
+					}
+					else if ($.trim(response) == '3') {
+					toastr.error($('#email_exist').val(), '', {
+					timeOut: 2500,
+					"closeButton": true,
+					"positionClass": "toast-top-right"
+				});
+					}
+					 else {
+						toastr.error(response, '', {
+							timeOut: 2500,
+							"closeButton": true,
+							"positionClass": "toast-top-right"
+						});
+					}
+				});
+				return false;
+			});
+	});
 
 
     /* Candidate Saving  Job */
@@ -2701,7 +2944,6 @@ $(document).on('click', '#email_this_job_btn', function () {
 			})
 			.on('form:submit', function () {
 				$('.cp-loader').show();
-
 				// Ajax Submitting Resume
 				$.post(nokri_ajax_url, {
 					action: 'email_this_job',
@@ -2711,7 +2953,7 @@ $(document).on('click', '#email_this_job_btn', function () {
 					if ($.trim(response) == '1') {
 						$.dialog({
 							title: get_strings.success,
-							content: get_strings.apply_without,
+							content: get_strings.action_success,
 							icon: 'fa fa-smile-o',
 							theme: 'modern',
 							closeIcon: true,
@@ -3641,83 +3883,10 @@ function my_g_map(markers1) {
 
 
 /*-- Add More Educational Degrees --*/
-
 var room = 1;
-
-
-function nokri_textarea_initial(call = '')
-{
-		$('button[data-remove-type='+call+'] ').parent().parent().closest('div').find( ".rich_textarea" ).jqte({
-            link: false,
-            unlink: false,
-            formats: false,
-            format: false,
-            funit: false,
-            fsize: false,
-            fsizes: false,
-            color: false,
-            strike: false,
-            source: false,
-            sub: false,
-            sup: false,
-            indent: false,
-            outdent: false,
-            right: false,
-            left: false,
-            center: false,
-            remove: false,
-            rule: false,
-            title: false,
-        });		
-	}
-
-function education_fields() {
-    "use strict";
-	
-	var my_Divs = $( ".for-edus div.ad-more-box-single" ).length;
-	var  room = my_Divs+1;
-	
-	
-    var objTo = document.getElementById('education_fields');
-    var divtest = document.createElement("div");
-	
-	var date_class = 'date-here-'+room;
-	
-    divtest.setAttribute("class", "removeclass_edu" + room); 
-    var rdiv = 'removeclass_edu' + ( room);
-    divtest.innerHTML = '<div class= "ad-more-box-single"><div class="col-md-12 col-sm-12"><h4 class="dashboard-heading">'+get_strings.deghead+'</h4></div><div class="col-md-6 col-sm-6"> <div class="form-group"> <label>'+get_strings.degtitle+'<span class="required">*</span></label> <input type="text"  placeholder="'+get_strings.degtitle+'" name="cand_education[\'degree_name\'][]" class="form-control"></div></div><div class="col-md-6 col-sm-6"> <div class="form-group"> <label>'+get_strings.deginsti+'<span class="required">*</span></label> <input type="text"  placeholder="'+get_strings.deginsti+'" name="cand_education[\'degree_institute\'][]" class="form-control"></div></div><div class="col-md-6 col-xs-12 col-sm-6"> <div class="form-group"><label class="">'+get_strings.degstart+'</label><input type="text"  name="cand_education[\'degree_start\'][]" class="'+date_class+' form-control" /></div></div><div class="col-md-6 col-xs-12 col-sm-6"> <div class="form-group"><label class="">'+get_strings.degend+'</label><input type="text"  name="cand_education[\'degree_end\'][]" class="'+date_class+' form-control"/></div></div><div class="col-md-6 col-sm-6"> <div class="form-group"> <label>'+get_strings.degpercnt+'<span class="required">*</span></label> <input type="text"  placeholder="'+get_strings.degpercntplc+'" name="cand_education[\'degree_percent\'][]" class="form-control"> </div></div><div class="col-md-6 col-sm-6"> <div class="form-group"> <label>'+get_strings.deggrad+'<span class="required">*</span></label> <input type="text" placeholder="'+get_strings.deggradplc+'"  name="cand_education[\'degree_grade\'][]" class="form-control"> </div></div><div class="col-md-12 col-sm-12 col-xs-12"> <div class="form-group"> <label>'+get_strings.degdesc+'</label> <textarea rows="6"  class="form-control rich_textarea" name="cand_education[\'degree_detail\'][]" id="ad_description2"></textarea> </div></div><div class="input-group-btn remove-btn"><button class="btn btn-danger" type="button" onclick="remove_education_fields(' + room + ');" data-remove-type="' + room + '"> <span class="ti-minus" aria-hidden="true"></span>'+get_strings.degremov+'</button></div></div><div class="clearfix"></div>'; 
-    objTo.appendChild(divtest);
-	
-	nokri_get_date_picker('months',date_class,'MM yyyy');
-	nokri_textarea_initial(room);
-}
-
-function remove_education_fields(rid) {
-    "use strict";
-	    $.confirm({
-        title: get_strings.confirmation,  
-        content: get_strings.content,
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-            tryAgain: {
-                text: get_strings.btn_cnfrm,
-                btnClass: 'btn-red',
-                action: function(){
-					jQuery('.removeclass_edu' + rid).remove();
-                }
-            },
-            close: function () {
-            }
-        }
-    });
-}
-
-/*-- Add More Professional Projects --*/
-var room = 1;
-function nokri_textarea_initial(call = '')
-{
-	$('button[data-remove-type='+call+'] ').parent().parent().closest('div').find( ".rich_textarea" ).jqte({
+function nokri_textarea_initial(call) {
+	call= typeof call !== 'undefined' ? call : '';
+	$('button[data-remove-type=' + call + '] ').parent().parent().closest('div').find(".rich_textarea").jqte({
 		link: false,
 		unlink: false,
 		formats: false,
@@ -3738,235 +3907,446 @@ function nokri_textarea_initial(call = '')
 		remove: false,
 		rule: false,
 		title: false,
-	});		
+	});
+}
+
+function education_fields() {
+	"use strict";
+
+	var my_Divs = Math.floor((Math.random() * 1000000000) + 1);
+	var room    = my_Divs + 1;
+	var end_date_class    = my_Divs + 2;
+	var objTo   = document.getElementById('education_fields');
+	var divtest = document.createElement("div");
+	var date_class = 'date-here-' + room;
+	divtest.setAttribute("class", "form-group removeclass_edu" + room); 
+	var rdiv = 'removeclass_edu' + (room);
+	
+	
+	divtest.innerHTML = '<div class= "removeclass_edu"><div class= "ad-more-box-single"><div class="col-md-12 col-sm-12"><h4 class="dashboard-heading">' + get_strings.deghead + '</h4></div><div class="col-md-6 col-sm-6"> <div class="form-group"> <label>' + get_strings.degtitle + '<span class="required">*</span></label> <input type="text"  placeholder="' + get_strings.degtitle + '" name="cand_education[\'degree_name\'][]" class="form-control"></div></div><div class="col-md-6 col-sm-6"> <div class="form-group"> <label>' + get_strings.deginsti + '<span class="required">*</span></label> <input type="text"  placeholder="' + get_strings.deginsti + '" name="cand_education[\'degree_institute\'][]" class="form-control"></div></div><div class="col-md-6 col-xs-12 col-sm-6"> <div class="form-group"><label class="">' + get_strings.degstart + '</label><input type="text"  name="cand_education[\'degree_start\'][]" class="' + date_class + ' form-control" /></div></div><div class="col-md-6 col-xs-12 col-sm-6"> <div class="form-group"><label class="">' + get_strings.degend + '</label><input type="text"  name="cand_education[\'degree_end\'][]" class="' + end_date_class + ' form-control"/></div></div><div class="col-md-6 col-sm-6"> <div class="form-group"> <label>' + get_strings.degpercnt + '<span class="required">*</span></label> <input type="text"  placeholder="' + get_strings.degpercntplc + '" name="cand_education[\'degree_percent\'][]" class="form-control"> </div></div><div class="col-md-6 col-sm-6"> <div class="form-group"> <label>' + get_strings.deggrad + '<span class="required">*</span></label> <input type="text" placeholder="' + get_strings.deggradplc + '"  name="cand_education[\'degree_grade\'][]" class="form-control"> </div></div><div class="col-md-12 col-sm-12 col-xs-12"> <div class="form-group"> <label>' + get_strings.degdesc + '</label> <textarea rows="6"  class="form-control rich_textarea" name="cand_education[\'degree_detail\'][]" id="ad_description"></textarea> </div></div><div class="input-group-btn remove-btn"><button class="btn btn-danger" type="button" onclick="remove_education_fields(' + room + ');" data-remove-type="' + room + '"> <span class="ti-minus" aria-hidden="true"></span>' + get_strings.degremov + '</button></div></div><div class="clearfix"></div></div>';
+	objTo.appendChild(divtest);
+
+	nokri_get_date_picker_start('months', date_class, 'MM yyyy',end_date_class);
+	nokri_textarea_initial(room);
+}
+
+function remove_education_fields(rid) {
+	"use strict";
+	$.confirm({
+		title: get_strings.confirmation,
+		content: get_strings.content,
+		type: 'red',
+		typeAnimated: true,
+		buttons: {
+			tryAgain: {
+				text: get_strings.btn_cnfrm,
+				btnClass: 'btn-red',
+				action: function () {
+					jQuery('.removeclass_edu' + rid).remove();
+				}
+			},
+			close: function () {}
+		}
+	});
+}
+
+/*-- Add More Professional Projects --*/
+var room = 1;
+
+function nokri_textarea_initial(call) {
+	call= typeof call !== 'undefined' ? call : '';
+	$('button[data-remove-type=' + call + '] ').parent().parent().closest('div').find(".rich_textarea").jqte({
+		link: false,
+		unlink: false,
+		formats: false,
+		format: false,
+		funit: false,
+		fsize: false,
+		fsizes: false,
+		color: false,
+		strike: false,
+		source: false,
+		sub: false,
+		sup: false,
+		indent: false,
+		outdent: false,
+		right: false,
+		left: false,
+		center: false,
+		remove: false,
+		rule: false,
+		title: false,
+	});
 }
 
 
 function professional_fields() {
-    "use strict";
-    
-	
-	var my_Divs = $( ".for-pros div.ad-more-box-single" ).length;
-	var  room = my_Divs+1;
-	
-    var objTo = document.getElementById('professional_fields');
-    var divtest = document.createElement("div");
-	
-    divtest.setAttribute("class", "form-group removeclass_pro" + room);
-    var rdiv = 'removeclass_pro' + room;
-	
-	var date_class_pro = 'date-here-pro'+room;
-	
-	
-	
-	
-    divtest.innerHTML = '<div class= "ad-more-box-single"><div class="col-md-12 col-sm-12"><h4 class="dashboard-heading">'+get_strings.projthead+'(' + room + ')</h4></div><div class="col-md-6 col-sm-12"><div class="form-group"><label>'+get_strings.projorg+'<span class="required">*</span></label><input type="text"  placeholder="'+get_strings.projorg+'" name="cand_profession[\'project_organization\'][]" class="form-control"></div></div><div class="col-md-6 col-sm-12"><div class="form-group"><label>'+get_strings.projdesign+'<span class="required">*</span></label><input type="text"   placeholder="'+get_strings.projdesign+'" name="cand_profession[\'project_role\'][]" class="form-control"></div></div><div class="col-md-6 col-xs-12 col-sm-6"><div class="form-group"><label class="">'+get_strings.projstrt+'</label><input type="text"   name="cand_profession[\'project_start\'][]" class="'+date_class_pro+'  form-control" /></div></div><div class="col-md-6 col-xs-12 col-sm-6"><div class="form-group"><label class="">'+get_strings.projend+'</label><input type="text"  name="cand_profession[\'project_end\'][]" class="'+date_class_pro+'  form-control end-hide"  /><input type="hidden"  value="0" name="cand_profession[\'project_name\'][]"  class="checked-input-hide" /><input type="checkbox" name="checked"  class="icheckbox_minimal control-class-' + room + '">'+get_strings.projtitle+'</div></div><div class="col-md-12 col-sm-12 col-xs-12"><div class="form-group"><label>'+get_strings.projdesc+'</label><textarea rows="6"  class="form-control rich_textarea" name="cand_profession[\'project_desc\'][]" id="ad_description"></textarea></div></div></div></div><div class="input-group-btn remove-btn"><button class="btn btn-danger" type="button" onclick="remove_professional_fields(' + room + ');" data-remove-type="' + room + '"> <span class="ti-minus" aria-hidden="true"></span>'+get_strings.degremov+'</button></div></div></div><div class="clearfix"></div></div></div>';
-	
+	"use strict";
 
 
-    objTo.appendChild(divtest);
+	var my_Divs = Math.floor((Math.random() * 1000000000) + 1);
+	var room    = my_Divs + 1;
+	var end_date_class    = my_Divs + 2;
+
+	var objTo = document.getElementById('professional_fields');
+	var divtest = document.createElement("div");
+
+	divtest.setAttribute("class", "form-group removeclass_pro" + room);
+	var rdiv = 'removeclass_pro' + room;
+
+	var date_class_pro = 'date-here-pro' + room;
+
+
+	divtest.innerHTML = '<div class= "ad-more-box-single"><div class="col-md-12 col-sm-12"><h4 class="dashboard-heading">' + get_strings.projthead + '(' + get_strings.new_btn + ')</h4></div><div class="col-md-6 col-sm-12"><div class="form-group"><label>' + get_strings.projorg + '<span class="required">*</span></label><input type="text"  placeholder="' + get_strings.projorg + '" name="cand_profession[\'project_organization\'][]" class="form-control"></div></div><div class="col-md-6 col-sm-12"><div class="form-group"><label>' + get_strings.projdesign + '<span class="required">*</span></label><input type="text"   placeholder="' + get_strings.projdesign + '" name="cand_profession[\'project_role\'][]" class="form-control"></div></div><div class="col-md-6 col-xs-12 col-sm-6"><div class="form-group"><label class="">' + get_strings.projstrt + '</label><input type="text"   name="cand_profession[\'project_start\'][]" class="' + date_class_pro + '  form-control" /></div></div><div class="col-md-6 col-xs-12 col-sm-6"><div class="form-group"><label class="">' + get_strings.projend + '</label><input type="text"  name="cand_profession[\'project_end\'][]" class="' + end_date_class + '  form-control end-hide"  /><input type="hidden"  value="0" name="cand_profession[\'project_name\'][]"  class="checked-input-hide" /><input type="checkbox" name="checked"  class="icheckbox_minimal control-class-' + room + '">' + get_strings.projtitle + '</div></div><div class="col-md-12 col-sm-12 col-xs-12"><div class="form-group"><label>' + get_strings.projdesc + '</label><textarea rows="6"  class="form-control rich_textarea" name="cand_profession[\'project_desc\'][]" id="ad_description"></textarea></div></div></div></div><div class="input-group-btn remove-btn"><button class="btn btn-danger" type="button" onclick="remove_professional_fields(' + room + ');" data-remove-type="' + room + '"> <span class="ti-minus" aria-hidden="true"></span>' + get_strings.degremov + '</button></div></div></div><div class="clearfix"></div></div></div>';
+
+
+	objTo.appendChild(divtest);
 	var class_name = 'control-class-' + room;
-	 nokri_get_date_picker('months',date_class_pro,'MM yyyy');
+	nokri_get_date_picker_start('months', date_class_pro, 'MM yyyy',end_date_class)
 	$('input').iCheck({
-    checkboxClass: 'icheckbox_minimal',
-    /*increaseArea: '20%' // optional*/
-  });
+		checkboxClass: 'icheckbox_minimal',
+		/*increaseArea: '20%' // optional*/
+	});
 	nokri_textarea_initial(room);
 }
 
 function remove_professional_fields(rid) {
-    "use strict";
+	"use strict";
 	$.confirm({
-        title: get_strings.confirmation,  
-        content: get_strings.content,
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-            tryAgain: {
-                text: get_strings.btn_cnfrm,
-                btnClass: 'btn-red',
-                action: function(){
+		title: get_strings.confirmation,
+		content: get_strings.content,
+		type: 'red',
+		typeAnimated: true,
+		buttons: {
+			tryAgain: {
+				text: get_strings.btn_cnfrm,
+				btnClass: 'btn-red',
+				action: function () {
 					jQuery('.removeclass_pro' + rid).remove();
-                }
-            },
-            close: function () {
-            }
-        }
-    });
+				}
+			},
+			close: function () {}
+		}
+	});
 }
 
 /*-- Add More Certifications --*/
 
 var room = 1;
 
-function nokri_textarea_initial(call = '')
-	{
-		$('button[data-remove-type='+call+'] ').parent().parent().closest('div').find( ".rich_textarea" ).jqte({
-            link: false,
-            unlink: false,
-            formats: false,
-            format: false,
-            funit: false,
-            fsize: false,
-            fsizes: false,
-            color: false,
-            strike: false,
-            source: false,
-            sub: false,
-            sup: false,
-            indent: false,
-            outdent: false,
-            right: false,
-            left: false,
-            center: false,
-            remove: false,
-            rule: false,
-            title: false,
-        });		
-	}
+function nokri_textarea_initial(call) {
+	call= typeof call !== 'undefined' ? call : '';
+	$('button[data-remove-type=' + call + '] ').parent().parent().closest('div').find(".rich_textarea").jqte({
+		link: false,
+		unlink: false,
+		formats: false,
+		format: false,
+		funit: false,
+		fsize: false,
+		fsizes: false,
+		color: false,
+		strike: false,
+		source: false,
+		sub: false,
+		sup: false,
+		indent: false,
+		outdent: false,
+		right: false,
+		left: false,
+		center: false,
+		remove: false,
+		rule: false,
+		title: false,
+	});
+}
 
 function certification_fields() {
-    "use strict";
+	"use strict";
 
-	var my_Divs = $( ".for-cert div.ad-more-box-single" ).length;
-	var  room = my_Divs+1;
+	var my_Divs = Math.floor((Math.random() * 1000000000) + 1);
+	var room = my_Divs + 1;
+    var end_date_class    = my_Divs + 2;
+	var objTo = document.getElementById('certification_fields');
+	var divtest = document.createElement("div");
+	divtest.setAttribute("class", "form-group removeclass_cert" + room);
+	var rdiv = 'removeclass_cert' + room;
 
-    var objTo   = document.getElementById('certification_fields');
-    var divtest = document.createElement("div");
-    divtest.setAttribute("class", "removeclass_cert" + room);
-    var rdiv = 'removeclass_cert' + room;
-	
-	var date_class_certi = 'date-here-certi'+room;
-	
-	
-    divtest.innerHTML = '<div class= "ad-more-box-single"><div class="col-md-12 col-sm-12"><h4 class="dashboard-heading">'+get_strings.certhead+'(' + room + ')</h4></div><div class="col-md-12 col-sm-12"><div class="form-group"><label>'+get_strings.certtitle+'<span class="required">*</span></label> <input type="text" placeholder="'+get_strings.certtitle+'"  name="cand_certifications[\'certification_name\'][]" class="form-control"> </div></div><div class="col-md-6 col-xs-12 col-sm-6"> <div class="form-group"><label class="">'+get_strings.certstrt+'</label><input type="text"  name="cand_certifications[\'certification_start\'][]" class="'+date_class_certi+' form-control" /></div></div><div class="col-md-6 col-xs-12 col-sm-6"> <div class="form-group"><label class="">'+get_strings.certend+'</label><input type="text"  name="cand_certifications[\'certification_end\'][]" class="'+date_class_certi+' form-control" /></div></div><div class="col-md-6 col-sm-12"> <div class="form-group"> <label>'+get_strings.certdur+'<span class="required">*</span></label> <input type="text"  placeholder="'+get_strings.certdur+'" name="cand_certifications[\'certification_duration\'][]" class="form-control"> </div></div><div class="col-md-6 col-sm-12"> <div class="form-group"> <label>'+get_strings.certinst+'<span class="required">*</span></label> <input type="text"   placeholder="'+get_strings.certinst+'" name="cand_certifications[\'certification_institute\'][]" class="form-control"> </div></div><div class="col-md-12 col-sm-12 col-xs-12"> <div class="form-group"> <label>'+get_strings.certdesc+'</label> <textarea rows="6" class="form-control rich_textarea"  name="cand_certifications[\'certification_desc\'][]" id="certification_description"></textarea> </div></div><div class="input-group-btn remove-btn"><button class="btn btn-danger" type="button" onclick="remove_certification_fields(' + room + ');" data-remove-type="' + room + '"> <span class="ti-minus" aria-hidden="true"></span>'+get_strings.degremov+'</button></div></div></div><div class="clearfix"></div></div></div>';
+	var date_class_certi = 'date-here-certi' + room;
 
-    objTo.appendChild(divtest);
-	
-	nokri_get_date_picker('months',date_class_certi,'MM yyyy');
-	
+
+	divtest.innerHTML = '<div class= "ad-more-box-single"><div class="col-md-12 col-sm-12"><h4 class="dashboard-heading">' + get_strings.certhead + '(' + get_strings.new_btn + ')</h4></div><div class="col-md-12 col-sm-12"><div class="form-group"><label>' + get_strings.certtitle + '<span class="required">*</span></label> <input type="text" placeholder="' + get_strings.certtitle + '"  name="cand_certifications[\'certification_name\'][]" class="form-control"> </div></div><div class="col-md-6 col-xs-12 col-sm-6"> <div class="form-group"><label class="">' + get_strings.certstrt + '</label><input type="text"  name="cand_certifications[\'certification_start\'][]" class="' + date_class_certi + ' form-control" /></div></div><div class="col-md-6 col-xs-12 col-sm-6"> <div class="form-group"><label class="">' + get_strings.certend + '</label><input type="text"  name="cand_certifications[\'certification_end\'][]" class="' + end_date_class + ' form-control" /></div></div><div class="col-md-6 col-sm-12"> <div class="form-group"> <label>' + get_strings.certdur + '<span class="required">*</span></label> <input type="text"  placeholder="' + get_strings.certdur + '" name="cand_certifications[\'certification_duration\'][]" class="form-control"> </div></div><div class="col-md-6 col-sm-12"> <div class="form-group"> <label>' + get_strings.certinst + '<span class="required">*</span></label> <input type="text"   placeholder="' + get_strings.certinst + '" name="cand_certifications[\'certification_institute\'][]" class="form-control"> </div></div><div class="col-md-12 col-sm-12 col-xs-12"> <div class="form-group"> <label>' + get_strings.certdesc + '</label> <textarea rows="6" class="form-control rich_textarea"  name="cand_certifications[\'certification_desc\'][]" id="certification_description"></textarea> </div></div><div class="input-group-btn remove-btn"><button class="btn btn-danger" type="button" onclick="remove_certification_fields(' + room + ');" data-remove-type="' + room + '"> <span class="ti-minus" aria-hidden="true"></span>' + get_strings.degremov + '</button></div></div></div><div class="clearfix"></div></div></div>';
+
+	objTo.appendChild(divtest);
+
+	//nokri_get_date_picker('months', date_class_certi, 'MM yyyy');
+	nokri_get_date_picker_start('months', date_class_certi, 'MM yyyy',end_date_class);
 	nokri_textarea_initial(room);
 }
 
 function remove_certification_fields(rid) {
-    "use strict";
+	"use strict";
 	$.confirm({
 		theme: 'dark',
-        title: get_strings.confirmation,  
-        content: get_strings.content,
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-            tryAgain: {
-                text: get_strings.btn_cnfrm,
-                btnClass: 'btn-red',
-                action: function(){
-					 jQuery('.removeclass_cert' + rid).remove();
-                }
-            },
-            close: function () {
-            }
-        }
-    });
+		title: get_strings.confirmation,
+		content: get_strings.content,
+		type: 'red',
+		typeAnimated: true,
+		buttons: {
+			tryAgain: {
+				text: get_strings.btn_cnfrm,
+				btnClass: 'btn-red',
+				action: function () {
+					jQuery('.removeclass_cert' + rid).remove();
+				}
+			},
+			close: function () {}
+		}
+	});
 }
 
-
 var $ = jQuery.noConflict();
-jQuery(document).ready(function() {
- "use strict";
-  $('.tool-tip').tipsy({
-   arrowWidth: 10,
-   attr: 'data-tipsy', 
-   cls: null, 
-   duration: 150, 
-   offset: 7,
-   position: 'top-center', 
-   trigger: 'hover',
- });
-  nokri_get_date_picker('months','datepicker-here-canidate','MM yyyy');
-  nokri_get_date_picker('days','datepicker-cand-dob','mm/dd/yyyy');
-  nokri_get_date_picker('days', 'datepicker-job-post', 'mm/dd/yyyy');
+jQuery(document).ready(function () {
+	"use strict";
+	$('.tool-tip').tipsy({
+		arrowWidth: 10,
+		attr: 'data-tipsy',
+		cls: null,
+		duration: 150,
+		offset: 7,
+		position: 'top-center',
+		trigger: 'hover',
+	});
+	nokri_get_date_picker_dob('days', 'datepicker-cand-dob', 'mm/dd/yyyy');
+	nokri_get_date_picker('days', 'datepicker-job-post', 'mm/dd/yyyy');
 });
 
- function nokri_get_date_picker(c_view , apl_class,date_format)
- {
-	$('.'+apl_class).datepicker({
-	view: c_view,
-	minView:c_view,
-	dateFormat: date_format,
-	  language: {
-    days: [get_strings.Sunday, get_strings.Monday, get_strings.Tuesday, get_strings.Wednesday, get_strings.Thursday, get_strings.Friday, get_strings.Saturday],
-    daysShort: [get_strings.Sun, get_strings.Mon, get_strings.Tue, get_strings.Wed, get_strings.Thu, get_strings.Fri, get_strings.Sat],
-    daysMin: [get_strings.Su, get_strings.Mo, get_strings.Tu, get_strings.We, get_strings.Th, get_strings.Fr, get_strings.Sa],
-    months: [get_strings.January,get_strings.February,get_strings.March,get_strings.April,get_strings.May,get_strings.June, get_strings.July,get_strings.August,get_strings.September,get_strings.October,get_strings.November,get_strings.December],
-    monthsShort: [get_strings.Jan, get_strings.Feb, get_strings.Mar, get_strings.Apr, get_strings.May, get_strings.Jun, get_strings.Jul, get_strings.Aug, get_strings.Sep, get_strings.Oct, get_strings.Nov, get_strings.Dec],
-    today: get_strings.Today,
-    clear: get_strings.Clear,
-    timeFormat: 'hh:ii aa',
-    firstDay: 0
-},
-	}); 
- }
 
-
-var $ = jQuery.noConflict();
-jQuery(document).ready(function() {
- "use strict";
-  $('.tool-tip').tipsy({
-   arrowWidth: 10,
-   attr: 'data-tipsy', 
-   cls: null, 
-   duration: 150, 
-   offset: 7,
-   position: 'top-center', 
-   trigger: 'hover',
- });
+$(document).one('ready', function () {
+	$('.datepicker-here-canidate').datepicker({
+		view: 'months',
+		minView: 'months',
+		dateFormat: 'MM yyyy',
+		language: {
+			days: [get_strings.Sunday, get_strings.Monday, get_strings.Tuesday, get_strings.Wednesday, get_strings.Thursday, get_strings.Friday, get_strings.Saturday],
+			daysShort: [get_strings.Sun, get_strings.Mon, get_strings.Tue, get_strings.Wed, get_strings.Thu, get_strings.Fri, get_strings.Sat],
+			daysMin: [get_strings.Su, get_strings.Mo, get_strings.Tu, get_strings.We, get_strings.Th, get_strings.Fr, get_strings.Sa],
+			months: [get_strings.January, get_strings.February, get_strings.March, get_strings.April, get_strings.May, get_strings.June, get_strings.July, get_strings.August, get_strings.September, get_strings.October, get_strings.November, get_strings.December],
+			monthsShort: [get_strings.Jan, get_strings.Feb, get_strings.Mar, get_strings.Apr, get_strings.May, get_strings.Jun, get_strings.Jul, get_strings.Aug, get_strings.Sep, get_strings.Oct, get_strings.Nov, get_strings.Dec],
+			today: get_strings.Today,
+			clear: get_strings.Clear,
+			timeFormat: 'hh:ii aa',
+			firstDay: 0,
+			
+			
+		},
+	});	
 });
+$(document).on("click",".datepicker-here-canidate",function() {
+	var apl_class = $(this).attr("class").split(' ')[0];
+	
+	last_date = '';
+	var first_date = $(this).attr('data-date-input');
+	var last_class = '';
+	var v_length = $(this).parent().parent().next().find('input.date-end').length;
+	if(v_length > 0)
+	{
+		var last_date = $(this).parent().parent().next().find('input.date-end').data('date-input');
+		var v1 = $(this).parent().parent().next().find('input.date-end').attr("class").split(' ')[2];
+		last_class = v1;
+	}
+	$('input[data-date-input="' + first_date + '"]').datepicker({
+		view: 'months',
+		minView: 'months',
+		dateFormat: 'MM yyyy',
+		language: {
+			days: [get_strings.Sunday, get_strings.Monday, get_strings.Tuesday, get_strings.Wednesday, get_strings.Thursday, get_strings.Friday, get_strings.Saturday],
+			daysShort: [get_strings.Sun, get_strings.Mon, get_strings.Tue, get_strings.Wed, get_strings.Thu, get_strings.Fri, get_strings.Sat],
+			daysMin: [get_strings.Su, get_strings.Mo, get_strings.Tu, get_strings.We, get_strings.Th, get_strings.Fr, get_strings.Sa],
+			months: [get_strings.January, get_strings.February, get_strings.March, get_strings.April, get_strings.May, get_strings.June, get_strings.July, get_strings.August, get_strings.September, get_strings.October, get_strings.November, get_strings.December],
+			monthsShort: [get_strings.Jan, get_strings.Feb, get_strings.Mar, get_strings.Apr, get_strings.May, get_strings.Jun, get_strings.Jul, get_strings.Aug, get_strings.Sep, get_strings.Oct, get_strings.Nov, get_strings.Dec],
+			today: get_strings.Today,
+			clear: get_strings.Clear,
+			timeFormat: 'hh:ii aa',
+			firstDay: 0,
+		},
+	});
+	
 
- 
-jQuery(document).ready(function() 
+
+
+	$('input[data-date-input="' + first_date + '"]').datepicker({
+	onSelect: function (dateText, inst)
+	 {
+				 var a = $('input[data-date-input="' + first_date + '"]').val();
+				 var b = $('input[data-date-input="' + last_date + '"]').val();
+				$('input[data-date-input="' + last_date + '"]').datepicker({
+				view: 'months',
+				minView: 'months',
+				dateFormat: 'MM yyyy',
+				minDate: inst,
+				language: {
+					days: [get_strings.Sunday, get_strings.Monday, get_strings.Tuesday, get_strings.Wednesday, get_strings.Thursday, get_strings.Friday, get_strings.Saturday],
+					daysShort: [get_strings.Sun, get_strings.Mon, get_strings.Tue, get_strings.Wed, get_strings.Thu, get_strings.Fri, get_strings.Sat],
+					daysMin: [get_strings.Su, get_strings.Mo, get_strings.Tu, get_strings.We, get_strings.Th, get_strings.Fr, get_strings.Sa],
+					months: [get_strings.January, get_strings.February, get_strings.March, get_strings.April, get_strings.May, get_strings.June, get_strings.July, get_strings.August, get_strings.September, get_strings.October, get_strings.November, get_strings.December],
+					monthsShort: [get_strings.Jan, get_strings.Feb, get_strings.Mar, get_strings.Apr, get_strings.May, get_strings.Jun, get_strings.Jul, get_strings.Aug, get_strings.Sep, get_strings.Oct, get_strings.Nov, get_strings.Dec],
+					today: get_strings.Today,
+					clear: get_strings.Clear,
+					timeFormat: 'hh:ii aa',
+					firstDay: 0
+				},
+			});				  
+				 if(a > b )
+				 {
+					  var b = $('input[data-date-input="' + last_date + '"]').val('');
+				 }				
+			  },
+		   });
+});
+function nokri_get_date_picker(c_view, apl_class, date_format)
 {
-   "use strict";
-	 jQuery(".rich_textarea").on("paste", function(e) {
-		e.preventDefault();
-		var text =  e.originalEvent.clipboardData.getData('text');   
-	   // insert copied data @ the cursor location
-	   document.execCommand("insertText", false, text);
+	$('.' + apl_class).datepicker({
+		view: c_view,
+		minView: c_view,
+		dateFormat: date_format,
+		language: {
+			days: [get_strings.Sunday, get_strings.Monday, get_strings.Tuesday, get_strings.Wednesday, get_strings.Thursday, get_strings.Friday, get_strings.Saturday],
+			daysShort: [get_strings.Sun, get_strings.Mon, get_strings.Tue, get_strings.Wed, get_strings.Thu, get_strings.Fri, get_strings.Sat],
+			daysMin: [get_strings.Su, get_strings.Mo, get_strings.Tu, get_strings.We, get_strings.Th, get_strings.Fr, get_strings.Sa],
+			months: [get_strings.January, get_strings.February, get_strings.March, get_strings.April, get_strings.May, get_strings.June, get_strings.July, get_strings.August, get_strings.September, get_strings.October, get_strings.November, get_strings.December],
+			monthsShort: [get_strings.Jan, get_strings.Feb, get_strings.Mar, get_strings.Apr, get_strings.May, get_strings.Jun, get_strings.Jul, get_strings.Aug, get_strings.Sep, get_strings.Oct, get_strings.Nov, get_strings.Dec],
+			today: get_strings.Today,
+			clear: get_strings.Clear,
+			timeFormat: 'hh:ii aa',
+			firstDay: 0
+		},
+	});
+} 
+function nokri_get_date_picker_start(c_view, apl_class, date_format,end_date_class) {
+	$('.' + apl_class).datepicker({
+		view: c_view,
+		minView: c_view,
+		dateFormat: date_format,
+		language: {
+			days: [get_strings.Sunday, get_strings.Monday, get_strings.Tuesday, get_strings.Wednesday, get_strings.Thursday, get_strings.Friday, get_strings.Saturday],
+			daysShort: [get_strings.Sun, get_strings.Mon, get_strings.Tue, get_strings.Wed, get_strings.Thu, get_strings.Fri, get_strings.Sat],
+			daysMin: [get_strings.Su, get_strings.Mo, get_strings.Tu, get_strings.We, get_strings.Th, get_strings.Fr, get_strings.Sa],
+			months: [get_strings.January, get_strings.February, get_strings.March, get_strings.April, get_strings.May, get_strings.June, get_strings.July, get_strings.August, get_strings.September, get_strings.October, get_strings.November, get_strings.December],
+			monthsShort: [get_strings.Jan, get_strings.Feb, get_strings.Mar, get_strings.Apr, get_strings.May, get_strings.Jun, get_strings.Jul, get_strings.Aug, get_strings.Sep, get_strings.Oct, get_strings.Nov, get_strings.Dec],
+			today: get_strings.Today,
+			clear: get_strings.Clear,
+			timeFormat: 'hh:ii aa',
+			firstDay: 0
+		},
+	});
+	
+$(function(){
+   $('.' + apl_class).datepicker({
+      onSelect: function (dateText, inst) {
+		  nokri_get_date_picker_end(c_view, end_date_class, date_format,inst);
+      }
+   });
+});
+
+
+} 
+function nokri_get_date_picker_end(c_view, apl_class, date_format,end_date)
+{
+	$('.' + apl_class).datepicker({
+		view: c_view,
+		minView: c_view,
+		dateFormat: date_format,
+		minDate: end_date,
+		language: {
+			days: [get_strings.Sunday, get_strings.Monday, get_strings.Tuesday, get_strings.Wednesday, get_strings.Thursday, get_strings.Friday, get_strings.Saturday],
+			daysShort: [get_strings.Sun, get_strings.Mon, get_strings.Tue, get_strings.Wed, get_strings.Thu, get_strings.Fri, get_strings.Sat],
+			daysMin: [get_strings.Su, get_strings.Mo, get_strings.Tu, get_strings.We, get_strings.Th, get_strings.Fr, get_strings.Sa],
+			months: [get_strings.January, get_strings.February, get_strings.March, get_strings.April, get_strings.May, get_strings.June, get_strings.July, get_strings.August, get_strings.September, get_strings.October, get_strings.November, get_strings.December],
+			monthsShort: [get_strings.Jan, get_strings.Feb, get_strings.Mar, get_strings.Apr, get_strings.May, get_strings.Jun, get_strings.Jul, get_strings.Aug, get_strings.Sep, get_strings.Oct, get_strings.Nov, get_strings.Dec],
+			today: get_strings.Today,
+			clear: get_strings.Clear,
+			timeFormat: 'hh:ii aa',
+			firstDay: 0
+		},
+	});
+}
+function nokri_get_date_picker_dob(c_view, apl_class, date_format,end_class) {
+	$('.' + apl_class).datepicker({
+		view: c_view,
+		minView: c_view,
+		dateFormat: date_format,
+		maxDate: new Date(),
+		language: {
+			days: [get_strings.Sunday, get_strings.Monday, get_strings.Tuesday, get_strings.Wednesday, get_strings.Thursday, get_strings.Friday, get_strings.Saturday],
+			daysShort: [get_strings.Sun, get_strings.Mon, get_strings.Tue, get_strings.Wed, get_strings.Thu, get_strings.Fri, get_strings.Sat],
+			daysMin: [get_strings.Su, get_strings.Mo, get_strings.Tu, get_strings.We, get_strings.Th, get_strings.Fr, get_strings.Sa],
+			months: [get_strings.January, get_strings.February, get_strings.March, get_strings.April, get_strings.May, get_strings.June, get_strings.July, get_strings.August, get_strings.September, get_strings.October, get_strings.November, get_strings.December],
+			monthsShort: [get_strings.Jan, get_strings.Feb, get_strings.Mar, get_strings.Apr, get_strings.May, get_strings.Jun, get_strings.Jul, get_strings.Aug, get_strings.Sep, get_strings.Oct, get_strings.Nov, get_strings.Dec],
+			today: get_strings.Today,
+			clear: get_strings.Clear,
+			timeFormat: 'hh:ii aa',
+			firstDay: 0
+		},
+	});
+	
+	
+}
+var $ = jQuery.noConflict();
+jQuery(document).ready(function () {
+	"use strict";
+	$('.tool-tip').tipsy({
+		arrowWidth: 10,
+		attr: 'data-tipsy',
+		cls: null,
+		duration: 150,
+		offset: 7,
+		position: 'top-center',
+		trigger: 'hover',
 	});
 });
 
-$(window).on('load',function() {
- //*MASONRY */
-  $('.mansi').masonry();
-  
-  if ($('.rich_textarea').length > 0) {
-        $('.rich_textarea').jqte({
-            link: false,
-            unlink: false, 
-            formats: [
-					["p",get_strings.p_text],
-					["h2","H2"],
-					["h3","H3"],
-					["h4","H4"],
-					],
-            funit: false,
-            fsize: false,
-            fsizes: false,
-            color: false,
-            strike: false,
-            source: false,
-            sub: false,
-            sup: false,
-            indent: false,
-            outdent: false,
-            right: false,
-            left: false,
-            center: false,
-            remove: false,
-            rule: false,
-            title: false,
-			p:true,
-        });
+jQuery(document).ready(function () {
+	"use strict";
+	jQuery(".rich_textarea").on("paste", function (e) {
+		e.preventDefault();
+		var text = e.originalEvent.clipboardData.getData('text');
+		// insert copied data @ the cursor location
+		document.execCommand("insertText", false, text);
+	});
+});
 
-    }
+$(window).on('load', function () {
+	//*MASONRY */
+	$('.mansi').masonry();
+
+	if ($('.rich_textarea').length > 0) {
+		$('.rich_textarea').jqte({
+			link: false,
+			unlink: false,
+			formats: [
+				["p", get_strings.p_text],
+				["h2", "H2"],
+				["h3", "H3"],
+				["h4", "H4"],
+			],
+			funit: false,
+			fsize: false,
+			fsizes: false,
+			color: false,
+			strike: false,
+			source: false,
+			sub: false,
+			sup: false,
+			indent: false,
+			outdent: false,
+			right: false,
+			left: false,
+			center: false,
+			remove: false,
+			rule: false,
+			title: false,
+			p: true,
+		});
+
+	}
 });

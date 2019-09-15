@@ -24,7 +24,7 @@
         'opt_name' => 'nokri',
         'dev_mode' => false,
         'display_name' => esc_html__( 'Theme Options', 'nokri' ),
-        'display_version' => '1.1.3',
+        'display_version' => '1.1.5',
         'page_title' => esc_html__( 'Theme Options', 'nokri' ),
         'update_notice' => false,
         'admin_bar' => TRUE,
@@ -253,6 +253,7 @@
                     'default'  => '1',
                     ),
 					array(
+					//'required' => array( 'main_header_style', '=', array( '2') ),
                     'id'       => 'is_sticky_menu',
                     'type'     => 'switch',
                     'title'    => esc_html__( 'Sticky Menu', 'nokri' ),
@@ -348,7 +349,7 @@
                     'multi'    => false,
                     'title'    => esc_html__( 'Employer Job Post Link ', 'nokri' ),
                     'subtitle' => esc_html__( 'Select Page', 'nokri' ),
-                    'default'  => array('2'),
+                    'default'  => array('266'),
                 ),
                  array(
                  'required' => array( 'user_bar_switch', '=', array( '1' ) ),
@@ -382,7 +383,7 @@
                     'multi'    => false,
                     'title'    => esc_html__( 'Candidate Page Link ', 'nokri' ),
                     'subtitle' => esc_html__( 'Job search page for candidate', 'nokri' ),
-                    'default'  => array('2'),
+                    'default'  => array('274'),
                 ),
                 
             /* Top bar settings */
@@ -397,7 +398,7 @@
                     'multi'    => false,
                     'title'    => esc_html__( 'Job Post Page ', 'nokri' ),
                     'subtitle' => esc_html__( 'Select Page', 'nokri' ),
-                    'default'  => array('2'),
+                    'default'  => array('266'),
                 ),
                 array(
                  'required' => array( 'top_main_page_bar', '=', array( '1' ) ),
@@ -650,14 +651,6 @@
 				 ), 
 				'default' => 'inter',
 			     ),
-				 /* Apply without login */
-				 array(
-                'id'       => 'apply_without_login',
-                'type'     => 'switch',
-                'title'    => esc_html__( 'Apply without login', 'nokri' ),
-                'desc'     => esc_html__( 'Enable/disable apply without login', 'nokri' ),
-                'default'  => false,
-                ),
 				 /* Custom feilds options */
 				 array(
 				 'required' => array( 'job_post_form', '=', array( '0' ) ),
@@ -994,7 +987,25 @@
                 'desc'     => esc_html__( 'Enter your desired label', 'nokri' ),
                 'default'  => '',
                 ),
-            
+            	
+				$fields = array(
+				'required' => array( 'job_post_form', '=', array( '0' ) ),
+				'id'       => 'allow_job_countries',
+				'type'     => 'button_set',
+				'title'    => __('Countries Taxonomy', 'nokri'),
+				'multi'    => false,
+				//Must provide key => value pairs for options
+				'options'  => array(
+				'show' 	   => __('Show', 'nokri'), 
+				'hide' 	   => __('Hide', 'nokri'), 
+				'required' => __('Required', 'nokri'), 
+				 ), 
+				'default' => 'required',
+			     ),
+				
+				
+				
+				
 					)
 				) );
 			
@@ -1184,7 +1195,15 @@
                 'title'    => esc_html__('Enable/disable job tags', 'nokri' ),
                 'desc'     => esc_html__('Hide/show related job tags on job detail page', 'nokri' ),
                 'default'  => true,
-             ),
+             ), 
+			  /* Apply without login */
+				 array(
+                'id'       => 'apply_without_login',
+                'type'     => 'switch',
+                'title'    => esc_html__( 'Apply without login', 'nokri' ),
+                'desc'     => esc_html__( 'Enable/disable apply without login', 'nokri' ),
+                'default'  => false,
+                ),
                 array(
                 'id'       => 'cand_linkedin_apply',
                 'type'     => 'switch',
@@ -1196,7 +1215,7 @@
                 'type'     => 'switch',
                 'title'    => esc_html__( 'Email Job To Anyone', 'nokri' ),
                 'default'  => true,
-                            ),    
+                            ), 
             array(
                 'id'       => 'relateds_jobs_switch',
                 'type'     => 'switch',
@@ -1319,6 +1338,33 @@
                 'step'    => '1',
                 'max'     => '50',
             ),
+			array(
+                'id'       => 'job_alerts_switch',
+                'type'     => 'switch',
+                'title'    => esc_html__( 'Job alert button', 'nokri' ),
+                'default'  => true,
+              ), 
+			  array(
+			    'required' => array( 'job_alerts_switch', '=', array( '1' ) ),
+                'id'       => 'job_alerts_title',
+                'type'     => 'text',
+                'title'    => esc_html__('Job alerts', 'nokri' ),
+                'default'  => esc_html__( 'Enable/disbale job alerts', 'nokri' ),
+            ),
+			array(
+				'required' => array( 'job_alerts_switch', '=', array( '1' ) ),
+                'id'       => 'job_alerts_tagline',
+                'type'     => 'text',
+                'title'    => esc_html__('Job alert tagline', 'nokri' ),
+                'default'  => esc_html__( 'Receive emails for the latest jobs matching your search criteria', 'nokri' ),
+            ),
+			array(
+				'required' => array( 'job_alerts_switch', '=', array( '1' ) ),
+                'id'       => 'job_alerts_btn',
+                'type'     => 'text',
+                'title'    => esc_html__('Job alert button title ', 'nokri' ),
+                'default'  => esc_html__( 'Job Alerts', 'nokri' ),
+            ),
             array(
                 'id'       => 'cat_level_2',
                 'type'     => 'text',
@@ -1398,71 +1444,35 @@
                 'desc'       => '',
                 'icon' => 'el el-user',
             ) );
-            
-                 /*********************/
-                /* Users setting */
+			
+			
+			
+			    /*********************/
+                /* Genreal  options */
                 /********************/
                 
                 Redux::setSection( $opt_name, array(
-                'title'            => esc_html__( 'Users', 'nokri' ),
-                'id'               => 'sb_user_settings',
+                'title'            => esc_html__( 'General', 'nokri' ),
+                'id'               => 'sb_user_profile_settings',
                 'subsection'       => true,
                 'customizer_width' => '700px',
-                'fields'           => array(  
+				'desc'             => __( 'Settings for both employers and candidates', 'nokri' ),
+                'fields'           => array( 
+				array(
+						'id'       => 'sb_upload_profile_pic_size',
+						'type'     => 'select',
+						'title'    => esc_html__( 'Profile picture max size', 'nokri' ),
+						'options'  => array( '307200-300kb' => '300kb', '614400-600kb' => '600kb', '819200-800kb' => '800kb', '1048576-1MB' => '1MB', '2097152-2MB' => '2MB', '3145728-3MB' => '3MB', '4194304-4MB' => '4MB', '5242880-5MB' => '5MB' ),
+						'default'  => '819200-800kb',
+						), 
                 array(
-                    'id'       => 'cand_resume_style',
-                    'type'     => 'button_set',
-                    'title'    => esc_html__( 'Candidate Profile Style', 'nokri' ),
-                    'options'  => array(
-                    '1'        => esc_html__( 'Style 1','nokri' ),
-                    '2'        => esc_html__( 'Style 2','nokri' ),
-                    ),
-                    'default'  => '1',
-                    ),
-					array(
                              'id'       => 'user_profile_setting_option',
                              'type'     => 'switch',
-                             'title'    => __( 'Public/Private option', 'nokri' ),
+                             'title'    => __( 'Public/Private option', 'nokri' ), 
 							 'subtitle' => __( 'Allow users to set profile public/private', 'nokri' ),
                              'default'  => false,
                         ),
 					array(
-						 'id'       => 'user_assign_pkg',
-						 'type'     => 'switch',
-						 'title'    => __( 'Assign package', 'nokri' ),
-						 'subtitle' => __( 'Assign package at time of registration', 'nokri' ),
-						 'default'  => false,
-					),
-					
-					array(
-					'required' => array( 'user_assign_pkg', '=', array( '1' ) ),
-					'id'       => 'register_package',
-					'type'     => 'select',
-					'data'     => 'post',
-					'args'     => array('post_type' => array( 'product' ),),				
-					'multi'    => false,
-					'sortable' => false,
-					'title'    => __( 'Select Products', 'nokri-rest-api' ),
-					'subtitle' => __( 'Select only free package', 'nokri' ),
-				),
-					array(
-						 'id'       => 'user_profile_delete_option',
-						 'type'     => 'switch',
-						 'title'    => __( 'Account delete option', 'nokri' ),
-						 'subtitle' => __( 'Allow users to delete account', 'nokri' ),
-						 'default'  => true,
-					),
-                    array(
-                    'id'       => 'cand_search_mode',
-                    'type'     => 'button_set',
-                    'title'    => esc_html__( 'Candidate Search', 'nokri' ),
-                    'options'  => array(
-                    '1'        => esc_html__( 'Free','nokri' ),
-                    '2'        => esc_html__( 'Package Base','nokri' ),
-                    ),
-                    'default'  => '1',
-                    ),
-                    array(
                              'id'       => 'user_phone_email',
                              'type'     => 'switch',
                              'title'    => __( 'Hide/Show phone and email', 'nokri' ),
@@ -1481,30 +1491,17 @@
                          'default'  => true
                     ),
 					array(
-                    'id'       => 'video_resume',
-                    'type'     => 'switch',
-                    'title'    => esc_html__( 'Introduction video', 'nokri' ),
-                    'subtitle' => esc_html__( 'Hide/Show candidate introduction video', 'nokri' ),
-                    'default'  => true,
-               		 ),
+						 'id'       => 'user_profile_delete_option',
+						 'type'     => 'switch',
+						 'title'    => __( 'Account delete option', 'nokri' ),
+						 'subtitle' => __( 'Allow users to delete account', 'nokri' ),
+						 'default'  => true,
+					),
 					array(
                     'id'       => 'user_profile_dashboard_txt',
                     'type'     => 'text',
                     'title'    => esc_html__( 'User dashboard text', 'nokri' ),
                     'default'  => __( 'Howdy !', 'nokri' ),
-                        ),
-					array(
-                         'id'       => 'user_low_profile_txt_btn',
-                         'type'     => 'switch',
-                         'title'    => __( 'Hide/Show low profile alert', 'nokri' ),
-                         'default'  => true
-                    ),
-						array(
-					'required' => array( 'user_low_profile_txt_btn', '=', array( '1' ) ),
-                    'id'       => 'user_low_profile_txt',
-                    'type'     => 'textarea',
-                    'title'    => esc_html__( 'Private profile alert text', 'nokri' ),
-                    'default'  => '',
                         ),
                     array(
                     'id'       => 'user_private_txt',
@@ -1518,13 +1515,200 @@
                     'title'    => esc_html__( 'Company address on inovice', 'nokri' ),
                     'default'  => '',
                         ),
+						array(
+							'id'       => 'user_pagination',
+							'type'     => 'spinner', 
+							'title'    => esc_html__( 'Show Users Per Page', 'nokri' ),
+							'desc'     => __('Set number of user per page', 'nokri'),
+							'default'  => '10',
+							'min'      => '1',
+							'step'     => '1',
+							'max'      => '1000',
+						),
+			
+					)
+					) );
+					
+				/*********************/
+                /* Employer  options */
+                /********************/
+                
+                Redux::setSection( $opt_name, array(
+                'title'            => esc_html__( 'Employers', 'nokri' ),
+                'id'               => 'sb_employers_settings',
+                'subsection'       => true,
+                'customizer_width' => '700px',
+                'fields'           => array(  
 				array(
-                'id'       => 'sb_upload_profile_pic_size',
-                'type'     => 'select',
-                'title'    => esc_html__( 'Profile picture max size', 'nokri' ),
-                'options'  => array( '307200-300kb' => '300kb', '614400-600kb' => '600kb', '819200-800kb' => '800kb', '1048576-1MB' => '1MB', '2097152-2MB' => '2MB', '3145728-3MB' => '3MB', '4194304-4MB' => '4MB', '5242880-5MB' => '5MB' ),
-                'default'  => '819200-800kb',
-            ),
+						 'id'       => 'user_assign_pkg',
+						 'type'     => 'switch',
+						 'title'    => __( 'Assign package', 'nokri' ),
+						 'subtitle' => __( 'Assign package at time of registration', 'nokri' ),
+						 'default'  => false,
+					),
+					
+					array(
+					'required' => array( 'user_assign_pkg', '=', array( '1' ) ),
+					'id'       => 'register_package',
+					'type'     => 'select',
+					'data'     => 'post',
+					'args'     => array('post_type' => array( 'product' ),),				
+					'multi'    => false,
+					'sortable' => false,
+					'title'    => __( 'Select Products', 'nokri-rest-api' ),
+					'subtitle' => __( 'Select only free package', 'nokri' ),
+				),
+					
+                    array(
+                    'id'       => 'cand_search_mode',
+                    'type'     => 'button_set',
+                    'title'    => esc_html__( 'Candidate Search', 'nokri' ),
+                    'options'  => array(
+                    '1'        => esc_html__( 'Free','nokri' ),
+                    '2'        => esc_html__( 'Package Base','nokri' ),
+                    ),
+                    'default'  => '1',
+                    ),
+					$fields = array(
+						'id'       => 'sb_comp_gallery',
+						'type'     => 'button_set',
+						'title'    => __('Select company gallery option', 'nokri'),
+						'desc'     => __('You can select multiple', 'nokri'),
+						'multi'    => true,
+						//Must provide key => value pairs for options
+						'options' => array(
+							'1' => __('Images', 'nokri'), 
+							'2' => __('Youtube Link', 'nokri'), 
+						 ), 
+						'default' => '',
+						 ),
+                	 array(
+						'id'       => 'sb_comp_img_limit',
+						'type'     => 'select',
+						'title'    => esc_html__( 'Images upload limit', 'nokri' ),
+						'options'  => array(1 => 1,2 => 2,3 => 3,4 => 4,5 => 5,6 => 6,7 => 7,8 => 8,9 => 9,10 => 10, 11 => 11, 12=> 12, 13 => 13, 14 => 14, 15 => 15),
+						'default'  => 5,
+						),
+            
+						array(
+							'id'       => 'sb_comp_img_size',
+							'type'     => 'select',
+							'title'    => esc_html__( 'Image max size', 'nokri' ),
+							'options'  => array( '307200-300kb' => '300kb', '614400-600kb' => '600kb', '819200-800kb' => '800kb', '1048576-1MB' => '1MB', '2097152-2MB' => '2MB', '3145728-3MB' => '3MB', '4194304-4MB' => '4MB', '5242880-5MB' => '5MB' ),
+							'default'  => '819200-800kb',
+						),
+					/* Menu sorter */
+					array(
+							'id'       	  => 'employer_menu_sorter',
+							'type'        => 'sortable',
+							'desc'        => esc_html__( 'Click and drag for sorting', 'nokri' ),
+							'label'       => true,
+							'options'     => array(
+							'Dashboard'   => 'Dashboard',
+							'udpdate profile'=> 'Update Profile',
+							'View My Profile'=> 'View My Profile',
+							'My Jobs'      => 'My Jobs',
+							'Email Templates'=> 'Email Templates',
+							'Matched Resumes'=> 'Matched Resumes',
+							'Saved Resumes'=> 'Saved Resumes',
+							'Followers'    => 'Followers',
+							'My Package'   => 'My Package',
+							'My Orders'    => 'My Orders',
+							'Logout'       => 'Logout',
+							 
+						),
+							'default'  =>  array(
+							'Dashboard'   => 'Dashboard',
+							'udpdate profile'=> 'Update Profile',
+							'View My Profile'=> 'View My Profile',
+							'My Jobs'      => 'My Jobs',
+							'Email Templates'=> 'Email Templates',
+							'Matched Resumes'=> 'Matched Resumes',
+							'Followers'    => 'Followers',
+							'My Package'   => 'My Package',
+							'My Orders'    => 'My Orders',
+							'Logout'       => 'Logout',
+						)
+						),
+						
+			
+					)
+					) );
+					
+				/*********************/
+                /* Candidates  options */
+                /********************/
+                
+                Redux::setSection( $opt_name, array(
+                'title'            => esc_html__( 'Candidates', 'nokri' ),
+                'id'               => 'sb_candidates_settings',
+                'subsection'       => true,
+                'customizer_width' => '700px',
+                'fields'           => array( 
+				array(
+                    'id'       => 'cand_resume_style',
+                    'type'     => 'button_set',
+                    'title'    => esc_html__( 'Candidate Detail Page Style', 'nokri' ),
+                    'options'  => array(
+                    '1'        => esc_html__( 'Style 1','nokri' ),
+                    '2'        => esc_html__( 'Style 2','nokri' ),
+					 '3'        => esc_html__( 'Style 3','nokri' ),
+                    ),
+                    'default'  => '1',
+                    ),
+					
+					array(
+                    'id'       => 'cand_listing_style',
+                    'type'     => 'button_set',
+                    'title'    => esc_html__( 'Candidate Listing Style', 'nokri' ),
+                    'options'  => array(
+                    '1'        => esc_html__( 'Style 1','nokri' ),
+                    '2'        => esc_html__( 'Style 2','nokri' ),
+                    ),
+                    'default'  => '1',
+                    ),
+					array(
+                    'id'       => 'job_apply_package_base',
+                    'type'     => 'button_set',
+                    'title'    => esc_html__( 'Applied on jobs', 'nokri' ),
+                    'options'  => array(
+                    '2'        => esc_html__( 'Free','nokri' ),
+                    '1'        => esc_html__( 'Package Base','nokri' ),
+                    ),
+                    'default'  => '2',
+                    ),
+					array(
+                    'id'       => 'cand_advertisment',
+                    'type'     => 'textarea',
+                    'title'    => esc_html__( 'Advertisement', 'nokri' ),
+                    'subtitle' => __( '728 x 90', 'adforest' ),
+                    'desc'     => __( 'Advertisement on candidate profile', 'nokri' ),
+                    'default'  => '',
+                        ),
+					array(
+                    'id'       => 'video_resume',
+                    'type'     => 'switch',
+                    'title'    => esc_html__( 'Introduction video', 'nokri' ),
+                    'subtitle' => esc_html__( 'Hide/Show candidate introduction video', 'nokri' ),
+                    'default'  => true,
+               		 ),
+					 
+					array(
+                         'id'       => 'user_low_profile_txt_btn',
+                         'type'     => 'switch',
+                         'title'    => __( 'Hide/Show low profile alert', 'nokri' ),
+                         'default'  => true
+                    ),
+						array(
+					'required' => array( 'user_low_profile_txt_btn', '=', array( '1' ) ),
+                    'id'       => 'user_low_profile_txt',
+                    'type'     => 'textarea',
+                    'title'    => esc_html__( 'Private profile alert text', 'nokri' ),
+                    'default'  => '',
+                        ),
+						
+					
+				
             array(
                 'id'       => 'sb_upload_limit',
                 'type'     => 'select',
@@ -1557,23 +1741,47 @@
                 'options'  => array( '307200-300kb' => '300kb', '614400-600kb' => '600kb', '819200-800kb' => '800kb', '1048576-1MB' => '1MB', '2097152-2MB' => '2MB', '3145728-3MB' => '3MB', '4194304-4MB' => '4MB', '5242880-5MB' => '5MB' ),
                 'default'  => '819200-800kb',
             ),
-            array(
-                'id'       => 'user_pagination',
-                'type'     => 'select',
-                'title'    => esc_html__( 'Show Users Per Page', 'nokri' ),
-                'options'  => array(1 => 1,2 => 2,3 => 3,4 => 4,5 => 5,6 => 6,7 => 7,8 => 8,9 => 9,10 => 10, 11 => 11, 12=> 12, 13 => 13, 14 => 14, 15 => 15),
-                'subtitle' =>  esc_html__( 'Followers pages/candidates search page','nokri' ),
-                'default'  => 5,
-            ),
-            
-                
-        )
-    ) );
-    
-    
-    
-    
-    
+            	/* Menu sorter */
+					array(
+							'id'       	  		=> 'candidate_menu_sorter',
+							'type'        		=> 'sortable',
+							'desc'        		=> esc_html__( 'Click and drag for sorting', 'nokri' ),
+							'label'       		=> true,
+							'options'     		=> array(
+							'Dashboard'   		=> esc_html__( 'Dashboard', 'nokri' ),
+							'udpdate profile'	=> esc_html__( 'Update Profile', 'nokri' ),
+							'View My Profile'	=> esc_html__( 'View My Profile', 'nokri' ),
+							'My Resumes'      	=> esc_html__( 'My Resumes', 'nokri' ),
+							'Jobs Applied'		=> esc_html__( 'Jobs Applied', 'nokri' ),
+							'Saved Jobs'		=> esc_html__( 'Saved Jobs', 'nokri' ),
+							'Followed Companies'=> esc_html__( 'Followed Companies', 'nokri' ),
+							'Job Alerts'    	=> esc_html__( 'Job Alerts', 'nokri' ),
+							'My Package'   		=> esc_html__( 'My Package', 'nokri' ),
+							'My Orders'    		=> esc_html__( 'My Orders', 'nokri' ),
+							'Logout'       		=> esc_html__( 'Logout', 'nokri' ),
+							 
+						),
+							'default'           =>  array(
+							'Dashboard'   		=> esc_html__( 'Dashboard', 'nokri' ),
+							'udpdate profile'	=>  esc_html__( 'Update Profile', 'nokri' ),
+							'View My Profile'	=> esc_html__( 'View My Profile', 'nokri' ),
+							'My Resumes'      	=> esc_html__( 'My Resumes', 'nokri' ),
+							'Jobs Applied'		=> esc_html__( 'Jobs Applied', 'nokri' ),
+							'Saved Jobs'		=> esc_html__( 'Saved Jobs', 'nokri' ),
+							'Followed Companies'=> esc_html__( 'Followed Companies', 'nokri' ),
+							'Job Alerts'    	=> esc_html__( 'Job Alerts', 'nokri' ),
+							'My Package'   		=> esc_html__( 'My Package', 'nokri' ),
+							'My Orders'    		=> esc_html__( 'My Orders', 'nokri' ),
+							'Logout'       		=> esc_html__( 'Logout', 'nokri' ),
+						)
+						),
+						
+			
+					)
+					) );
+			
+			
+			
     
     /* ========================= */
     /* Pages Settings*/
@@ -1589,23 +1797,23 @@
                 'type'     => 'select',
                 'data'     => 'pages',
                 'title'    => esc_html__( 'Sign In Page', 'nokri' ),
-                'subtitle'       => 'Select Your Signin Page',
-                'default'  => array('6'),
+                'subtitle' => 'Select Your Signin Page',
+                'default'  => array('156'),
             ),
             array(
                 'id'       => 'sb_sign_up_page',
                 'type'     => 'select',
                 'data'     => 'pages',
                 'title'    => esc_html__( 'Sign Up Page', 'nokri' ),
-                'subtitle'       => 'Select Your Signup Page',
-                'default'  => array('6'),
+                'subtitle' => 'Select Your Signup Page',
+                'default'  => array('145'),
             ),
         array(
                 'id'       => 'term_condition',
                 'type'     => 'select',
                 'data'     => 'pages',
                 'title'    => esc_html__( 'Term And Condition Page', 'nokri' ),
-                'subtitle'       => 'Term And Condition Page',
+                'subtitle' => 'Term And Condition Page',
                 'default'  => array('6'),
             ),
             array(
@@ -1613,16 +1821,16 @@
                 'type'     => 'select',
                 'data'     => 'pages',
                 'title'    => esc_html__( 'Dashboard Page', 'nokri' ),
-                'subtitle'       => 'Select Redirecting Page After Employer Signup/Signin',
-                'default'  => array('6'),
+                'subtitle' => 'Select Redirecting Page After Employer Signup/Signin',
+                'default'  => array('235'),
             ),
             array(
                 'id'       => 'candidates_search_page',
                 'type'     => 'select',
                 'data'     => 'pages',
                 'title'    => esc_html__( 'Candidates Page', 'nokri' ),
-                'subtitle'       => 'Select candidates search page',
-                'default'  => array('6'),
+                'subtitle' => 'Select candidates search page',
+                'default'  => array('239'),
             ),
             array(
                 'id'       => 'employer_search_page',
@@ -1630,7 +1838,7 @@
                 'data'     => 'pages',
                 'title'    => esc_html__( 'Employer page', 'nokri' ),
                 'subtitle'       => 'Select employer search page',
-                'default'  => array('8'),
+                'default'  => array('424'),
             ),
             array(
                 'id'       => 'package_page',
@@ -1638,7 +1846,15 @@
                 'data'     => 'pages',
                 'title'    => esc_html__( 'Purchase Package', 'nokri' ),
                 'subtitle'       => 'Set Your Purchase Package Page',
-                'default'  => array('6'),
+                'default'  => array('441'),
+            ),
+			array(
+                'id'       => 'cand_package_page',
+                'type'     => 'select',
+                'data'     => 'pages',
+                'title'    => esc_html__( 'Candidate  Packages', 'nokri' ),
+                'subtitle' => 'Set Your Candidate Package Page',
+                'default'  => array('441'),
             ),
             array(
                 'id'       => 'contact_us',
@@ -1646,7 +1862,7 @@
                 'data'     => 'pages',
                 'title'    => esc_html__( 'Contact  us page', 'nokri' ),
                 'subtitle' => 'Set Your Contact us Page',
-                'default'  => array('6'),
+                'default'  => array('291'),
             ),
             array(
                 'id'       => 'about_us',
@@ -1654,7 +1870,7 @@
                 'data'     => 'pages',
                 'title'    => esc_html__( 'About  us', 'nokri' ),
                 'subtitle'       => 'Set your about us page',
-                'default'  => array('6'),
+                'default'  => array('289'),
             ),
     
      )
@@ -1908,6 +2124,100 @@ New apply  %site_name%;
                 'id'       => 'sb_email_job_to_anyone_body',
                 'type'     => 'editor',
                 'title'    => __( 'New applier email template', 'nokri' ),
+				'args'   => array(
+					'teeny'            => true,
+					'textarea_rows'    => 10,
+					'wpautop' => false,
+				),
+                'desc'     => __( '%site_name% , %job_title%, %job_link% will be translated accordingly.', 'nokri' ),
+                'default'  => '<table class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #f6f6f6; width: 100%;" border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;"></td>
+<td class="container" style="font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 580px; padding: 10px; width: 580px; margin: 0 auto !important;">
+<div class="content" style="box-sizing: border-box; display: block; margin: 0 auto; max-width: 580px; padding: 10px;">
+<table class="main" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; background: #fff; border-radius: 3px; width: 100%;">
+<tbody>
+<tr>
+<td class="wrapper" style="font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 20px;">
+<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr style="font-family: \'Helvetica Neue\',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+<td class="alert" style="font-family: \'Helvetica Neue\',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; color: #000; font-weight: 500; text-align: center; border-radius: 3px 3px 0 0; background-color: #fff; margin: 0; padding: 20px;" align="center" valign="top" bgcolor="#fff">
+
+A Designing and development company</td>
+</tr>
+<tr>
+<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
+<p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;"><span style="font-family: sans-serif; font-weight: normal;">Hello</span><span style="font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif;"><b>,</b></span></p>
+<p>Job Title: %job_title% </p>
+
+<p>Job Link: %job_link% </p>
+
+
+&nbsp;
+<p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;"><strong>Thanks!</strong></p>
+<p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">ScriptsBundle</p>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="footer" style="clear: both; padding-top: 10px; text-align: center; width: 100%;">
+<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td class="content-block powered-by" style="font-family: sans-serif; font-size: 12px; vertical-align: top; color: #999999; text-align: center;"><a style="color: #999999; text-decoration: underline; font-size: 12px; text-align: center;" href="https://themeforest.net/user/scriptsbundle">Scripts Bundle</a>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+&nbsp;
+
+</div></td>
+<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;"></td>
+</tr>
+</tbody>
+</table>
+&nbsp;',    
+            ),
+            
+            
+        )
+        ) );
+		
+/********************/
+/* Email job alerts */
+/********************/
+	
+	Redux::setSection( $opt_name, array(
+        'title'      => __( 'Email job alerts', "nokri" ),
+        'id'         => 'sb_email_job_alerts',
+        'desc'       => '',
+        'subsection' => true,
+        'fields'     => array(
+        array(
+                'id'       => 'sb_email_job_alerts_subj',
+                'type'     => 'text',
+                'title'    => __( 'Email Subject', 'nokri' ),
+                'default'  => __( 'Job For You', 'nokri' ),
+            ),
+        
+        array(
+                'id'       => 'sb_email_job_alerts_from',
+                'type'     => 'text',
+                'title'    => __( 'New user email FROM for Admin', 'nokri' ),
+    'desc'     => __( 'NAME valid@email.com is compulsory as we gave in default.', 'nokri' ),
+                'default'  => get_bloginfo( 'name' ).' <'.get_option( 'admin_email' ).'>',    
+            ),
+        
+         array(
+                'id'       => 'sb_email_job_alerts_body',
+                'type'     => 'editor',
+                'title'    => __( 'Job alerts email template', 'nokri' ),
 				'args'   => array(
 					'teeny'            => true,
 					'textarea_rows'    => 10,

@@ -31,10 +31,11 @@ include( 'template-parts/linkedin-access.php' );
 get_template_part( 'template-parts/linkedin','messages' );
 /* Email verification and reset password */
  get_template_part( 'template-parts/verification','logic' ); ?>
-<div id="popup-data"></div> 
+<div id="popup-data"></div>
 <div id="app-data"></div>
 <div id="short-desc-data"></div>
 <div id="status_action_data"></div>
+<div id="job-alert-dataaaaa"></div> 
 <?php
 if( isset( $nokri['banners_code_footer'] ) &&  $nokri['banners_code_footer'] != '')
 {
@@ -45,7 +46,9 @@ if( isset( $nokri['banners_code_footer'] ) &&  $nokri['banners_code_footer'] != 
 if((isset($nokri['scroll_to_top'])) && $nokri['scroll_to_top']  == '1' ) { ?>
 <a href="#" class="scrollup"><i class="fa fa-chevron-up"></i></a>
 <?php } echo nokri_authorization();
-wp_footer();?>
-</div>
+wp_footer();
+/* Email job alerts */
+get_template_part( 'template-parts/job','alerts' );
+?>
 </body>
 </html>

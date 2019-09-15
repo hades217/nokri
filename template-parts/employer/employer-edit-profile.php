@@ -114,6 +114,18 @@ if( $levelz >= 4 )
 	}
 	
 }
+
+if (!empty($nokri['sb_comp_gallery']))
+{
+	$images =  $you_link = false;
+	foreach ($nokri['sb_comp_gallery'] as $key => $value) 
+	{
+		if($value == '1')
+		$images = true;
+		if($value == '2')
+		$you_link = true;
+	}
+}
 ?>
 
 <form id="sb-emp-profile" method="post">
@@ -208,6 +220,9 @@ if( $levelz >= 4 )
             <input type="text" value="<?php echo get_user_meta($user_crnt_id, '_emp_est', true); ?>" name="emp_est" class="datepicker-here-canidate form-control"  />
           </div>
         </div>
+        
+       
+        
         <!--End Company Specialization --> 
         <!-- Company Soical Links -->
         <div class="col-md-12 col-xs-12 col-sm-12">
@@ -282,7 +297,6 @@ if( $levelz >= 4 )
           </div>
         </div>
          <?php } ?>
-         
          <div class="col-md-12 col-xs-12 col-sm-12">
           <div class="row">
             <div class="dashboard-location">
@@ -340,7 +354,38 @@ if( $levelz >= 4 )
       </div>
     </div>
   </div>
+
+<?php if($images || $you_link) { ?>
+<div class="main-body change-password">
+  <div class="dashboard-edit-profile">
+    <h4 class="dashboard-heading"><?php echo esc_html__('Company Portfolio','nokri'); ?></h4>
+    <div class="row">
+                <div class="col-md-12 col-xs-12 col-sm-12">
+                    <div class="row">
+                    <?php if($images) { ?>
+                    <div class="col-md-12 col-lg-12 col-xs-12 col-sm-12">
+                     <div class="form-group">
+                        <label class="control-label"><?php echo esc_html__('Company Gallery','nokri'); ?><small><?php echo " ".esc_html__('Drag drop or click to upload your company images','nokri'); ?></small></label>
+                        <div id="company-dropzone" class="dropzone"></div>
+                        </div>
+                    </div>
+                    <?php } if($you_link) { ?>
+                    <div class="col-md-12 col-sm-12">
+                        <div class="form-group">
+                            <label><?php echo esc_html__('Video url (only youtube) ','nokri'); ?></label>
+                            <input type="text" placeholder="<?php echo esc_attr__('Put youtube video link','nokri'); ?>" value="<?php echo  nokri_candidate_user_meta('_emp_video'); ?>" name="emp_video" class="form-control" data-parsley-pattern="^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/.+">
+                        </div>
+                    </div>
+                    <?php } ?>
+                   </div>
+                </div>
+            </div>
+             <input type="submit"  value="<?php echo esc_html__( 'Save Profile', 'nokri' ); ?>" class="btn n-btn-flat">
+  </div>
+</div>
+<?php } ?>
 </form>
+
 <!-- update password-->
 <div class="main-body change-password">
   <div class="dashboard-edit-profile">
@@ -375,6 +420,7 @@ if( $levelz >= 4 )
     </form>
   </div>
 </div>
+
 <?php
 if($mapType == 'leafletjs_map')
 {

@@ -274,6 +274,14 @@ if( isset( $nokri['search_job_advert_switch']) && $nokri['search_job_advert_swit
 }
 /* Search page lay out */
 $search_page_layout = ( isset($nokri['search_page_layout']) && $nokri['search_page_layout'] != ""  ) ? $nokri['search_page_layout'] : "";
+/* Is job alerts*/
+$job_alerts = ( isset($nokri['job_alerts_switch']) && $nokri['job_alerts_switch'] != ""  ) ? $nokri['job_alerts_switch'] : false;
+/* Job alert title*/
+$job_alerts_title = ( isset($nokri['job_alerts_title']) && $nokri['job_alerts_title'] != ""  ) ? $nokri['job_alerts_title'] : '';
+/* Job alert tagline*/
+$job_alerts_tagline = ( isset($nokri['job_alerts_tagline']) && $nokri['job_alerts_tagline'] != ""  ) ? $nokri['job_alerts_tagline'] : '';
+/* Job alert btn*/
+$job_alerts_btn = ( isset($nokri['job_alerts_btn']) && $nokri['job_alerts_btn'] != ""  ) ? $nokri['job_alerts_btn'] : '';
 if($search_page_layout == 1)
 {
 ?>
@@ -318,6 +326,19 @@ if($search_page_layout == 1)
                                  </div>
                               </div>
                            </div>
+                           <?php if($job_alerts) { ?>
+                           <div class="jobs-alert-box">
+                           	<div class="row">
+                                <div class="col-lg-9 col-md-8 col-sm-8 col-xs-12">
+                                   <span><?php echo esc_html($job_alerts_title); ?></span>
+                                   <p><?php echo esc_html($job_alerts_tagline); ?></p>
+                                </div>
+                                <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+                                    <a href="javascript:void(0)" class="btn n-btn-flat job_alert"><?php echo esc_html($job_alerts_title); ?></a>
+                                </div>
+                            </div>
+                           </div>
+                    	 <?php } ?>
                            <div class="n-search-listing n-featured-jobs-two">
                               <div class="row">
                               <?php echo ($advert_up); ?>
@@ -414,7 +435,8 @@ if($search_page_layout == 1)
                 <div class="n-search-main">
                    <div class="n-bread-crumb">
                       <ol class="breadcrumb">
-                         <li> <a href=""><?php  echo esc_html__("Home", "nokri"); ?></a></li>
+                         <li> <a href="javascript:void(0)"><?php  echo esc_html__("Home", "nokri"); ?></a></li>
+                         <li class="job_alert"> <a href="javascript:void(0)"><?php  echo esc_html__("Job Alert", "nokri"); ?></a></li>
                          <li class="active"><a href="javascript:void(0);" class="active"><?php  echo esc_html__("Search Page", "nokri"); ?></a></li>
                       </ol>
                    </div>
@@ -425,16 +447,30 @@ if($search_page_layout == 1)
                          </div>
                          <div class="col-md-4 col-sm-4 col-xs-12">
                             <form method="GET" id="job_order_search">
-                                       <select class="js-example-basic-single form-control change_order" data-allow-clear="true" data-placeholder="<?php  echo esc_html__("Select Option", "nokri"); ?>" style="width: 100%" name="order_job">
-                                          <option value="" ><?php  echo esc_html__("Select Option", "nokri"); ?></option>
-                                           <option value="ASC" <?php if ( $order == 'ASC') { echo "selected"; } ; ?>><?php  echo esc_html__("Ascending", "nokri"); ?></option>
-                                        <option value="DESC" <?php if ( $order == 'DESC') { echo "selected"; } ; ?>><?php  echo esc_html__("Descending ", "nokri"); ?></option>
-                                       </select>
-                                    </form>
+                               <select class="js-example-basic-single form-control change_order" data-allow-clear="true" data-placeholder="<?php  echo esc_html__("Select Option", "nokri"); ?>" style="width: 100%" name="order_job">
+                                  <option value="" ><?php  echo esc_html__("Select Option", "nokri"); ?></option>
+                                   <option value="ASC" <?php if ( $order == 'ASC') { echo "selected"; } ; ?>><?php  echo esc_html__("Ascending", "nokri"); ?></option>
+                                <option value="DESC" <?php if ( $order == 'DESC') { echo "selected"; } ; ?>><?php  echo esc_html__("Descending ", "nokri"); ?></option>
+                               </select>
+                            </form>
                          </div>
                       </div>
                    </div>
-                   <?php echo ($advert_up); ?>
+                   <?php if($job_alerts) { ?>
+                   <div class="jobs-alert-box">
+                           	<div class="row">
+                                <div class="col-lg-9 col-md-8 col-sm-8 col-xs-12">
+                                   <span><?php echo esc_html($job_alerts_title); ?></span>
+                                   <p><?php echo esc_html($job_alerts_tagline); ?></p>
+                                </div>
+                                <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+                                    <a href="javascript:void(0)" class="btn n-btn-flat job_alert"><?php echo esc_html($job_alerts_title); ?></a>
+                                </div>
+                            </div>
+                           </div>
+                   
+                   
+                   <?php } echo ($advert_up); ?>
                    <div class="n-search-listing n-featured-jobs featured">
                    <?php
 				   /*Section Title */
@@ -464,7 +500,7 @@ if($search_page_layout == 1)
                     </div>
                    <div class="n-search-listing n-featured-jobs">
                       <div class="n-featured-job-boxes">
-                      <?php
+                       <?php
 						/* Regular Search Query */	
 						 if ( $results->have_posts() ) { 
 								 $current_layout    =   $nokri['search_layout'];

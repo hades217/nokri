@@ -7,13 +7,8 @@ if((isset($nokri['sb_post_ad_page'])) && $nokri['sb_post_ad_page']  != '' )
 {
 	$page_job_post =  ($nokri['sb_post_ad_page']);
 } 
-$current_id = get_current_user_id();
-
-$job_name = '';
-$job_order = '';
-$meta_key = '';
-$job_filter = '';
-
+$current_id =  get_current_user_id();
+$job_name   =  $job_order = $meta_key = $job_filter = '';
 	$job_name    =  (isset($_GET['job_name']) && $_GET['job_name'] != "") ? $_GET['job_name'] : '';
 	$job_order   =  (isset($_GET['job_order']) && $_GET['job_order'] != "") ? $_GET['job_order'] : 'date'; 
 	$job_class   =  (isset($_GET['job_class']) && $_GET['job_class'] != "" ) ? $_GET['job_class'] : '';
@@ -29,11 +24,9 @@ $job_filter = '';
 	}
 $query_title = '';
 if($job_name != '')
-
 {
 	 $query_title = "'s'  => $job_name";
 }
-
 $paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
 $args = array(
 	'post_type'   => 'job_post',
@@ -52,7 +45,6 @@ $args = array(
             'compare' => '='
         )
     )
-  
 );
 ?>
 <div class="dashboard-job-filters">
@@ -112,14 +104,13 @@ $query = new WP_Query( $args );
 			$query->the_post(); 
 			get_template_part( 'template-parts/layouts/job-style/style', '3');
 	 }
- 
 }
 else
 {
 ?>
 <div class="dashboard-posted-jobs">
     <div class="notification-box">
-        <h4><?php echo esc_html__( 'No Job Found', 'nokri' ); ?></h4>
+        <h4><?php echo esc_html__( 'No job found', 'nokri' ); ?></h4>
     </div>
 </div>
 <?php } ?>

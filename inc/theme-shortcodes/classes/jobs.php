@@ -238,7 +238,7 @@ if (! class_exists ( 'jobs' )) {
 			
 			/* Getting Last country value*/
 			$job_locations  = array();
-			$last_location        =  '';
+			$last_location  =  '';
 			$job_locations  =  wp_get_object_terms( $pid,  array('ad_location'), array('orderby' => 'term_group') );
 			if ( ! empty( $job_locations ) ) { 
 				foreach($job_locations as $location)

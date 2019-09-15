@@ -125,3 +125,4 @@ if($is_sticky_menu)
 <input type="hidden" id="email_exist" value="<?php echo esc_html__( 'Email already exist, please try other one.', 'nokri' ); ?>" />
 <input type="hidden" id="some_wrong" value="<?php echo esc_html__( 'Email not sent', 'nokri' ); ?>" />
 <input type="hidden" id="add_skills_value" value="<?php echo esc_html__( 'Set Your Skills Percentage', 'nokri' ); ?>" />
+<input type="hidden" id="cand_pkg_expire" value="<?php echo esc_html__( 'Package Expired', 'nokri' ); ?>" />

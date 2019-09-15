@@ -37,3 +37,5 @@ require trailingslashit( get_template_directory () ) . 'inc/theme-shortcodes/sho
 require trailingslashit( get_template_directory () ) . 'inc/theme-shortcodes/shortcodes/recent_jobs_list.php';
 require trailingslashit( get_template_directory () ) . 'inc/theme-shortcodes/shortcodes/hero_premium_section.php';
 require trailingslashit( get_template_directory () ) . 'inc/theme-shortcodes/shortcodes/call_action3.php';
+require trailingslashit( get_template_directory () ) . 'inc/theme-shortcodes/shortcodes/pricing-cand.php';
+require trailingslashit( get_template_directory () ) . 'inc/theme-shortcodes/shortcodes/featured-candidates.php';

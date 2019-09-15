@@ -58,16 +58,9 @@ foreach( $ad_country as $ad_count )
 {
 	$country_html	.=	'<option value="'.$ad_count->term_id.'">' . $ad_count->name .  '</option>';
 }
-$cand_skills_values_get	= get_user_meta($user_crnt_id, '_cand_skills_values', true);
-$cand_skills_values = '';
-if(!empty($cand_skills_values_get))
-{
-	foreach ($cand_skills_values_get as $value) 
-	{
-		$cand_skills_values .= $value.',';
-		
-	}
-}
+$cand_skills   = $cand_skills_values = array();
+$cand_skills_values	= get_user_meta($user_crnt_id, '_cand_skills_values', true);
+$cand_skills	= get_user_meta($user_crnt_id, '_cand_skills', true);
 /*Setting profile option*/
 $profile_setting_option = isset($nokri['user_profile_setting_option']) ? $nokri['user_profile_setting_option']  : false;
 /*Is map show*/
@@ -235,7 +228,7 @@ $cand_intro_vid =( isset($nokri['video_resume']) && $nokri['video_resume'] != ""
                 </div>
             </div>
             
-           
+    
             
              <?php if($profile_setting_option) { ?>
             <div class="col-md-12 col-xs-12 col-sm-12">
@@ -252,24 +245,6 @@ $cand_intro_vid =( isset($nokri['video_resume']) && $nokri['video_resume'] != ""
              
              
              
-             
-            <div class="col-md-12 col-xs-12 col-sm-12">
-                <div class="form-group">
-                    <label class=""><?php echo esc_html__('Select Your Skills','nokri'); ?></label>
-                    <select   class="select-generat form-control" name="cand_skills[]" multiple="multiple">
-                         <?php echo nokri_candidate_skills('job_skills','_cand_skills'); ?>
-                    </select>
-                </div>
-            </div>
-            
-           
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                 <div class="form-group">
-                 <label id='humayun'><?php echo esc_html__( 'Select your skills percentage respectively (only integers)', 'nokri' ); ?></label>					
-                    <input type="text" id="tags_tag" name="cand_skills_values"  value="<?php echo (rtrim($cand_skills_values)); ?>" class="form-control" data-role="tagsinput" />
-                 </div>
-            </div>
-            
             
             <div class="col-md-12 col-xs-12 col-sm-12">
                 <div class="form-group">
@@ -284,7 +259,97 @@ $cand_intro_vid =( isset($nokri['video_resume']) && $nokri['video_resume'] != ""
         </div>
 </div>
 </div>
-<!-- End Candidate Personal Informations -->                             
+<!-- End Candidate Personal Informations -->
+ <!-- Candidate Skills-->
+<div class="main-body">
+	<div class="dashboard-edit-profile">
+		<h4 class="dashboard-heading"><?php echo esc_html__('Skills','nokri'); ?></h4>
+		<div class="rows">
+        <div class="skills-gen content">
+        <?php
+		if( isset($cand_skills) && !empty($cand_skills) &&  count($cand_skills) > 0 )
+		{
+			foreach($cand_skills as $key => $csv )
+			{
+				$term = get_term_by( 'id', $csv , 'job_skills' );		
+				if($term)
+				{
+					$skill_lavel = 10;
+					if( isset($cand_skills_values) && is_array($cand_skills_values))
+					{
+						if(array_key_exists($key,$cand_skills_values))
+						{
+							$skill_lavel = $cand_skills_values[$key]; ?>
+                            <div class="row group">
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    <label class="">
+                                        <?php echo esc_html__( 'Select Your Skill', 'nokri'); ?>
+                                    </label>
+                                    <select class="candidate-skill-gener form-control" name="cand_skills_new[]" data-allow-clear="true" data-placeholder="<?php echo esc_html__( 'Select Your Skills', 'nokri' ); ?>">
+                                    <option value=""><?php echo esc_html__( 'Select Option', 'nokri' ); ?></option>
+                                        <?php echo nokri_job_post_taxonomies( 'job_skills', $csv); ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                            <div class="form-group">
+                             <label class=""><?php echo esc_html__( 'Enter Your Skill Value', 'nokri'); ?></label>
+                                <input class="form-control" type="text" name="cand_skills_val[]" data-parsley-type="number" max="100" data-parsley-error-message="<?php echo esc_html__('Digits allowed less than 100','nokri'); ?>" placeholder="<?php echo esc_html__('Digits allowed less than 100','nokri'); ?>" value="<?php echo esc_attr($skill_lavel); ?>">
+                            </div></div>
+                            <div class="col-md-2 nopadding">
+                                <button type="button" class="btn btn-danger btnRemove">
+                                    <?php echo esc_html__( 'Remove', 'nokri'); ?>
+                                </button>
+                            </div>
+                        </div>
+						<?php }
+					}			
+				}
+			}
+		}
+?>
+            <div class="row group">
+                <div class="col-md-5">
+                    <div class="form-group">
+                        <label class="">
+                            <?php echo esc_html__( 'Select Your Skills', 'nokri'); ?>
+                        </label>
+                        <select class="candidate-skill-gener form-control" name="cand_skills_new[]">
+                            <option value="">
+                                <?php echo esc_html__( 'Select an option', 'nokri'); ?>
+                            </option>
+                            <?php echo nokri_candidate_skills( 'job_skills', ''); ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                <div class="form-group">
+                <label class=""><?php echo esc_html__( 'Select Your Skills', 'nokri'); ?></label>
+                    <input class="form-control" type="text" name="cand_skills_val[]" data-parsley-type="number" max="100" data-parsley-error-message="<?php echo esc_html__('Digits allowed less than 100','nokri'); ?>" placeholder="<?php echo esc_html__('Digits allowed less than 100','nokri'); ?>">
+                </div></div>
+                <div class="col-md-2 nopadding">
+                    <button type="button" class="btn btn-danger btnRemove">
+                        <?php echo esc_html__( 'Remove', 'nokri'); ?>
+                    </button>
+                </div>
+            </div>
+            <div class="row skills-btn-postion">
+                <div class="col-md-12">
+                    <button type="button" id="btnAdd-2" class="btn btn-success">
+                        <?php echo esc_html__( 'Add Skills', 'nokri'); ?>
+                    </button>
+                </div>
+            </div>
+		</div>
+        </div>
+		<div class="col-md-12 col-xs-12 col-sm-12">
+			<input type="submit" value="<?php echo esc_html__('Save Skills','nokri'); ?>" class="btn n-btn-flat">
+		</div>
+	</div>
+</div>
+<!-- Candidate Skills End --> 
+                             
 <!-- Candidate Resume Uplaoad -->
 <div class="main-body">
 	<div class="dashboard-edit-profile" id="add-resume">
@@ -368,15 +433,15 @@ $cand_intro_vid =( isset($nokri['video_resume']) && $nokri['video_resume'] != ""
 							<label class="">
 								<?php echo esc_html__( 'Start Date', 'nokri'); ?>
 							</label>
-							<input type="text"  name="cand_education['degree_start'][]" value="<?php echo esc_html($degree_start); ?>" class="datepicker-here-canidate form-control" />
+							<input type="text"  name="cand_education['degree_start'][]" value="<?php echo esc_html($degree_start); ?>" class="datepicker-here-canidate form-control date-start" data-date-input='start-date-<?php echo $c; ?>'/>
 						</div>
 					</div>
-					<div class="col-md-6 col-xs-12 col-sm-6">
+					<div class="col-md-6 col-xs-12 col-sm-6 last-end-date">
 						<div class="form-group">
 							<label class="">
 								<?php echo esc_html__( 'End Date', 'nokri'); ?>
 							</label>
-							<input type="text"  value="<?php echo esc_html($degree_end); ?>" name="cand_education['degree_end'][]" class="datepicker-here-canidate form-control" />
+							<input type="text"  value="<?php echo esc_html($degree_end); ?>" name="cand_education['degree_end'][]" class="datepicker-here-canidate1 form-control date-end " data-date-input='end-date-<?php echo $c; ?>' />
 						</div>
 					</div>
                     <div class="clear"></div>
@@ -484,13 +549,13 @@ $cand_intro_vid =( isset($nokri['video_resume']) && $nokri['video_resume'] != ""
                         <div class="col-md-6 col-xs-12 col-sm-6">
                             <div class="form-group">
                                 <label class=""><?php echo esc_html__('Job start Date','nokri'); ?></label>
-                                <input  type="text"  name="cand_profession['project_start'][]" value="<?php echo esc_html($project_start); ?>" class="datepicker-here-canidate form-control"  />
+                                <input  type="text"  name="cand_profession['project_start'][]" value="<?php echo esc_html($project_start); ?>" class="datepicker-here-canidate form-control date-start" data-date-input='start-date-<?php echo $c; ?>'  />
                             </div>
                         </div>
                         <div class="col-md-6 col-xs-12 col-sm-6"> 
                             <div class="form-group " >
                                 <label class="end-hide" ><?php echo esc_html__('Job End Date','nokri'); ?></label>
-                                <input type="text"  value="<?php echo esc_html($project_end); ?>" name="cand_profession['project_end'][]"  class="datepicker-here-canidate form-control end-hide"   <?php echo ($hide_class); ?>  />
+                                <input type="text"  value="<?php echo esc_html($project_end); ?>" name="cand_profession['project_end'][]"  class="datepicker-here-canidate form-control end-hide date-end"   <?php echo ($hide_class); ?>  data-date-input='end-date-<?php echo $c; ?>'  />
 
 <input type="hidden"  value="<?php echo esc_html($project_name); ?>" name="cand_profession['project_name'][]"  class="checked-input-hide"   <?php echo ($hide_class); ?>  />
 
@@ -500,7 +565,7 @@ $cand_intro_vid =( isset($nokri['video_resume']) && $nokri['video_resume'] != ""
                         <div class="col-md-12 col-sm-12 col-xs-12">
                             <div class="form-group">
                                 <label><?php echo esc_html__('Description','nokri'); ?></label>
-                                <textarea rows="6" class="form-control rich_textarea"  name="cand_profession['project_desc'][]" id="ad_description"><?php echo ($project_detail); ?></textarea>
+                                <textarea rows="6" class="form-control rich_textarea"  name="cand_profession['project_desc'][]" ><?php echo ($project_detail); ?></textarea>
                             </div>
                         </div>
                   		<?php echo "".$removeBtn ; ?>
@@ -557,13 +622,13 @@ $cand_intro_vid =( isset($nokri['video_resume']) && $nokri['video_resume'] != ""
                         <div class="col-md-6 col-xs-12 col-sm-6">
                             <div class="form-group">
                                 <label class=""><?php echo esc_html__('Certification Start Date','nokri'); ?></label>
-                                <input type="text" name="cand_certifications['certification_start'][]" value="<?php echo esc_html($certification_start); ?>" class="datepicker-here-canidate form-control"   />
+                                <input type="text" name="cand_certifications['certification_start'][]" value="<?php echo esc_html($certification_start); ?>" class="datepicker-here-canidate form-control date-start" data-date-input='start-date-<?php echo $c; ?>'   />
                             </div>
                         </div>
                         <div class="col-md-6 col-xs-12 col-sm-6">
                             <div class="form-group">
                                 <label class=""><?php echo esc_html__('Certification End Date','nokri'); ?></label>
-                                <input type="text" value="<?php echo esc_html($certification_end); ?>" name="cand_certifications['certification_end'][]" class="datepicker-here-canidate form-control"   />
+                                <input type="text" value="<?php echo esc_html($certification_end); ?>" name="cand_certifications['certification_end'][]" class="datepicker-here-canidate form-control date-end" data-date-input='end-date-<?php echo $c; ?>'   />
                             </div>
                         </div>
                         <div class="col-md-6 col-sm-12">
@@ -636,25 +701,25 @@ $cand_intro_vid =( isset($nokri['video_resume']) && $nokri['video_resume'] != ""
                     <div class="dashboard-social-links">
                         <div class="col-md-6 col-sm-12">
                             <div class="form-group">
-                                <label><?php echo esc_html__('Face Book','nokri'); ?><span class="required">*</span></label>
+                                <label><?php echo esc_html__('Face Book','nokri'); ?></label>
                                 <input type="text" value="<?php echo  nokri_candidate_user_meta('_cand_fb'); ?>"  name="cand_fb" class="form-control">
                             </div>
                         </div>
                         <div class="col-md-6 col-sm-12">
                             <div class="form-group">
-                                <label><?php echo esc_html__('Twitter','nokri'); ?><span class="required">*</span></label>
+                                <label><?php echo esc_html__('Twitter','nokri'); ?></label>
                                 <input type="text" value="<?php echo  nokri_candidate_user_meta('_cand_twiter'); ?>" name="cand_twiter" class="form-control">
                             </div>
                         </div>
                         <div class="col-md-6 col-sm-12">
                             <div class="form-group">
-                                <label><?php echo esc_html__('LinkedIn','nokri'); ?><span class="required">*</span></label>
+                                <label><?php echo esc_html__('LinkedIn','nokri'); ?></label>
                                 <input type="text" value="<?php echo  nokri_candidate_user_meta('_cand_linked'); ?>"  name="cand_linked"  class="form-control">
                             </div>
                         </div>
                         <div class="col-md-6 col-sm-12">
                             <div class="form-group">
-                                <label><?php echo esc_html__('Instagram','nokri'); ?> <span class="required">*</span></label>
+                                <label><?php echo esc_html__('Instagram','nokri'); ?></label>
                                 <input type="text" value="<?php echo  nokri_candidate_user_meta('_cand_google'); ?>" name="cand_google" class="form-control">
                             </div>
                         </div>
@@ -721,7 +786,7 @@ $cand_intro_vid =( isset($nokri['video_resume']) && $nokri['video_resume'] != ""
            <div class="form-group">
             <label><?php echo esc_html($job_country_level_1 ); ?></label>
               <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo esc_html__( 'Select Your Country', 'nokri' ); ?>" id="ad_country" name="cand_country">
-                 
+                 <option value=""><?php echo esc_html__( 'Select an option', 'nokri'); ?> </option>
                   <?php echo "".($country_html);?>
               </select>
              
