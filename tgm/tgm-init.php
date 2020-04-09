@@ -76,7 +76,7 @@ function nokri_register_required_plugins()
             'slug' => 'nokri_framework',
             'source' => get_template_directory_uri() . '/required-plugins/nokri_framework.zip',
             'required' => true,
-            'version' => '1.2.0',
+            'version' => '1.3.1',
             'force_activation' => false,
             'force_deactivation' => false,
             'external_url' => '',
@@ -113,10 +113,9 @@ function nokri_register_required_plugins()
             'version' => '',
             'force_activation' => false,
             'force_deactivation' => false,
-            'external_url' => 'https://downloads.wordpress.org/plugin/add-to-any.1.7.36.zip',
+            'external_url' => 'https://downloads.wordpress.org/plugin/add-to-any.1.7.39.zip',
             'is_callable' => ''
         ),
-		
 		array(
             'name' => esc_html__('One Click Demo Import', 'nokri'),
             'slug' => 'one-click-demo-import',
@@ -137,7 +136,7 @@ function nokri_register_required_plugins()
 			'version'            => '', // E.g. 1.0.0. If set, the active plugin must be this version or higher. If the plugin version is higher than the plugin version installed, the user will be notified to update the plugin.
 			'force_activation'   => false, // If true, plugin is activated upon theme activation and cannot be deactivated until theme switch.
 			'force_deactivation' => false, // If true, plugin is deactivated upon theme switch, useful for theme-specific plugins.   
-			'external_url'       => esc_url( 'https://downloads.wordpress.org/plugin/woocommerce.3.7.0.zip'
+			'external_url'       => esc_url( 'https://downloads.wordpress.org/plugin/woocommerce.3.7.1.zip'
 			 ), // If set, overrides default API URL and points to an external URL.
 			'is_callable'        => '', // If set, this callable will be be checked for availability to determine if a plugin is active.
 		),

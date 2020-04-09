@@ -109,81 +109,84 @@ function categories_section2_short_base_func($atts, $content = '')
 		'link' => '',
 	) , $atts));
 // For Job Category
-$rows  		= vc_param_group_parse_atts( $atts['cats'] );
-$cats 		= false;
-$cats_html 	= '';
-/*Opening txt*/
-$one_opening = (isset($section_open_txt) && $section_open_txt != "") ? $section_open_txt : esc_html__( 'Openings', 'nokri' );
-$more_opening = (isset($section_open_txt2) && $section_open_txt2 != "") ? $section_open_txt2 : esc_html__( 'Openings', 'nokri' );
-  if( count((array) $rows ) > 0 )
-  {
-   $cats_html =  '';
-   foreach($rows as $row )
-   {
-		if( isset( $row['cat'] )  )
-		{
-			 if($row['cat'] == 'all' ) 
-			 {
-				  $cats = true;
-				  break;
-			 }
-			 $category = get_term_by('slug', $row['cat'], 'job_category');
-			 /* calling function for openings*/
-			 $custom_count =  nokri_get_opening_count($category->term_id);
-			 if( count((array) $category ) == 0 )
-			 continue;
-			 /*Category Image */
-			 $cat_img = '';	
-			if(isset($row['cat_img']))
-			{
-				 $img 		=  	wp_get_attachment_image_src($row['cat_img'], '');
-				$img_thumb 	= 	$img[0];
-				$cat_img    =   '<div class="cat-icons"><img src="'.esc_url($img_thumb).'" alt="'.esc_attr__( 'image', 'nokri' ).'"></div>';
-			}
-			$count_cat = $one_opening;
-			if ($category->count > 1)
-			{
-				$count_cat = $more_opening;
-			}
-				$cats_html .= '<li><a href="'.nokri_cat_link_page($category->term_id).'" >
-				'.$cat_img.'
-				'.$category->name.'
-				<span>('.$custom_count." ".$count_cat.')</span>
-				<span class="arrow"> <i class="ti-arrow-right"></i></span>
-				</a>
-				</li>';
-	   }
-	}
-	  if( $cats )
-	   {
-			$ad_cats = nokri_get_cats('job_category', 0 );
-			 /*Category Image */
-			 $cat_img = '';	
-			if(isset($row['cat_img']))
-			{
-				 $img 		=  	wp_get_attachment_image_src($row['cat_img'], '');
-				$img_thumb 	= 	$img[0];
-				$cat_img    =   '<img src="'.esc_url($img_thumb).'" alt="'.esc_attr__( 'image', 'nokri' ).'">';
-			}
-			foreach( $ad_cats as $cat )
-			{
-				/* calling function for openings*/
-			    $custom_count =  nokri_get_opening_count($cat->term_id);
-				$count_cat = $one_opening;;
-				if ($cat->count > 1)
+if(isset($atts['cats']) && $atts['cats'] != '')
+	{
+		$rows  		= vc_param_group_parse_atts( $atts['cats'] );
+		$cats 		= false;
+		$cats_html 	= '';
+		/*Opening txt*/
+		$one_opening = (isset($section_open_txt) && $section_open_txt != "") ? $section_open_txt : esc_html__( 'Openings', 'nokri' );
+		$more_opening = (isset($section_open_txt2) && $section_open_txt2 != "") ? $section_open_txt2 : esc_html__( 'Openings', 'nokri' );
+		  if( count((array) $rows ) > 0 )
+		  {
+		   $cats_html =  '';
+		   foreach($rows as $row )
+		   {
+				if( isset( $row['cat'] )  )
 				{
-					$count_cat = $more_opening;
-				}
-				$cats_html .= '<li><a href="'.nokri_cat_link_page($cat->term_id).'" >
-				'.$cat_img.'
-				'.$cat->name.'
-				<span>('.$custom_count." ".$count_cat.')</span>
-				<span class="arrow"> <i class="ti-arrow-right"></i></span>
-				</a>
-				</li>';
+					 if($row['cat'] == 'all' ) 
+					 {
+						  $cats = true;
+						  break;
+					 }
+					 $category = get_term_by('slug', $row['cat'], 'job_category');
+					 /* calling function for openings*/
+					 $custom_count =  nokri_get_opening_count($category->term_id,'job_category');
+					 if( count((array) $category ) == 0 )
+					 continue;
+					 /*Category Image */
+					 $cat_img = '';	
+					if(isset($row['cat_img']))
+					{
+						 $img 		=  	wp_get_attachment_image_src($row['cat_img'], '');
+						$img_thumb 	= 	$img[0];
+						$cat_img    =   '<div class="cat-icons"><img src="'.esc_url($img_thumb).'" alt="'.esc_attr__( 'image', 'nokri' ).'"></div>';
+					}
+					$count_cat = $one_opening;
+					if ($category->count > 1)
+					{
+						$count_cat = $more_opening;
+					}
+						$cats_html .= '<li><a href="'.nokri_cat_link_page($category->term_id).'" >
+						'.$cat_img.'
+						'.$category->name.'
+						<span>('.$custom_count." ".$count_cat.')</span>
+						<span class="arrow"> <i class="ti-arrow-right"></i></span>
+						</a>
+						</li>';
+			   }
 			}
-	   }	  
-}
+			  if( $cats )
+			   {
+					$ad_cats = nokri_get_cats('job_category', 0 );
+					 /*Category Image */
+					 $cat_img = '';	
+					if(isset($row['cat_img']))
+					{
+						 $img 		=  	wp_get_attachment_image_src($row['cat_img'], '');
+						$img_thumb 	= 	$img[0];
+						$cat_img    =   '<img src="'.esc_url($img_thumb).'" alt="'.esc_attr__( 'image', 'nokri' ).'">';
+					}
+					foreach( $ad_cats as $cat )
+					{
+						/* calling function for openings*/
+						$custom_count =  nokri_get_opening_count($cat->term_id,'job_category');
+						$count_cat = $one_opening;;
+						if ($cat->count > 1)
+						{
+							$count_cat = $more_opening;
+						}
+						$cats_html .= '<li><a href="'.nokri_cat_link_page($cat->term_id).'" >
+						'.$cat_img.'
+						'.$cat->name.'
+						<span>('.$custom_count." ".$count_cat.')</span>
+						<span class="arrow"> <i class="ti-arrow-right"></i></span>
+						</a>
+						</li>';
+					}
+			   }	  
+		}
+	}
  /* Background Image */
 $bg_img = '';
 if( $section_img != "" )

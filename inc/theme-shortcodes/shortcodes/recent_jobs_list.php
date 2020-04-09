@@ -116,6 +116,7 @@ $recent_job = array(
 );
 
 global $nokri;
+$recent_job = nokri_wpml_show_all_posts_callback($recent_job);
 $recent_job_query = new WP_Query( $recent_job ); 
 $recent_job_html = '';
 if ( $recent_job_query->have_posts() )
@@ -124,7 +125,11 @@ if ( $recent_job_query->have_posts() )
 	  { 
 			$recent_job_query->the_post();
 			$job_id		    = get_the_ID();
-		    $post_author_id = get_post_field('post_author', $job_id );
+		        $post_author_id = get_post_field('post_author', $job_id );
+                        
+                        $post_author_data  = get_userdata( $post_author_id);
+                        
+                        $author_name      =   $post_author_data->display_name;
 			/* Getting Profile Photo */
 			$rel_image_link[0]   =   get_template_directory_uri(). '/images/candidate-dp.jpg';
 			if( get_user_meta($post_author_id, '_sb_user_pic', true ) != "" )
@@ -152,11 +157,14 @@ if ( $recent_job_query->have_posts() )
 			$recent_job_html    .= '<div class="col-md-4 col-sm-6 col-xs-12">
                                         <div class="job-list-simple">
                                             <div class="job-list-simple-img">
-                                                <a href="'.get_the_permalink().'"><img src="'.esc_url($rel_image_link[0]).'" class="img-responsive img-circle" alt="'.esc_html__('image','nokri').'"></a>
+                                                <a href="'.get_the_permalink().'"><img src="'.esc_url($rel_image_link[0]).'" class="img-responsive" alt="'.esc_html__('image','nokri').'"></a>
                                             </div> 
                                             <div class="job-list-simple-title">
                                                 <a href="'.get_the_permalink().'">'.get_the_title().'</a>
-                                                '.$last_location.'
+                                                   '. $author_name  .'   
+                                                      '.",".'
+                                                    '.$last_location.'
+                                                  
                                             </div>
                                         </div>
                                     </div>';

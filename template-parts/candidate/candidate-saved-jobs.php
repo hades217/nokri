@@ -25,6 +25,7 @@ if(isset($_GET['job_name']))
              <input type="hidden" name="candidate-page" value="saved-jobs" >
                 <input type="text" class="form-control" name="job_name" value="<?php echo esc_html($job_name); ?>" placeholder="<?php echo esc_html__('Keyword or Name','nokri'); ?>">
                 <a href="javascript:void(0)" class="a-btn no-top search_job"><i class="ti-search"></i></a>
+                <?php echo nokri_form_lang_field_callback(true); ?>
             </form>  
             </div>
         </div>  
@@ -52,6 +53,7 @@ $args = array(
 	'order'      =>  'DESC',
 	'meta_query' =>  array( array('key'     => '_job_saved_value_'.$current_id,),),
 			);
+$args  = nokri_wpml_show_all_posts_callback($args);
 $query = new WP_Query( $args );
 if ($query->have_posts() )
 { 
@@ -106,8 +108,8 @@ while ( $query->have_posts() )
 <?php $count++; } ?>
   </div>
     <div class="pagination-box clearfix">
-    <?php echo nokri_job_pagination( $query ); ?>
-</div>
+    	<?php echo nokri_job_pagination( $query ); ?>
+	</div>
 <?php } else { ?>
 <div class="dashboard-posted-jobs">
     <div class="notification-box">

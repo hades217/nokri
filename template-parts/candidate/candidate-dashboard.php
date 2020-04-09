@@ -11,6 +11,13 @@ $cand_video	         =  get_user_meta($user_crnt_id, '_cand_video', true);
 $job_qualifications	 =  get_user_meta($user_crnt_id, '_cand_last_edu', true);
 nokri_load_search_countries(1);
 /* Getting Candidate Dp */
+/* Updating Profile Percentage*/
+$top_bar_class = 'no-topbar';
+if((isset($nokri['header_top_bar'])) && $nokri['header_top_bar']  == 1 )
+{
+	$top_bar_class = '';
+}
+ echo nokri_updating_candidate_profile_percent();
 $image_dp_link[0] =  get_template_directory_uri(). '/images/candidate-dp.jpg';
 if( isset( $nokri['nokri_user_dp']['url'] ) && $nokri['nokri_user_dp']['url'] != "" )
 	{
@@ -29,29 +36,42 @@ if( isset( $_GET['candidate-page'] ) && $_GET['candidate-page'] != "" )
  else
  {
  }
- /* Getting Profile Percentage*/
-$profile_percent = 10;
-$cand_pesonal 	 = get_user_meta($user_crnt_id, '_cand_intro', true);
-if ($cand_pesonal )
-{
-	 $profile_percent = $profile_percent + 23;
-}
-$cand_education = get_user_meta($user_crnt_id, '_cand_education', true); 
-if ( $cand_education  && $cand_education[0]['degree_name'] != '' ) 
-{
-	$profile_percent = 33 + $profile_percent;
-}
-$cand_profession	= get_user_meta($user_crnt_id, '_cand_profession', true);
-if ( $cand_profession  && $cand_profession[0]['project_organization'] != '' )
-{
-	$profile_percent = 34 + $profile_percent;
-}
-if($profile_percent != '')
-{
-	update_user_meta( $user_crnt_id, '_cand_profile_percent', $profile_percent);
-}
+
 /* Candidate Job Notifiactions */
-$query            = array('post_type' => 'job_post','post_status' => 'publish','posts_per_page' => 3,'orderby' => 'date','order' => 'DESC');  
+$cand_job_notif_en = ( isset($nokri['cand_job_notif']) && $nokri['cand_job_notif'] != ""  ) ? $nokri['cand_job_notif'] : '1';
+$cand_job_notif   = ( isset($nokri['cand_job_notif']) && $nokri['cand_job_notif'] != ""  ) ? $nokri['cand_job_notif'] : false;
+$get_companies    =  nokri_following_company_ids($user_crnt_id);
+if(!empty($get_companies) && $cand_job_notif == '2' )
+{
+	$authors        =  $get_companies;
+	$noti_message   =  esc_html__('Follow companies for job notifications','nokri');
+}
+else if($cand_job_notif == '1')
+{
+	$authors        =  0;
+	$noti_message   =  esc_html__('Set your skills for job notifications','nokri');
+}
+else
+{
+	$authors = 98780;
+	$noti_message   =  esc_html__('Follow companies for job notifications','nokri');
+}
+$query    = array(
+					'post_type'   		=>  'job_post',
+					'post_status' 		=>  'publish',
+					'posts_per_page' 	=>   3,
+					'orderby' 			=>  'date',
+					'order' 			=>  'DESC',
+					'author__in'		=>  $authors,
+					'meta_query'        => 	array(
+								array(
+									'key'     => '_job_status',
+									'value'   => 'active',
+									'compare' => '=',
+								),
+							),
+					);  
+$args             = nokri_wpml_show_all_posts_callback($query);
 $loop             = new WP_Query($query);
 $notification     = '';
 while ( $loop->have_posts() ) 
@@ -67,7 +87,6 @@ while ( $loop->have_posts() )
 		$final_array = array_intersect($job_skills, $cand_skills);
 		if (count($final_array) > 0) 
 		{
-			
 			$notification .= '<li>
 								<div class="notif-single">
 									<a href="'. esc_url(get_author_posts_url(get_the_author_meta('ID'))).'">'.esc_html($company_name). " " .'</a>'.esc_html__('Posted','nokri').'<a href="'.get_the_permalink($job_id).'" class="notif-job-title">'." ".get_the_title().'</a>
@@ -111,7 +130,7 @@ $user_low_profile_txt = ( isset($nokri['user_low_profile_txt']) && $nokri['user_
 /* Is applying job package base*/
 $is_apply_pkg_base = ( isset($nokri['job_apply_package_base']) && $nokri['job_apply_package_base'] != ""  ) ? $nokri['job_apply_package_base'] : false; 
  ?>
- <section class="dashboard-new candidate-dashboard">
+ <section class="dashboard-new candidate-dashboard <?php echo esc_attr($top_bar_class); ?>">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12 col-sm-12 col-xs-12 nopadding">
@@ -192,8 +211,11 @@ $is_apply_pkg_base = ( isset($nokri['job_apply_package_base']) && $nokri['job_ap
                                             <?php  } ?>
                                         </ul>
                                     </div>
+                                    <?php if(isset($cand_job_notif_en) && $cand_job_notif_en != '3') { ?>
                                 <div class="notification-area">
-                                	<h4><?php echo esc_html__('These jobs match your skills','nokri'); ?></h4>
+                                  <?php if($notification) { ?>
+                                	<h4><?php echo nokri_feilds_label('cand_job_notif_txt',esc_html__('These jobs match your skills', 'nokri' )); ?></h4> 
+                                       <?php } ?>
                                     <div class="notif-box">
                                     	<ul>
                                         	<?php echo "".$notification; ?>
@@ -204,13 +226,14 @@ $is_apply_pkg_base = ( isset($nokri['job_apply_package_base']) && $nokri['job_ap
                                                 </div>
                                                 <?php } else { ?>
                                                 <div class="notif-single">
-                                                	<a href="javascript:void(0)"><?php echo esc_html__('Set your skills for job notifications','nokri'); ?></a>
+                                                	<h4><?php echo $noti_message; ?></h4>
                                                 </div>
                                                 <?php } ?>
                                             </li>
                                         </ul>
                                     </div>
                                 </div>
+                                <?php } ?>
                             </div>
                             </div>
                         </div>

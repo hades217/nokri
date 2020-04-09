@@ -20,7 +20,7 @@ if( isset($_GET['c_order']) )
         <div class="col-md-6 col-xs-12 col-sm-6">
             <div class="form-group">
                 <form method="GET" id="order_form">
-                     <input type="hidden" name="tab-data" value="my-orders" >
+                     <input type="hidden" name="candidate-page" value="my-orders" >
                         <select class="js-example-basic-single form-control order_form" name="c_order">
                             <option value="all" <?php if ( $c_order == 'all') { echo "selected"; } ; ?> ><?php echo esc_html__('All orders', 'nokri' ); ?></option>
                             <option value="completed" <?php if (isset($c_order[0]) && $c_order[0] == 'wc-completed') { echo "selected"; } ; ?>><?php echo  esc_html__( 'Completed', 'nokri' ); ?></option>

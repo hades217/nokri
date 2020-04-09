@@ -134,42 +134,45 @@ function about_us_short_base_func($atts, $content = '')
 		'abt_img' => '', 
 		'employer_signup_img' => '',
 	) , $atts));
-	$rows = vc_param_group_parse_atts( $atts['faq_qstns'] );
-	$about_html = '';
-	if( count( $rows ) > 0) {
-   foreach($rows as $row )
-   {	
-		/*Title */
-		$title = (isset($row['faq_qstn_title']) && $row['faq_qstn_title'] != "") ? '<h4>'.$row['faq_qstn_title'].'</h4>' : "";
-		/*Details */
-		$details = (isset($row['faq_qstn_details']) && $row['faq_qstn_details'] != "") ? '<p>'.$row['faq_qstn_details'].'</p>' : "";
-		 /*Icons Image */
-			 $about_img = '';	
-			if(isset($row['abt_img']))
-			{
-				$img 		=  	wp_get_attachment_image_src($row['abt_img'], '');
-				$img_thumb 	= 	$img[0];
-				$about_img  =   '<div class="icons"><img src="'.esc_url($img_thumb).'" alt="'.esc_attr__( 'image', 'nokri' ).'"></div>';
-			}
-			
-			/*Step Icon */
-			$astep_icon = '';	
-			if(isset($row['step_icon']))
-			{
-				$about_img    =   '<i class="la '.trim($row['step_icon']).' la-4x"></i>';
-			}
-						
-		$about_html .='<div class="col-md-6 col-xs-12 col-sm-6">
-								 <div class="services-grid">
-									'.$about_img.'
-									'.$title.'
-									'.$details.'
-								 </div>
-							  </div>';
-   }
-   
-  }
-
+	if(isset($atts['faq_qstns']) && $atts['faq_qstns'] != '')
+	{
+		$rows = vc_param_group_parse_atts( $atts['faq_qstns'] );
+		$about_html = '';
+		if( count( $rows ) > 0)
+		 {
+	   foreach($rows as $row )
+	   {	
+			/*Title */
+			$title = (isset($row['faq_qstn_title']) && $row['faq_qstn_title'] != "") ? '<h4>'.$row['faq_qstn_title'].'</h4>' : "";
+			/*Details */
+			$details = (isset($row['faq_qstn_details']) && $row['faq_qstn_details'] != "") ? '<p>'.$row['faq_qstn_details'].'</p>' : "";
+			 /*Icons Image */
+				 $about_img = '';	
+				if(isset($row['abt_img']))
+				{
+					$img 		=  	wp_get_attachment_image_src($row['abt_img'], '');
+					$img_thumb 	= 	$img[0];
+					$about_img  =   '<div class="icons"><img src="'.esc_url($img_thumb).'" alt="'.esc_attr__( 'image', 'nokri' ).'"></div>';
+				}
+				
+				/*Step Icon */
+				$astep_icon = '';	
+				if(isset($row['step_icon']))
+				{
+					$about_img    =   '<i class="la '.trim($row['step_icon']).' la-4x"></i>';
+				}
+							
+			$about_html .='<div class="col-md-6 col-xs-12 col-sm-6">
+									 <div class="services-grid">
+										'.$about_img.'
+										'.$title.'
+										'.$details.'
+									 </div>
+								  </div>';
+	   }
+	   
+	  }
+	}
 /*Section Image */
  $img_html = '';	
 if(isset($employer_signup_img))

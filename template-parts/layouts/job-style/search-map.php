@@ -2,12 +2,10 @@
 global $nokri;
 /* Getting Title From Query String */ 
 $title	=	'';
-if( isset( $_GET['job_title'] ) && $_GET['job_title'] != "" )
+if( isset( $_GET['job-title'] ) && $_GET['job-title'] != "" )
 {
-	$title	=	$_GET['job_title'];
+	$title	=	$_GET['job-title'];
 }
-
-
  /* Getting All Taxonomy From Query String */
  $taxonomies	=	array('job_type','ad_title', 'cat_id','job_category','job_tags','job_qualifications','job_level','job_salary','job_currency','job_skills','job_experience','job_currency','job_shift','job_class','ad_location');
 foreach( $taxonomies as $tax )
@@ -20,25 +18,25 @@ foreach( $taxonomies as $tax )
 		}
 }
 $category	=	'';
-if( isset( $_GET['cat_id'] ) && $_GET['cat_id'] != ""  )
+if( isset( $_GET['cat-id'] ) && $_GET['cat-id'] != ""  )
 {
 	$category	=	array(
 		array(
 		'taxonomy' => 'job_category',
 		'field'    => 'term_id',
-		'terms'    => $_GET['cat_id'],
+		'terms'    => $_GET['cat-id'],
 		),
 	);	
 }	
 
 $location	=	'';
-if( isset( $_GET['job_location'] ) && $_GET['job_location'] != ""  )
+if( isset( $_GET['job-location'] ) && $_GET['job-location'] != ""  )
 {
 	$location	=	array(
 		array(
 		'taxonomy' => 'ad_location',
 		'field'    => 'term_id',
-		'terms'    => $_GET['job_location'],
+		'terms'    => $_GET['job-location'],
 		),
 	);	
 }
@@ -55,8 +53,6 @@ if( isset( $_GET['loc_keyword'] ) && $_GET['loc_keyword'] != ""  )
 		),
 	);	
 }
-
-
 /* Passing Query String Results To Arguments */ 
 $order	=	'DESC';
 if( isset($_GET['order_job']) )
@@ -286,6 +282,7 @@ $job_alerts_btn = ( isset($nokri['job_alerts_btn']) && $nokri['job_alerts_btn'] 
                                   <option value="ASC" <?php if ( $order == 'ASC') { echo "selected"; } ; ?> ><?php  echo esc_html__("Ascending", "nokri"); ?></option>
                                   <option value="DESC" <?php if ( $order == 'DESC') { echo "selected"; } ; ?>><?php  echo esc_html__("Descending ", "nokri"); ?></option>
                                </select>
+                              <?php echo nokri_form_lang_field_callback(true) ?>
                             </form>
                          </div>
                       </div>
@@ -298,7 +295,7 @@ $job_alerts_btn = ( isset($nokri['job_alerts_btn']) && $nokri['job_alerts_btn'] 
                                    <p><?php echo esc_html($job_alerts_tagline); ?></p>
                                 </div>
                                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                                    <a href="javascript:void(0)" class="btn n-btn-flat job_alert"><?php echo esc_html($job_alerts_title); ?></a>
+                                    <a href="javascript:void(0)" class="btn n-btn-flat job_alert"><?php echo esc_html($job_alerts_btn); ?></a>
                                 </div>
                              </div>
                     	 <?php } ?>
@@ -326,7 +323,7 @@ $job_alerts_btn = ( isset($nokri['job_alerts_btn']) && $nokri['job_alerts_btn'] 
 						}
 						?>
                       </div>
-                      </div>
+                   </div>
                    <div class="n-search-listing n-featured-jobs">
                       <div class="n-featured-job-boxes">
                          <?php

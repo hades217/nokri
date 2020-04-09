@@ -34,11 +34,11 @@ $job_phone	     		   =      get_post_meta($job_id, '_job_phone', true);
 $job_vacancy	 		   =      get_post_meta($job_id, '_job_posts', true);
 $job_video	     		   =      get_post_meta($job_id, '_job_video', true);
 $cats	         		   =	  nokri_get_ad_cats ( $job_id, 'ID' );
-$post_date       		   =      get_the_date(' M j ,Y' ); 
+$post_date       		   =      get_the_date(' M j ,Y' );
 /* Jobs aplly with */
-$job_apply_with	     =     get_post_meta($job_id, '_job_apply_with', true);
-$job_apply_url	     =     get_post_meta($job_id, '_job_apply_url', true); 
-$job_apply_mail	     =     get_post_meta($job_id, '_job_apply_mail', true);
+$job_apply_with	          =     get_post_meta($job_id, '_job_apply_with', true);
+$job_apply_url	          =     get_post_meta($job_id, '_job_apply_url', true); 
+$job_apply_mail	          =     get_post_meta($job_id, '_job_apply_mail', true);
 /* Jobs tags */
 $tags_html       = '';
 $jobs_tags       = get_the_terms( $job_id, 'job_tags');
@@ -46,7 +46,9 @@ if(!empty($jobs_tags) && count((array)  $jobs_tags ) > 0)
 {
 	foreach($jobs_tags as $tag) 
 	{
-		$tags_html .= '<a href="'.esc_url( get_tag_link($tag->term_id) ).'">#'.esc_attr( $tag->name ).'</a>';
+		$link      = nokri_set_url_param(get_the_permalink($nokri['sb_search_page']), 'job_tags', esc_attr( $tag->term_id));
+		$final_url = esc_url(nokri_page_lang_url_callback($link));
+		$tags_html .= '<a href="'.$final_url.'">#'.esc_attr( $tag->name ).'</a>';
 	}
 }
 /* Calling Funtion Job Class For Badges */ 
@@ -54,7 +56,7 @@ $single_job_badges	=	nokri_job_class_badg($job_id);
 $job_badge_text     =   '';
 if( count((array)  $single_job_badges ) > 0) 
 {	
-	foreach( $single_job_badges as $job_badge => $val )
+	    foreach( $single_job_badges as $job_badge => $val )
 		{
 			$term_vals =  get_term_meta($val);
 			$bg_color  =  get_term_meta( $val, '_job_class_term_color_bg', true );
@@ -64,7 +66,9 @@ if( count((array)  $single_job_badges ) > 0)
 			{
 				$style_color = 'style=" background-color: '.$bg_color.' !important; color: '.$color.' !important;"';
 			}
-			$job_badge_text .= '<li><a href="'.get_the_permalink($nokri['sb_search_page']).'?job_class='.$val.'" class="job-class-tags-anchor" '.$style_color.'><span>'.esc_html(ucfirst($job_badge)).'</span></a></li>';
+			$search_url = nokri_set_url_param(get_the_permalink($nokri['sb_search_page']), 'job_class',$val);
+			$job_badge_text .= '<li><a href="'.esc_url(nokri_page_lang_url_callback($search_url)).'" class="job-class-tags-anchor" '.$style_color.'><span>'.esc_html(ucfirst($job_badge)).'</span></a></li>';
+			
 		}  
 }
 /* Setting job Expiration */
@@ -79,28 +83,10 @@ if($today_string > $expiry_date_string)
 }
 /* Getting job Aplly Expiration Status */
  $post_apply_status = get_post_meta($job_id, '_job_status', true);
-/* Getting Last Child Value*/
-$job_categories  = array();
-$project         =  '';
-$job_categories  =  wp_get_object_terms( $job_id,  array('job_category'), array('orderby' => 'term_group') );
-if ( ! empty( $job_categories ) ) { 
-	$last_cat        =  '';
-	foreach($job_categories as $c)
-	{
-	   $project = $c->name;
-	}
-}
-/* Getting Last Country Value*/
-$job_countries_last = array();
-$countries_last         =  '';
-$job_countries_last  =  wp_get_object_terms( $job_id,  array('ad_location'), array('orderby' => 'term_group') );
-if ( ! empty( $job_countries_last ) ) { 
-	$last_cat        =  '';
-	foreach($job_countries_last as $c)
-	{
-	   $countries_last = $c->name;
-	}
-}
+/* Getting Catgories*/
+$project = nokri_job_categories_with_chlid_no_href($job_id,'job_category');
+/* Getting Location*/
+$countries_last = nokri_job_categories_with_chlid_no_href($job_id,'ad_location');
 /* Getting Job Skills  */
 $skill_tags      =  '';
 if(is_array($job_skills))
@@ -111,7 +97,11 @@ if(is_array($job_skills))
 		 foreach($taxonomies as $taxonomy)
 				{
 					if (in_array( $taxonomy->term_id, $job_skills ))
-					$skill_tags .= '<a href="'.get_the_permalink($nokri['sb_search_page']).'?job_skills='.esc_attr($taxonomy->term_id).'">'." ".esc_html($taxonomy->name)." ".'</a>';
+					{
+						$link      = nokri_set_url_param(get_the_permalink($nokri['sb_search_page']), 'job_skills', esc_attr( $taxonomy->term_id ));
+						$final_url = esc_url(nokri_page_lang_url_callback($link));
+						$skill_tags .= '<a href="'.$final_url.'">'." ".esc_html($taxonomy->name)." ".'</a>';
+					}
 				}
 	  }
 }
@@ -227,3 +217,5 @@ $job_alerts_title = ( isset($nokri['job_alerts_title']) && $nokri['job_alerts_ti
 $job_alerts_tagline = ( isset($nokri['job_alerts_tagline']) && $nokri['job_alerts_tagline'] != ""  ) ? $nokri['job_alerts_tagline'] : '';
 /* Job alert btn*/
 $job_alerts_btn = ( isset($nokri['job_alerts_btn']) && $nokri['job_alerts_btn'] != ""  ) ? $nokri['job_alerts_btn'] : '';
+/* Job schema*/
+$single_job_schema = ( isset($nokri['single_job_schema']) && $nokri['single_job_schema'] != ""  ) ? $nokri['single_job_schema'] : '';

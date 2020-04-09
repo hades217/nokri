@@ -2,27 +2,38 @@
 /* Employer Dashboard */
 global $nokri;
 $user_id 		 = get_current_user_id();
+$post_found    = '';
 $args = array(
 	'post_type'   => 'job_post',
 	'orderby'     => 'date',
 	'order'       => 'DESC',
 	'author' 	  => $user_id,
 	'post_status' => array('publish'),
+	'meta_query' => array(
+        array(
+            'key' => '_job_status',
+            'value' => 'active',
+            'compare' => '='
+        )
+    )
 );
+$args = nokri_wpml_show_all_posts_callback($args);
 $query = new WP_Query( $args ); 
 	$job_html = '';
 	if ( $query->have_posts() )
 	{
+        $post_found    =  $query->found_posts;
 		while ( $query->have_posts()  )
 	  	{ 
 			$query->the_post();
 		    $job_id	       =  get_the_ID();
-			$resume_counts =  nokri_get_resume_count($job_id);
+            $resume_counts =  nokri_get_resume_count($job_id);
 			$post_status   =  get_post_status( $job_id);
 			$class		   =  'warning';
 			if($post_status == 'publish')
 			{
-				$class     =  'success';
+				$post_status   =  esc_html__( 'Publish', 'nokri' );
+				$class         =  'success';
 			}
 			// check for plugin post-views-counter
 			$job_views = '';
@@ -32,7 +43,7 @@ $query = new WP_Query( $args );
 			} 
 		    $job_html .= '<tr>
 						<td><a href="'.get_the_permalink().'">'.get_the_title($job_id).'</a></td>
-						<td><span class="label label-'.esc_attr($class).'">'.get_post_status( $job_id).'</span></td>
+						<td><span class="label label-'.esc_attr($class).'">'.$post_status.'</span></td>
 						<td>'.$resume_counts.'</td>
 						<td>'.$job_views.'</td>
                     </tr>';
@@ -48,7 +59,7 @@ $query = new WP_Query( $args );
                 <div class="stat-box-meta">
                     <div class="stat-box-meta-text">
                         <h4><?php echo esc_html__( 'Published Jobs', 'nokri' ); ?></h4>
-                        <h3><?php echo nokri_get_jobs_count($user_id,'publish'); ?></h3>
+                        <h3><?php echo $post_found != '' ? $post_found : 0; ?></h3>
                     </div>
                     <div class="stat-box-meta-icon">
                         <img src="<?php echo get_template_directory_uri();?>/images/icons/job1.png" class="img-responsive" alt="<?php echo esc_attr__( 'image', 'nokri' ); ?>">

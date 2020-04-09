@@ -13,7 +13,6 @@ $job_currency	           =	  isset( $job_currency[0] ) ? $job_currency[0] : '';
 $company_name  			   =      get_user_meta($user_id, '_emp_name', true);
 $job_expiry                =      get_post_meta($job_id, '_job_date', true);
 $job_status                =      get_post_meta($job_id, '_job_status', true);
-
 if($job_status == 'inactive')
 {
 	$job_status            =      esc_html__('inactive', 'nokri' );
@@ -28,7 +27,6 @@ if($today_string > $expiry_date_string)
 {
 	$take_action = false;
 }
-
 $job_ap_status =     $job_status;
 $staus_clr     =     'warning';
 if ($job_status == 'active')
@@ -46,33 +44,39 @@ if( get_user_meta($user_id, '_sb_user_pic', true ) != "" )
 
 /* Calling Funtion Job Class For Badges */ 
 $single_job_badges	=	nokri_job_class_badg($job_id);
-$job_badge_text     =   '';
+$job_badge_text     =   $premium_txt = '';
 if( count( $single_job_badges ) > 0) 
 {	
 	foreach( $single_job_badges as $job_badge => $val )
 		{
 			$job_badge_text .= '<a href="#">'.esc_html(ucfirst($job_badge)).'</a>';
 		}
+		if(!empty($job_badge_text))
+		{
+			$premium_txt = '<div class="job-class">'.$job_badge_text.'</div>';
+		}
 }
+/* Dashboard Page */
+$dashboard_id = '';
+if((isset($nokri['sb_dashboard_page'])) && $nokri['sb_dashboard_page']  != '' )
+{
+ 	$dashboard_id =  ($nokri['sb_dashboard_page']);
+}
+$myurl     =   get_the_permalink($dashboard_id);
+$final_url =   esc_url(nokri_set_url_params_multi($myurl,'tab-data','match-list','id',esc_attr( $job_id)));
 ?>
-<div class="cp-loader"></div>
-<div class="posted-job-list" id="all-jobs-list-box2-<?php echo esc_attr($job_id); ?>">
-    <ul class="list-inline">
-        <li class="posted-job-title"> 
-            <a href="<?php echo get_the_permalink($job_id); ?>"><?php the_title(); ?></a>
-            <p><strong><?php echo esc_html__( 'Posted Date', 'nokri' ); ?>: </strong><?php echo get_the_date(); ?></p>
-            <div class="job-class"> 
-               <?php echo "".$job_badge_text ?>
-            </div>
-        </li>
-        <li class="posted-job-status"><span class="label label-<?php echo esc_attr( $staus_clr); ?>"><?php echo esc_html( $job_ap_status); ?></span></li>
-       
-        <li class="posted-job-expiration"><?php echo date_i18n(get_option('date_format'), strtotime($job_expiry)); ?></li>
-        <li class="posted-job-action"> 
-            <ul class="list-inline">
-                <li class="tool-tip" title="<?php echo esc_html__( 'View Resumes', 'nokri' ); ?>"> <a href="?tab-data=match-list&id=<?php echo esc_attr( $job_id ); ?>" class="label label-success"> <i class="ti-files"></i></a></li>
-            </ul>
-        </li>
-        
-    </ul>
-</div>
+<tr>
+    <td><a class= "job-title" href="<?php echo get_the_permalink($job_id); ?>"><?php the_title(); ?></a>
+<p><strong><?php echo esc_html__( 'Posted Date', 'nokri' ); ?>: </strong><?php echo get_the_date(); ?></p>
+<?php echo "".$premium_txt; ?>
+    </td>
+    <td> 
+     <span class="label label-<?php echo esc_attr( $staus_clr); ?>"><?php echo esc_html( $job_ap_status); ?></span>
+    </td>
+    <td> 
+     <?php echo date_i18n(get_option('date_format'), strtotime($job_expiry)); ?>
+    </td>
+    <td> 
+    	<a href="<?php echo $final_url; ?>" class="btn n-btn-custom btn-small"><?php echo esc_html__( 'View Resumes', 'nokri' ); ?></a>
+	</td>
+</tr>

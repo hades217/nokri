@@ -3,12 +3,10 @@ if (! class_exists ( 'jobs' )) {
 	class jobs
 	{
 		var $obj;
-		
 		public function __construct()
 		{
 			
 		}
-		
 		/* Search Lay Out 1 */
 		function nokri_search_layout_list_1( $pid, $col = '', $sm = 6, $holder = '' )
 		{
@@ -51,6 +49,10 @@ if (! class_exists ( 'jobs' )) {
 		    $job_currency	           =	  isset( $job_currency[0] ) ? $job_currency[0] : '';
 			$job_type        		   =      wp_get_post_terms($pid, 'job_type', array("fields" => "ids"));
 			$job_type	     		   =	  isset( $job_type[0] ) ? $job_type[0] : '';
+			/* Jobs aplly with */
+			$job_apply_with	          =     get_post_meta($pid, '_job_apply_with', true);
+			$job_apply_url	          =     get_post_meta($pid, '_job_apply_url', true); 
+			$job_apply_mail	          =     get_post_meta($pid, '_job_apply_mail', true);
 			/* Calling Funtion Job Class For Badges */ 
 			$job_badge_ul  = nokri_premium_job_class_badges($pid);
 			$featured_html = '';
@@ -82,7 +84,7 @@ if (! class_exists ( 'jobs' )) {
                                              <div class="n-featured-singel-meta">
                                                 <h4><a href="'.get_the_permalink($pid).'">'.get_the_title($pid).'</a></h4>
                                                 <div class="n-cat">'.nokri_job_categories_with_chlid($pid).'</div>
-                                                <p><i class="fa fa-map-marker"></i>'." ".nokri_job_country($pid).'</p>
+                                                <p><i class="fa fa-map-marker"></i>'." ".nokri_job_country($pid,'').'</p>
 												'.$job_badge_ul.'
                                              </div>
 											 '.$featured_html.'
@@ -98,7 +100,6 @@ if (! class_exists ( 'jobs' )) {
                                        </div>
                                     </div>';
 		}
-		
 		/* Premium jobs */
 		function nokri_search_layout_list_2( $pid, $col = '', $sm = 6, $holder = '' )
 		{
@@ -119,6 +120,10 @@ if (! class_exists ( 'jobs' )) {
 			$job_currency	    =  	isset( $job_currency[0] ) ? $job_currency[0] : '';
 			$job_salary_type    =  	wp_get_post_terms($pid, 'job_salary_type', array("fields" => "ids"));
 			$job_salary_type 	=	isset( $job_salary_type[0] ) ? $job_salary_type[0] : '';
+			/* Jobs aplly with */
+			$job_apply_with	          =     get_post_meta($pid, '_job_apply_with', true);
+			$job_apply_url	          =     get_post_meta($pid, '_job_apply_url', true); 
+			$job_apply_mail	          =     get_post_meta($pid, '_job_apply_mail', true);
 			/* Calling Funtion Job Class For Badges */ 
 			$single_job_badges	=	nokri_job_class_badg($pid);
 			$job_badge_text     =   '';
@@ -157,7 +162,7 @@ if (! class_exists ( 'jobs' )) {
                                     <div class="vertical-single-job ">
                                        <a href="'.get_the_permalink($nokri['sb_search_page']).'?job_type='.$job_type.'" class="label">'.nokri_job_post_single_taxonomies('job_type', $job_type).'</a>
                                        <h4><a href="'.get_the_permalink($pid).'">'.get_the_title($pid).'</a></h4>
-                                       <p><i class="fa fa-map-marker"></i>'." ".nokri_job_country($pid).'</p>
+                                       <p><i class="fa fa-map-marker"></i>'." ".nokri_job_country($pid,'').'</p>
                                        <p><i class="fa fa-clock-o"></i>'. " ".nokri_time_ago().'</p>
                                        <span> <i class="fa fa-money"></i>'.nokri_job_post_single_taxonomies('job_currency', $job_currency)." ".nokri_job_post_single_taxonomies('job_salary', $job_salary)."/".nokri_job_post_single_taxonomies('job_salary_type', $job_salary_type).'</span>
                                     </div>
@@ -183,7 +188,10 @@ if (! class_exists ( 'jobs' )) {
 			$job_currency		=  	isset( $job_currency[0] ) ? $job_currency[0] : '';
 			$job_salary_type 	=  	wp_get_post_terms($pid, 'job_salary_type', array("fields" => "ids"));
 			$job_salary_type 	=	isset( $job_salary_type[0] ) ? $job_salary_type[0] : '';
-			
+			/* Jobs aplly with */
+			$job_apply_with	          =     get_post_meta($pid, '_job_apply_with', true);
+			$job_apply_url	          =     get_post_meta($pid, '_job_apply_url', true); 
+			$job_apply_mail	          =     get_post_meta($pid, '_job_apply_mail', true);
 			
 			/* Calling Funtion Job Class For Badges */ 
 			$job_badge_ul  = nokri_premium_job_class_badges($pid);
@@ -232,7 +240,9 @@ if (! class_exists ( 'jobs' )) {
 				$last_cat        =  '';
 				foreach($job_categories as $c)
 				{
-				   $project = '<a href="'.get_the_permalink($nokri['sb_search_page']).'?cat_id='.$c->term_id.'">'.$c->name.'</a>';
+					$link       = nokri_set_url_param(get_the_permalink($nokri['sb_search_page']), 'cat-id', esc_attr( $c->term_id));
+		            $final_url  = esc_url(nokri_page_lang_url_callback($link));
+				    $project    = '<a href="'.$final_url.'">'.$c->name.'</a>';
 				}
 			}
 			
@@ -243,10 +253,13 @@ if (! class_exists ( 'jobs' )) {
 			if ( ! empty( $job_locations ) ) { 
 				foreach($job_locations as $location)
 				{
-				   $last_location = '<a href="'.get_the_permalink($nokri['sb_search_page']).'?job_location='.$location->term_id.'">'.$location->name.'</a>';
+					$link       = nokri_set_url_param(get_the_permalink($nokri['sb_search_page']), 'job-location', esc_attr( $location->term_id));
+		            $final_url  = esc_url(nokri_page_lang_url_callback($link));
+				   $last_location = '<a href="'.$final_url.'">'.$location->name.'</a>';
 				}
 			}
-			
+			/* Jobs aplly with */
+			$exter_apply_btn = nokri_apply_with_external_source($pid);
 			
 		return $my_ads = '<div class="n-job-single '.esc_attr($premium_class).'">
                                     '.$comp_img_html.'
@@ -265,7 +278,7 @@ if (! class_exists ( 'jobs' )) {
                                              <span> <strong>'.esc_html__("Posted:", "nokri").'</strong>'. " ".nokri_time_ago().'</span>
                                           </li>
                                           <li class="n-job-btns">
-                                            <a href="javascript:void(0)" class="btn n-btn-rounded apply_job" data-toggle="modal" data-target="#myModal"  data-job-id='.esc_attr( $pid ).'>'.esc_html__( 'Apply Now', 'nokri' ).' </a>
+                                            '.$exter_apply_btn.'
                                           </li>
                                        </ul>
                                     </div>
@@ -292,8 +305,8 @@ if (! class_exists ( 'jobs' )) {
 			$job_salary_type =  wp_get_post_terms($pid, 'job_salary_type', array("fields" => "ids"));
 			$job_salary_type =	isset( $job_salary_type[0] ) ? $job_salary_type[0] : '';
 			$job_address     = get_post_meta( $pid, '_job_address', true);
-			
-			
+			/* Jobs aplly with */
+			$exter_apply_btn = nokri_apply_with_external_source($pid);
 			/* Calling Funtion Job Class For Badges */ 
 			$single_job_badges	=	nokri_job_class_badg($pid);
 			$featured_html =  $premium_val  =  $premium_class = $job_badge_text = '';
@@ -356,18 +369,22 @@ if (! class_exists ( 'jobs' )) {
 				$last_cat        =  '';
 				foreach($job_categories as $c)
 				{
-				   $project = '<a href="'.get_the_permalink($nokri['sb_search_page']).'?cat_id='.$c->term_id.'">'.$c->name.'</a>';
+					$link       = nokri_set_url_param(get_the_permalink($nokri['sb_search_page']), 'cat-id', esc_attr( $c->term_id));
+		            $final_url  = esc_url(nokri_page_lang_url_callback($link));
+				    $project    = '<a href="'.$final_url.'">'.$c->name.'</a>';
 				}
 			}
 			
 			/* Getting Last country value*/
 			$job_locations  = array();
-			$last_location        =  '';
+			$last_location  =  '';
 			$job_locations  =  wp_get_object_terms( $pid,  array('ad_location'), array('orderby' => 'term_group') );
 			if ( ! empty( $job_locations ) ) { 
 				foreach($job_locations as $location)
 				{
-				   $last_location = '<a href="'.get_the_permalink($nokri['sb_search_page']).'?job_location='.$location->term_id.'">'.$location->name.'</a>';
+					$link       = nokri_set_url_param(get_the_permalink($nokri['sb_search_page']), 'job-location', esc_attr( $location->term_id));
+		            $final_url  = esc_url(nokri_page_lang_url_callback($link));
+				   $last_location = '<a href="'.$final_url.'">'.$location->name.'</a>';
 				}
 			}
 			
@@ -384,7 +401,7 @@ if (! class_exists ( 'jobs' )) {
                                              <span> <strong>'.esc_html__("Posted:", "nokri").'</strong>'. " ".nokri_time_ago().'</span>
                                           </li>
                                               <li class="n-job-btns">
-                                                 <a href="javascript:void(0)" class="btn n-btn-rounded apply_job" data-toggle="modal" data-target="#myModal"  data-job-id='.esc_attr( $pid ).'>'.esc_html__( 'Apply Now', 'nokri' ).' </a>
+                                                 '.$exter_apply_btn.'
                                               </li>
                                            </ul>
                                         </div>

@@ -89,21 +89,21 @@ $template_body = '<table class="body" style="border-collapse: separate; mso-tabl
         <form method="post" enctype="multipart/form-data" id="create_email_template">
         <input type="hidden" value="<?php echo esc_attr($template_id); ?>" id="template_id" name="template_id" />
             <div class="row">
-            <div class="col-md-6 col-sm-12">
+            <div class="col-md-6 col-sm-12 col-xs-12">
                 <div class="form-group">
                     <label><?php echo esc_html__( 'Template Name', 'nokri' ); ?><span class="required">*</span>
                     </label>
                     <input type="text" placeholder="<?php echo esc_html__( 'Template name', 'nokri' ); ?>" required value="<?php echo esc_html($template_name); ?>" name="email_temp_name" class="form-control">
                 </div>
             </div>
-            <div class="col-md-6 col-sm-12">
+            <div class="col-md-6 col-sm-12 col-xs-12">
                 <div class="form-group">
                     <label><?php echo esc_html__( 'Email Subject', 'nokri' ); ?><span class="required">*</span>
                     </label>
                     <input type="text" placeholder="<?php echo esc_html__( 'Email Subject', 'nokri' ); ?>" required value="<?php echo esc_html($template_subject);?>" name="email_temp_subject" class="form-control">
                 </div>
             </div>
-            <div class="column col-md-12 col-sm-12 col-xs-12">
+            <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="form-group">
                 <label> <?php echo esc_html__( 'Template For', 'nokri' ); ?><span class="required">*</span></label>
                     <select  class="select-resume form-control" name="email_temp_for" required> 
@@ -111,14 +111,14 @@ $template_body = '<table class="body" style="border-collapse: separate; mso-tabl
                     </select>
                 </div>
             </div>
-            <div class="col-md-12 col-sm-12">
+            <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="form-group">
                     <label><?php echo esc_html__( 'Description', 'nokri' ); ?><span class="required">*</span>
                     </label>
                     <textarea cols="6" rows="8" name="email_temp_details"  class="form-control rich_textarea"><?php echo "".$template_body;?></textarea>
                 </div>
             </div>
-            <div class="col-md-12 col-sm-12">
+            <div class="col-md-12 col-sm-12 col-xs-12">
                 <button class="btn n-btn-flat" id="temp_save"><?php echo esc_html__( 'Save Template', 'nokri' ); ?></button>
                 <button class="btn n-btn-flat" type="button" id="temp_proc" disabled><?php echo  esc_html__( 'Processing...','nokri' ); ?></button>
             </div>

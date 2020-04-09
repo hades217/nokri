@@ -28,6 +28,7 @@ if(isset($_GET['job_name']))
                              <input type="hidden" name="candidate-page" value="jobs-applied" >
                             <input type="text" class="form-control" name="job_name" value="<?php echo esc_html($job_name); ?>" placeholder="<?php echo esc_html__('Keyword or name','nokri'); ?>">
                             <a href="javascript:void(0)" class="a-btn no-top search_aplied_job"><i class="ti-search"></i></a>
+                            <?php echo nokri_form_lang_field_callback(true); ?>
                         </form>
                     </div>
         </div>  
@@ -36,11 +37,12 @@ if(isset($_GET['job_name']))
     <div class="dashboard-posted-jobs">
         <div class="posted-job-list jobs-saved header-title">
             <ul class="list-inline">
-                <li class="resume-id"><?php echo esc_html__( '#', 'nokri' ); ?></li>
+                
                 <li class="posted-job-title"><?php echo esc_html__( 'Title', 'nokri' ); ?></li>
+                 <li class="posted-job-status"><?php echo esc_html__( 'Status', 'nokri' ); ?></li>            
                 <li class="posted-job-status"><?php echo esc_html__( 'Type', 'nokri' ); ?></li>
                 <li class="posted-job-expiration"><?php echo esc_html__( 'Applied on', 'nokri' ); ?></li>
-                <li class="posted-job-expiration"><?php echo esc_html__( 'View detail ', 'nokri' ); ?></li>
+                <li class="posted-job-expiration"><?php echo esc_html__( 'Detail ', 'nokri' ); ?></li>
             </ul>
         </div>
 <?php
@@ -55,7 +57,7 @@ $args  = array(
 		'orderby' 			=> 'meta_value',
 		'order'      		=> 'date',
 		'meta_query'        => array(
-        'relation'          => 'AND',
+                'relation'          => 'AND',
 								array( 'key'   => '_job_applied_resume_'.$current_id),
 								array(
 									'key' => '_job_status',
@@ -64,6 +66,7 @@ $args  = array(
 								),
     							),
 									);
+$args = nokri_wpml_show_all_posts_callback($args);
 $query = new WP_Query( $args );
 if ( $query->have_posts() )
 {
@@ -86,6 +89,29 @@ if ( $query->have_posts() )
 		$job_date	      =     get_post_meta($job_id, '_job_applied_date_'.$current_id, true);
 		$job_date	      =     date_i18n(get_option('date_format'), strtotime($job_date));
 		$job_cvr		  =     get_post_meta($job_id, '_job_applied_resume_'.$current_id, true);
+                 $cand_status       = get_post_meta($job_id, '_job_applied_status_' . $current_id, true);
+             
+               $cand_final = nokri_canidate_apply_status($cand_status);        
+	/* Getting Questions Answers */
+            $label_class  =  '';
+            if ($cand_status == '0') {
+                $label_class = 'default';                        
+            } elseif ($cand_status == '1') {
+                $label_class = 'info';
+              
+            } elseif ($cand_status == '2') {
+                $label_class = 'danger';
+               
+            } elseif ($cand_status == '3') {
+                $label_class = 'primary';
+              
+            } elseif ($cand_status == '4') {
+                $label_class = 'warning';
+              
+            } elseif ($cand_status == '5') {
+                $label_class = 'success';            
+            }
+        
 		/* Getting Company  Profile Photo */
 		$image_link[0] =  get_template_directory_uri(). '/images/candidate-dp.jpg';
 		if( isset( $nokri['nokri_user_dp']['url'] ) && $nokri['nokri_user_dp']['url'] != "" )
@@ -100,7 +126,7 @@ if ( $query->have_posts() )
 ?>
  <div class="posted-job-list jobs-saved">
     <ul class="list-inline">
-        <li class="resume-id"><?php echo esc_attr($count); ?></li>
+        
         <li class="posted-job-title">
         <?php if (esc_url($image_link[0])) { ?>
             <div class="posted-job-title-img">
@@ -112,6 +138,7 @@ if ( $query->have_posts() )
                 <p><?php echo esc_html($company_name); ?></p>
             </div>
         </li>
+        <li class="posted-job-status"> <span class="label label-<?php echo esc_attr($label_class); ?>"><?php  echo esc_html($cand_final); ?></span></li>
         <li class="posted-job-status"> <span class="label label-default"><?php echo nokri_job_post_single_taxonomies('job_type', $job_type); ?></span></li>
         <li class="posted-job-expiration"><?php echo esc_attr($job_date); ?></li>
         <li class="posted-job-action"> 
@@ -119,12 +146,7 @@ if ( $query->have_posts() )
         </li>
     </ul>
 </div>	
-	
-<?php 
-$count++;
-} 
-
- } else { ?>
+<?php $count++; }  } else { ?>
  <div class="dashboard-posted-jobs">
     <div class="notification-box">
         <div class="notification-box-icon"><span class="ti-info-alt"></span></div>

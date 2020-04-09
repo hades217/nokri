@@ -94,17 +94,19 @@ if($emp_profile_status == 'priv' & $author_id != $current_user_id ) { $image_lin
 $user_private_txt = isset($nokri['user_private_txt']) ? $nokri['user_private_txt']  : '';
 /*Social links hide/show*/
 $social_links = isset($nokri['user_contact_social']) ? $nokri['user_contact_social']  : true;
-/*Images and video options*/
-if (!empty($nokri['sb_comp_gallery']))
+/*Custom registration feilds for candidate */
+$custom_feild_id = $registration_feilds = '';
+$custom_feild_id           =  (isset($nokri['custom_registration_feilds'])) ? $nokri['custom_registration_feilds'] : '';
+if(isset($custom_feild_id) && $custom_feild_id != '')
 {
-	$images =  $you_link = false;
-	foreach ($nokri['sb_comp_gallery'] as $key => $value) 
-	{
-		if($value == '1')
-		$images = true;
-		if($value == '2')
-		$you_link = true;
-	}
+	$registration_feilds       =  nokri_get_custom_feilds($author_id,'Registration',$custom_feild_id,false,true);
+}
+/* Custom feilds for employer */
+$custom_feilds_emp = '';
+$custom_feild_emp  = (isset($nokri['custom_employer_feilds'])) ? $nokri['custom_employer_feilds'] : '';
+if(isset($custom_feild_emp) && $custom_feild_emp != '')
+{
+	$custom_feilds_emp =  nokri_get_custom_feilds($author_id,'Employer',$custom_feild_emp,false,true);
 }
 ?> 
 <section class="n-breadcrumb-big resume-3-brreadcrumb" <?php echo "".($bg_url); ?>>
@@ -129,7 +131,7 @@ if (!empty($nokri['sb_comp_gallery']))
                         <h4><?php echo the_author_meta( 'display_name', $user_id ); ?></h4>
                         <?php } if($emp_headline) { ?>
                         <p><?php echo esc_html($emp_headline); ?></p>
-                        <?php } if($social_links && $author_id == $current_user_id ) { ?>
+                        <?php } if($social_links || $author_id == $current_user_id ) { ?>
                         <ul class="social-links list-inline">
                      <?php if($emp_fb) { ?>
                         <li> <a href="<?php echo esc_url($emp_fb); ?>" target="_blank"><img src="<?php echo get_template_directory_uri();?>/images/icons/006-facebook.png" alt="<?php echo esc_attr__( 'icon', 'nokri' ); ?>"></a></li>
@@ -156,36 +158,36 @@ if (!empty($nokri['sb_comp_gallery']))
                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                 	<aside class="resume-3-sidebar">
                     	<div class="n-candidate-info">
-                            <h4 class="widget-heading"><?php echo esc_html__( 'Employer detail ', 'nokri' ); ?> </h4>
+                            <h4 class="widget-heading"><?php echo nokri_feilds_label('emp_det',esc_html__('Employer detail:', 'nokri' )); ?></h4>
                             <ul>
                                <li>
                                   <i class="la la-calendar la-3x"></i>
-                                  <div class="resume-detail-meta"><small><?php echo esc_html__( 'Member since:', 'nokri' ); ?></small> <strong><?php echo date_i18n(get_option('date_format'), strtotime($registered)); ?></strong></div>
+                                  <div class="resume-detail-meta"><small><?php echo nokri_feilds_label('emp_mem_sinc',esc_html__('Member since:', 'nokri' )); ?></small> <strong><?php echo date_i18n(get_option('date_format'), strtotime($registered)); ?></strong></div>
                                </li>
                                <?php  if($emp_address) { ?>
                                <li>
                                   <i class="la la-map-marker la-3x "></i> 
-                                  <div class="resume-detail-meta"><small><?php echo esc_html__( 'Location:', 'nokri' ); ?></small> <strong><?php echo esc_html($emp_address); ?> </strong></div>
+                                  <div class="resume-detail-meta"><small><?php echo nokri_feilds_label('emp_loc_section_label',esc_html__('Location:', 'nokri' )); ?></small> <strong><?php echo esc_html($emp_address); ?> </strong></div>
                                </li>
                                <?php }  if($emp_size) { ?>
                                <li>
                                   <i class="la la-users la-3x"></i> 
-                                  <div class="resume-detail-meta"><small><?php echo esc_html__( 'Employees ', 'nokri' ); ?></small><strong><?php echo esc_html($emp_size); ?></strong></div>
+                                  <div class="resume-detail-meta"><small><?php echo nokri_feilds_label('emp_no_emp_label',esc_html__('Employees:', 'nokri' )); ?></small><strong><?php echo esc_html($emp_size); ?></strong></div>
                                </li>
                                <?php } if($is_public || $author_id == $current_user_id) {  ?>
                                <li>
                                   <i class="la la-envelope la-3x"></i> 
-                                  <div class="resume-detail-meta"><a href="mailto:<?php echo esc_attr($author->user_email); ?>"><small><?php echo esc_html__( 'Email Address ', 'nokri' ); ?></small><strong><?php echo esc_html($author->user_email); ?></strong></a></div>
+                                  <div class="resume-detail-meta"><a href="mailto:<?php echo esc_attr($author->user_email); ?>"><small><?php echo nokri_feilds_label('emp_email_label',esc_html__('Email Address:', 'nokri' )); ?></small><strong><?php echo esc_html($author->user_email); ?></strong></a></div>
                                </li>
                                <?php  } if($emp_web) { ?>
                                <li>
                                   <i class="la la-globe la-3x"></i> 
-                                  <div class="resume-detail-meta"><a href="<?php echo esc_url($emp_web); ?>" target="_blank"><small><?php echo esc_html__( 'Website URL ', 'nokri' ); ?></small><strong><?php echo esc_html($emp_web); ?></strong></a></div>
+                                  <div class="resume-detail-meta"><a href="<?php echo esc_url($emp_web); ?>" target="_blank"><small><?php echo nokri_feilds_label('emp_web_label',esc_html__('Website URL:', 'nokri' )); ?></small><strong><?php echo esc_html($emp_web); ?></strong></a></div>
                                </li>
-                               <?php }  if($emp_cntct && $is_public || $author_id == $current_user_id) { ?>
+                               <?php }  if($emp_cntct && $is_public || $author_id == $current_user_id && $emp_cntct ) { ?>
                                <li>
                                   <i class="la la-mobile la-3x"></i>
-                                  <div class="resume-detail-meta"><a href="tel:<?php echo esc_attr($emp_cntct); ?>"> <small><?php echo esc_html__( 'Contact Number ', 'nokri' ); ?> </small><strong><?php echo esc_html($emp_cntct); ?></strong></a></div>
+                                  <div class="resume-detail-meta"><a href="tel:<?php echo esc_attr($emp_cntct); ?>"> <small><?php echo nokri_feilds_label('emp_phone_label',esc_html__('Contact Number:', 'nokri' )); ?></small><strong><?php echo esc_html($emp_cntct); ?></strong></a></div>
                                </li>
                                <?php } 
 								if(get_user_meta($current_user_id, '_sb_reg_type', true) == 0) { 
@@ -198,14 +200,24 @@ if (!empty($nokri['sb_comp_gallery']))
 					<?php } } ?>
                             </ul>
                          </div>
-                         <?php  if ($portfolio_html && $images ) { ?>
+                         
+                          <?php if(isset($registration_feilds) && $registration_feilds != '' || isset($custom_feilds_emp)  && $custom_feilds_emp != '' ) { ?>
+                          
+                         <div class="n-candidate-info n-camp-custom-fields">
+                            <h4 class="widget-heading"><?php echo nokri_feilds_label('user_custom_feild_txt',esc_html__( 'Custom Fields', 'nokri' )); ?></h4>
+                            <?php echo '<div class="n-single-meta"><div class="resume-detail-meta"><ul class="n-single-meta-detail">'.$registration_feilds.$custom_feilds_emp.'</ul></div></div>'; ?>
+                            </div>
+                         
+                         
+                         
+                         <?php } if ($portfolio_html) { ?>
                          <div class="n-candidate-info">
-                            <h4 class="widget-heading"><?php echo esc_html__( 'Employer Gallery ', 'nokri' ); ?> </h4>
+                            <h4 class="widget-heading"><?php echo nokri_feilds_label('emp_gall_lab',esc_html__('Employer Gallery:', 'nokri' )); ?> </h4>
                          <ul class="emp-gallery"><?php echo ($portfolio_html); ?></ul>
                          </div>
-                         <?php } if(!empty($emp_video) && $you_link) { ?>
+                         <?php } if(!empty($emp_video)) { ?>
                          <div class="n-candidate-info">
-                            <h4 class="widget-heading"><?php echo esc_html__( 'Employer Video', 'nokri' ); ?> </h4>
+                            <h4 class="widget-heading"><?php echo nokri_feilds_label('emp_vid_lab',esc_html__('Employer Video:', 'nokri' )); ?> </h4>
                          <?php
 						  $rx = '~
 							  ^(?:https?://)?                           # Optional protocol
@@ -220,7 +232,7 @@ if (!empty($nokri['sb_comp_gallery']))
                          </div>
                          <?php  } if( $is_public_contact || $author_id == $current_user_id) {   ?>
                      	<div class="widget">
-                            <h4 class="widget-heading"><?php echo esc_html__( 'Contact ', 'nokri' );  echo the_author_meta( 'display_name', $user_id ); ?></h4>
+                            <h4 class="widget-heading"><?php echo nokri_feilds_label('emp_cont_lab',esc_html__('Contact ', 'nokri' ))." ";  echo the_author_meta( 'display_name', $user_id ); ?></h4>
                             <form id="contact_form_email" method="POST" enctype="multipart/form-data">
                                 <div class="form-group">
                                    <input type="text" name="contact_name" data-parsley-required="true" data-parsley-error-message="<?php echo esc_html__( 'Please enter name', 'nokri' ); ?>" class="form-control" placeholder="<?php echo esc_html__( 'Full name', 'nokri' ); ?>">
@@ -245,7 +257,7 @@ if (!empty($nokri['sb_comp_gallery']))
                <div class="resume-3-detail">
                 <?php if (get_user_meta( $user_id, '_emp_intro',true) != '' ) { ?>
                     	<div class="resume-3-box">
-                     <h4><?php echo esc_html__('About Company','nokri'); ?></h4>
+                     <h4><?php echo nokri_feilds_label('emp_about_label',esc_html__('About Company:', 'nokri' )); ?></h4>
                      <?php
 					$intro 	=	get_user_meta( $user_id, '_emp_intro', true);
 					if (!preg_match('%(<p[^>]*>.*?</p>)%i', $intro, $regs))
@@ -275,7 +287,7 @@ if (!empty($nokri['sb_comp_gallery']))
       <div class="n-related-jobs">
        <?php  if ($results->have_posts() ) { ?>
          <div class="heading-title left">
-            <h4><?php echo esc_html__('Open positions', 'nokri' ); ?></h4>
+            <h4><?php echo nokri_feilds_label('emp_open_pos',esc_html__('Open positions:', 'nokri' )); ?></h4>
          </div>
          <div class="n-search-listing n-featured-jobs">
             <div class="n-featured-job-boxes">
@@ -357,7 +369,7 @@ else
                      <ul class="list-inline">
                         <li class="n-job-title-box">
                            <h4><a href="<?php echo the_permalink($rel_post_id); ?>" class="job-title"><?php echo the_title(); ?></a></h4>
-                           <p><i class="ti-location-pin"></i><?php echo " ".nokri_job_country($rel_post_id); ?></p>
+                           <p><i class="ti-location-pin"></i><?php echo " ".nokri_job_country($rel_post_id,''); ?></p>
                         </li>
                         <li class="n-job-short">
                            <span> <strong><?php echo esc_html__(' Type:', 'nokri' ); ?></strong><?php echo nokri_job_post_single_taxonomies('job_type', $job_type); ?></span>
@@ -380,13 +392,18 @@ else
       </div>
   </div>
                </div>
-               <?php  } else { ?>
+               <?php  }
+               else { ?>
                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 	<div class="locked-profile alert alert-danger fade in" role="alert">
                       <i class="la la-lock"></i><?php echo "".( $user_private_txt ); ?>
                    </div>
                 </div>
                <?php } ?>
+                
+         
             </div>
          </div>
       </section>
+<?php 
+

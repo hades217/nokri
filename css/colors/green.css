@@ -17,7 +17,22 @@ a:hover, a:focus {
 .n-btn-rounded { 
 	background-color: #00a651; 
 	border-color:#00a651;
+}
+.mega-menu .drop-down-multilevel li:hover > a, .mega-menu .drop-down-multilevel li:focus > a {
+    color: #00a651;
 } 
+.n-jobs-recomend3 .nav-tabs > li.active a {
+    background-color: #00a651;
+}
+.n-hero-8 .n-8-container .n-8-product ul li i {
+    background-color: #00a651;
+}
+.n-job-listing5 .nav-tabs > li.active > a {
+	background-color: #00a651;
+}
+.n-hero-8 .n-8-container .n-8-content h1 span {
+   color: #00a651;
+}
 .n-btn-flat { 
 	background-color: #00a651; 
 	border-color:#00a651;
@@ -464,4 +479,15 @@ aside .app-deadline {
 }
 aside .apply-buttons .btn-theme {
 	color:#00a651;
+}
+.dashboard-new .main-body .file-upload-wrapper:before {
+    background-color: #00a651;
+    border: 1px solid #00a651;
+}
+.dashboard-new .main-body .file-upload-wrapper:hover:before {
+  background-color: #00a651;
+}
+
+.counter-active { 
+    color: #00a651 !important;
 }

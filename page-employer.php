@@ -34,11 +34,11 @@ elseif (isset( $_GET['order'] ) && $_GET['order'] == 'date')
  $order   =  'DESC';
 }
 $location_qry = '';
-if( isset( $_GET['job_location'] ) && $_GET['job_location'] != "" )
+if( isset( $_GET['job-location'] ) && $_GET['job-location'] != "" )
 {
 $location_qry =   array(
 		'key' => '_emp_custom_location',
-		'value' => $_GET['job_location'],
+		'value' => $_GET['job-location'],
 		'compare' => 'like'
 	);
 } 
@@ -64,7 +64,7 @@ $args = array(
    'orderby'        => $orderby ,
    'number' 	    => $limit,
    'offset'	        => $offset,
-   'role__in'       => array( 'subscriber', 'administrator' ),
+   'role__in'       => array( 'editor', 'administrator','subscriber' ),
    'meta_query' 	=> array($cands_qry,$location_qry,$skills_qry)
 );
 // Create the WP_User_Query object
@@ -132,11 +132,10 @@ $list_bg_url = '';
 									/* Query User results */
 									if (!empty($users))
 									 {
-										 $fb_link = $twitter_link = $google_link = $linkedin_link = '';
-										// Loop through results
-										foreach ($users as $user) {
+										     // Loop through results
+										     foreach ($users as $user) {
 											 $user_id   = $user->ID;
-											$user_name = $user->display_name;
+											 $user_name = $user->display_name;
 											/* Profile Pic  */
 											$image_dp_link[0] =  get_template_directory_uri(). '/images/candidate-dp.jpg';
 											if( isset( $nokri['nokri_user_dp']['url'] ) && $nokri['nokri_user_dp']['url'] != "" )
@@ -158,6 +157,7 @@ $list_bg_url = '';
 											$user_post_count_html = '<span class="job-openings">'.$user_post_count." ".esc_html__( 'Openings', 'nokri' ).'</span>';
 											$emp_address   = get_user_meta($user_id, '_emp_map_location', true);
 												/* Social links */
+												$fb_link = $twitter_link = $google_link = $linkedin_link =  '';
 												$emp_fb        = get_user_meta($user_id, '_emp_fb', true);
 												$emp_twitter    = get_user_meta($user_id, '_emp_twitter', true);
 												$emp_google    = get_user_meta($user_id, '_emp_google', true);
@@ -211,13 +211,10 @@ $list_bg_url = '';
 													 { 
 													 	$postion_html = '<span>'.esc_html__('No open postion','nokri').'</span>';
 													 }
-													 
-													 
 													 if($company_tot_jobs > 1)
 													 { 
 													 	$open_positions_txt =  esc_html__('Open postions','nokri'); 
 													 }
-													  
 													 if($company_tot_jobs)
 													 {
 														 $postion_html = '<span>'.$company_tot_jobs." ".$open_positions_txt.'</span>';
@@ -227,9 +224,7 @@ $list_bg_url = '';
 													 if($emp_intro)
 													 {
 														 $intro_html = '<p>'.wp_trim_words( $emp_intro, 20, '…' ).'</p>';
-													 }
-													 
-											 ?>
+													 } ?>
                                              <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                              <div class="n-company-grid-single">
                                                 <div class="n-company-grid-img">
@@ -247,20 +242,19 @@ $list_bg_url = '';
                                                 <?php echo "".($social_icons); ?>
                                              </div>
                                           </div>
-                        				 <?php }  } 
-									 ?>
+                        				 <?php } } ?>
                                     </div>
                                  </div>
                               </div>
                            </div>
                         </div>
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 nopadding">
-                                 <nav aria-label="Page navigation">
-                                    <ul class="pagination">
-                                        <?php echo  nokri_user_pagination($pages_number,$page); ?>
-                                    </ul>
-                                 </nav>
-                              </div>
+                             <nav aria-label="Page navigation">
+                                <ul class="pagination">
+                                    <?php echo  nokri_user_pagination($pages_number,$page); ?>
+                                </ul>
+                             </nav>
+                          </div>
                      </div>
                   </div>
                </div>

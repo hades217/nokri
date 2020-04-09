@@ -111,18 +111,24 @@ function premium_jobs_grid_short_base_func($atts, $content = '')
 		'title_limit' => '',
 		'link' => '', 
 	) , $atts));
-$rows = vc_param_group_parse_atts( $atts['job_classes'] );	
-if( (array)count( $rows ) > 0 )
-{
-	foreach($rows as $row ) 
-	{
-		$job_class_array[] = (isset($row['job_class']) && $row['job_class'] != "") ? $row['job_class'] : array();
+global $nokri;
+
+if(isset($atts['job_classes']) && !empty($atts['job_classes']) != '')
+{       
+	$rows = vc_param_group_parse_atts( $atts['job_classes'] );  
+	$job_class_array = array();	
+	if( (array)count( $rows ) > 0 )
+	{     
+		foreach($rows as $row ) 
+		{                                                           
+			$job_class           = nokri_show_taxonomy_all($row['job_class'],'job_class');
+                        if( $job_class  != ''){
+                            $job_class_array[] =    $job_class;
+                           }                      			
+		}
 	}
+               
 }
-	
-	
-	
-	
 $args = array(
 	'post_type'   		=> 'job_post',
 	'order'       		=> 'date',
@@ -144,8 +150,7 @@ $args = array(
 		)
 	)
 );
-
-global $nokri;
+$args            = nokri_wpml_show_all_posts_callback($args);
 $job_class_query = new WP_Query( $args ); 
 $job_class_html = '';
 if ( $job_class_query->have_posts() )
@@ -154,6 +159,12 @@ if ( $job_class_query->have_posts() )
 	  { 
 			$job_class_query->the_post();
 			$job_id		    = get_the_ID();
+                        
+                         $post_author_id = get_post_field('post_author', $job_id );
+                        
+                        $post_author_data  = get_userdata( $post_author_id);
+                        
+                        $author_name      =   $post_author_data->display_name;
 		    $post_author_id = get_post_field('post_author', $job_id );
 			$job_type       = wp_get_post_terms($job_id, 'job_type', array("fields" => "ids"));
 			$job_type	    = isset( $job_type[0] ) ? $job_type[0] : '';
@@ -163,7 +174,6 @@ if ( $job_class_query->have_posts() )
 			$job_currency	=  isset( $job_currency[0] ) ? $job_currency[0] : '';
 			$job_salary_type =  wp_get_post_terms($job_id, 'job_salary_type', array("fields" => "ids"));
 			$job_salary_type =	isset( $job_salary_type[0] ) ? $job_salary_type[0] : '';
-			
 			/* Getting Profile Photo */
 			$rel_image_link[0]   =   get_template_directory_uri(). '/images/candidate-dp.jpg';
 			if( get_user_meta($post_author_id, '_sb_user_pic', true ) != "" )
@@ -175,43 +185,49 @@ if ( $job_class_query->have_posts() )
 			{
 				$rel_image_link[0] =  get_template_directory_uri(). '/images/candidate-dp.jpg';
 			}
-			
-		
-			
-			
-			
 			/* Calling Funtion Job Class For Badges */ 
 			$job_badge_text = nokri_premium_job_class_badges($job_id);
 			if($job_badge_text != '')
 			{
 				$featured_html = '<div class="features-star"><i class="fa fa-star"></i></div>';
 			}
-			
-			
 			/* Getting Last country value*/
 			$job_locations  = array();
 			$last_location        =  '';
+                        
 			$job_locations  =  wp_get_object_terms( $job_id,  array('ad_location'), array('orderby' => 'term_group') );
 			if ( ! empty( $job_locations ) ) { 
 				foreach($job_locations as $location)
 				{
-				   $last_location = '<a href="'.get_the_permalink($nokri['sb_search_page']).'?job_location='.$location->term_id.'">'.$location->name.'</a>';
+				   $search_url    = nokri_set_url_param(get_the_permalink($nokri['sb_search_page']), 'job-location',$location->term_id);
+				   $last_location = '<a href="'.esc_url(nokri_page_lang_url_callback($search_url)).'">'.$location->name.'</a>';
 				}
 			}
 			
 /*Title limit */
 $title_limit = (isset($title_limit) && $title_limit != "") ? $title_limit : "5";
 			
+                       $seprator = '' ;
+                       $currency   =  nokri_job_post_single_taxonomies('job_currency', $job_currency);
+                       $sallary    =  nokri_job_post_single_taxonomies('job_salary', $job_salary);
+                       $salry_type =  nokri_job_post_single_taxonomies('job_salary_type', $job_salary_type);
+                       
+                       if($sallary != '' && $salry_type != '' ){
+                           $seprator = '/';                          
+                       }
+                       
 			$job_class_html .= '<div class="col-md-4 col-sm-6 col-xs-12">
 								  <div class="featured-image-box">
 									<div class="img-box"><img src="'.esc_url($rel_image_link[0]).'" class="img-responsive center-block" alt="'.esc_attr__( 'logo', 'nokri' ).'"></div>
 									<div class="content-area">
 									  <div class="">
 										<h4><a href="'.get_the_permalink().'">'.wp_trim_words( get_the_title(), $title_limit ).'</a></h4>
-										<p>'." ".$last_location.'</p>
+										<p> '. $author_name  .'   
+                                                      '.",".'
+                                                    '.$last_location.'</p>
 									  </div>
 									  <div class="feature-post-meta"> <a href=""> <i class="fa fa-clock-o"></i>'." ".nokri_time_ago().'</a>'.nokri_job_search_taxonomy($job_id).'</div>
-									  <div class="feature-post-meta-bottom"> '.nokri_job_post_single_taxonomies('job_currency', $job_currency). " ".nokri_job_post_single_taxonomies('job_salary', $job_salary)." ".'/'. " ".nokri_job_post_single_taxonomies('job_salary_type', $job_salary_type).'</div>
+									  <div class="feature-post-meta-bottom"> '.nokri_job_post_single_taxonomies('job_currency', $job_currency). " ".nokri_job_post_single_taxonomies('job_salary', $job_salary)." ".$seprator. " ".nokri_job_post_single_taxonomies('job_salary_type', $job_salary_type).'</div>
 									  '.$featured_html.'
 									</div>
 								  </div>

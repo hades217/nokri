@@ -75,9 +75,11 @@ if((isset($nokri['sb_sign_up_page'])) && $nokri['sb_sign_up_page']  != '' )
 }
 /* Button text Option */
 $btn_text = '';
+$btn_text_def = esc_html__("Job Post", "nokri");
 if((isset($nokri['nav_bar_post_btn'])) && $nokri['nav_bar_post_btn']  != '' )
 {
  	$btn_text =  ($nokri['nav_bar_post_btn']);
+	$btn_text_def = ($nokri['nav_bar_post_btn']);
 }
 /* Button Icon Option */
 $btn_icon = '';
@@ -155,8 +157,10 @@ if(basename(get_page_template()) == 'page-dashboard.php')
 		$logo = ( $nokri['dashborad_header_logo']['url'] );
 	}
 }
-
-
+/* With out login button settings */
+$wo_txt  = isset($nokri['wo_log_btn_txt'])  ? $nokri['wo_log_btn_txt']   : '';
+$wo_link = isset($nokri['wo_log_btn_link']) ? $nokri['wo_log_btn_link']  : '';
+$wo_icon = isset($nokri['wo_log_btn_icon']) ? $nokri['wo_log_btn_icon']  : '';
  ?>
 <nav id="menu-1" class="mega-menu <?php echo esc_attr($dashboard_class); ?>">
 	<section class="menu-list-items">
@@ -184,7 +188,9 @@ if(basename(get_page_template()) == 'page-dashboard.php')
                     <?php } else { ?>
                     <li><a href="<?php echo get_the_permalink($signin); ?>" class="n-login-header"><i class="fa fa-sign-in"></i><?php echo esc_html__('Login','nokri'); ?></a></li>
                     <li><a href="<?php echo get_the_permalink($signup); ?>" class="n-login-header"><i class="fa fa-user-plus"></i><?php echo esc_html__('Register','nokri'); ?></a></li>
-                   <li><a href="<?php echo get_the_permalink($job_link); ?>" class="btn n-btn-rounded"><i class="<?php echo esc_attr($bnt_class); ?>"></i><?php echo esc_html($job_button); ?></a></li>
+                    <li>
+                   		<a href="<?php echo get_the_permalink($wo_link); ?>" class="btn n-btn-flat"><i class="<?php echo esc_attr($wo_icon); ?>"></i><?php echo ($wo_txt); ?></a>
+                    </li>
                    <?php } ?>
             </ul>
             <ul class="menu-links">

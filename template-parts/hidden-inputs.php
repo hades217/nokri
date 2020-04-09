@@ -80,6 +80,8 @@ if($is_sticky_menu)
 {
    $is_sticky_menu = true; 
 }
+/* admin post message */
+$admin_message = isset($nokri['job_post_for_admin_message']) ? $nokri['job_post_for_admin_message']  : esc_html__( 'Only admin can post jobs', 'nokri' );
 ?>
 <input type="hidden" id="latoz" value="<?php echo esc_attr($lat); ?>" />
 <input type="hidden" id="langoz" value="<?php echo esc_attr($lon); ?>" />
@@ -108,7 +110,8 @@ if($is_sticky_menu)
 <input type="hidden" id="chimp_mail_valid" value="<?php echo esc_html__( 'Email not valid', 'nokri' ); ?>" />
 <input type="hidden" id="chimp_success" value="<?php echo esc_html__( 'Thanks for subscription', 'nokri' ); ?>" />
 <input type="hidden" id="comp_folow_success" value="<?php echo esc_html__( 'Company followed successfully', 'nokri' ); ?>" />
-<input type="hidden" id="resume_save_success" value="<?php echo esc_html__( 'Resume saved successfully', 'nokri' ); ?>" />
+<input type="hidden" id="resume_save_success" value="<?php echo esc_html__( 'Resume Uploaded Successfully', 'nokri' ); ?>" />
+<input type="hidden" id="emp_resume_save" value="<?php echo esc_html__( 'Resume Saved Successfully', 'nokri' ); ?>" />
 <input type="hidden" id="already_resume_saved" value="<?php echo esc_html__( 'Already saved', 'nokri' ); ?>" />
 <input type="hidden" id="is_email_on" value="<?php echo ($email_user); ?>" />
 <input type="hidden" id="old_password_miss" value="<?php echo esc_html__( 'Enter old password', 'nokri' ); ?>" />
@@ -122,7 +125,8 @@ if($is_sticky_menu)
 <input type="hidden" id="is_gmap" value="<?php echo ($is_gmap); ?>" />
 <input type="hidden" id="validate_vid" value="<?php echo esc_html__( 'Invalid video resume link', 'nokri' ); ?>" />
 <input type="hidden" id="upload_doc" value="<?php echo esc_html__( 'Please upload resume', 'nokri' ); ?>" />
-<input type="hidden" id="email_exist" value="<?php echo esc_html__( 'Email already exist, please try other one.', 'nokri' ); ?>" />
+<input type="hidden" id="email_exist" value="<?php echo esc_html__( 'Email already exists, please login to apply', 'nokri' ); ?>" />
 <input type="hidden" id="some_wrong" value="<?php echo esc_html__( 'Email not sent', 'nokri' ); ?>" />
 <input type="hidden" id="add_skills_value" value="<?php echo esc_html__( 'Set Your Skills Percentage', 'nokri' ); ?>" />
-<input type="hidden" id="cand_pkg_expire" value="<?php echo esc_html__( 'Package Expired', 'nokri' ); ?>" />
+<input type="hidden" id="cand_pkg_expire" value="<?php echo esc_html__( 'Package Expired', 'nokri' ); ?>" /> 
+<input type="hidden" id="only_admin" value="<?php echo $admin_message; ?>" />

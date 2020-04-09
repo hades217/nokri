@@ -1,5 +1,7 @@
 <?php
+/* ========================= */
 /* Time Ago Function*/
+/* ========================= */
 if( ! function_exists( 'nokri_time_ago' ) )
 {
 	function nokri_time_ago()
@@ -7,7 +9,6 @@ if( ! function_exists( 'nokri_time_ago' ) )
 		return human_time_diff( get_the_time( 'U' ), current_time( 'timestamp' ) ).' '.esc_html__('ago','nokri');
 	 }
 }
-
 if ( ! function_exists( 'nokri_get_echoVal' ) )
 {
 	function nokri_get_echoVal($value = '')
@@ -15,8 +16,6 @@ if ( ! function_exists( 'nokri_get_echoVal' ) )
 		return $value;
 	}
 }
-
-
 if( ! function_exists( 'nokri_getBGStyle' ) )
 {
  function nokri_getBGStyle($optname = '')
@@ -47,15 +46,10 @@ if( ! function_exists( 'nokri_getBGStyle' ) )
   return str_replace('\\',"",$bg_img);
 }
 }
-
-
-
 if( ! function_exists( 'nokri_valid_json' ) )
 {
 	function nokri_valid_json($json){
-		
 		return is_array(json_decode($json,true)) ? true : false;
-	
 	}
 }
 /* Employer Dashboard */
@@ -140,7 +134,6 @@ if( ! function_exists( 'nokri_employer_dashboard_socail_links' ) )
 	
 	
 }
-
 /* Employer Side Navigation Pages */
 if( ! function_exists( 'nokri_employer_dashboard_side_links' ) )
 {
@@ -155,46 +148,43 @@ function nokri_employer_dashboard_side_links()
 		return '<li class="active"><a href="'.get_the_permalink($emp_side_edit).'"><i class="fa fa-user"></i>'.esc_html__('Edit Profile','nokri').'</a></li>';
 	}
 }
-
-
 /* Employer Getting Simple Jobs */
 if( ! function_exists( 'nokri_simple_jobs' ) )
 {
 function nokri_simple_jobs($is_expire = '')
 	{
-	$user_id = get_current_user_id();
-	$args = array(
+	$user_id =  get_current_user_id();
+	$args    =  array(
 				'taxonomy'      =>  'job_class',
 				'order'         =>  'ASC',
 				'hide_empty'    =>  false,
 				'hierarchical'  =>  false,
 				'parent'        =>  0,
 				);
-				$job_terms      = get_terms( $args );
+				$job_terms      = get_terms( $args );   
 				/* Getting Simple Job Class Value */
-				$simple_job_id = '';
+				$simple_job_id =  $term_id = '';
 				foreach( $job_terms as $job_term )
 				{
+					$term_id = nokri_get_origional_term_id($job_term->term_id);
 					if($is_expire)
 					{
-					 	 $meta_name      =  'package_job_class_'.$job_term->term_id;
-					 	$job_class	     =	 update_user_meta( $user_id, $meta_name, '' );
+					 	 $meta_name      =  'package_job_class_'.$term_id;
+					 	 $job_class	     =	 update_user_meta( $user_id, $meta_name, '' );
 					}
 					else
 					{
-						if (get_term_meta($job_term->term_id, 'emp_class_check', true) == '1') 
+						if (get_term_meta($term_id, 'emp_class_check', true) == '1') 
 						{
-							$simple_job_id = $job_term->term_id ;
+							$simple_job_id = $term_id ;
 							break;
 						}
 					}
 					
 				}
-					return $simple_job_id;
+				return $simple_job_id;
 	}
 }
-
-
 /* Employer Package Expired Notification*/
 if( ! function_exists( 'nokri_employer_package_expire_notify' ) )
 {
@@ -203,7 +193,7 @@ if( ! function_exists( 'nokri_employer_package_expire_notify' ) )
 			$user_id                =  get_current_user_id();
 			$pkg_message            =  '';
 			$job_class_free   		=  nokri_simple_jobs();
-			$regular_jobs     		=  get_user_meta($user_id, 'package_job_class_'.$job_class_free,true);
+			$regular_jobs     		=  get_user_meta($user_id, 'package_job_class_'.$job_class_free,true);                      
 			if($regular_jobs == '')
 			{
 				$pkg_message    = 're';
@@ -212,19 +202,20 @@ if( ! function_exists( 'nokri_employer_package_expire_notify' ) )
 			$today			    =  date("Y-m-d");
 			$expiry_date_string =  strtotime($expiry_date);
 			$today_string 		=  strtotime($today);
-			if($today_string > $expiry_date_string)
+			if($expiry_date != '-1')
 			{
-				$pkg_message  = 'pe';
+				if($today_string > $expiry_date_string)
+				{
+					$pkg_message  = 'pe';
+				}
 			}
 			if($expiry_date == '')
 			{
 				$pkg_message  = 'np';
 			}
-			
-			return $pkg_message;
+			return $pkg_message; 
 		}
 }
-
 /* Candidate Package Expired Notification*/
 if( ! function_exists( 'nokri_candidate_package_expire_notify' ) )
 {
@@ -241,11 +232,14 @@ if( ! function_exists( 'nokri_candidate_package_expire_notify' ) )
 		$today			    =  date("Y-m-d");
 		$expiry_date_string =  strtotime($expiry_date);
 		$today_string 		=  strtotime($today);
-		if($today_string > $expiry_date_string)
+		if($expiry_date != '-1') 
 		{
-			$pkg_message  = 'pe';
-			update_user_meta($user_id, '_candidate_applied_jobs','0');
-			update_user_meta($user_id, '_candidate_feature_profile','');
+			if($today_string > $expiry_date_string)
+			{
+				$pkg_message  = 'pe';
+				update_user_meta($user_id, '_candidate_applied_jobs','0');
+				update_user_meta($user_id, '_candidate_feature_profile','');
+			}
 		}
 		if($expiry_date == '')
 		{
@@ -254,8 +248,38 @@ if( ! function_exists( 'nokri_candidate_package_expire_notify' ) )
 		return $pkg_message;
 	}
 }
-
-
+/* Resume access package check*/
+if( ! function_exists( 'nokri_resume_access_package_check' ) )
+{
+	function nokri_resume_access_package_check()
+	{
+		$user_id                =  get_current_user_id();
+		$pkg_message            =  'ac';
+		$res_access     		=  get_user_meta($user_id, '_sb_cand_search_value',true);
+		if($res_access == '' || $res_access == '0')
+		{
+			$pkg_message    = 'ae';
+		}
+		$expiry_date        =  get_user_meta($user_id, '_sb_expire_ads',true);
+		$today			    =  date("Y-m-d");
+		$expiry_date_string =  strtotime($expiry_date);
+		$today_string 		=  strtotime($today);
+		if($today_string > $expiry_date_string)
+		{
+			$pkg_message  = 'pe';
+			update_user_meta($user_id, '_sb_cand_search_value','0');
+		}
+		if($expiry_date == '')
+		{
+			$pkg_message  = 'np';
+		}
+		if($res_access == '-1')
+		{
+			$pkg_message  = 'en';
+		}
+		return $pkg_message;
+	}
+}
 if ( ! function_exists( 'nokri_randomString' ) ) {
 function nokri_randomString($length = 50) {
  $str = "";
@@ -268,10 +292,6 @@ function nokri_randomString($length = 50) {
  return $str;
 }
 }
-
-
-
-
 /* Load Search Countries */
 if ( ! function_exists( 'nokri_load_search_countries' ) ) {
 function nokri_load_search_countries($action_on_complete = '')
@@ -318,7 +338,6 @@ echo "<script>
 	
 }
 }
-
 /* Getting All Countries */
 if ( ! function_exists( 'nokri_get_all_countries' ) ) {	 
 function nokri_get_all_countries()
@@ -339,16 +358,12 @@ function nokri_get_all_countries()
 	return $res;
 }
 }
-
-
-
 if ( ! function_exists( 'nokri_make_link' ) ) {	 
 function nokri_make_link( $url, $text )
 {
 	return wp_kses( "<a href='". esc_url ( $url )."' target='_blank'>", nokri_required_tags() )  . $text . wp_kses( '</a>', nokri_required_tags() );	
 }
 }
-
 if ( ! function_exists( 'nokri_required_tags' ) ) {	
 function nokri_required_tags()
 {
@@ -382,7 +397,6 @@ function nokri_required_tags()
         );
 }
 }
-
 if ( ! function_exists( 'nokri_required_attributes' ) ) {	
  function nokri_required_attributes()
 {
@@ -415,13 +429,14 @@ if ( ! function_exists( 'nokri_required_attributes' ) ) {
         );
 }
 }
-
-
 /* Getting Selected Taxonomies Name */
 if ( ! function_exists( 'nokri_job_post_taxonomies' ) ) {	
  function nokri_job_post_taxonomies($taxonomy_name = '', $value = '')
  {
- 		$taxonomies = get_terms($taxonomy_name, array('hide_empty' => false , 'orderby'=> 'id', 'order' => 'ASC' ,  'parent'   => 0  )); 
+
+ 	    $id='job_skills'==$taxonomy_name?'name':'id';
+
+ 		$taxonomies = get_terms($taxonomy_name, array('hide_empty' => false , 'orderby'=>$id, 'order' => 'ASC' ,  'parent'   => 0  )); 
 		$option = '';
 		if( count((array)  $taxonomies ) > 0 )
 		{ 
@@ -438,9 +453,10 @@ if ( ! function_exists( 'nokri_job_post_taxonomies' ) ) {
 /* Getting Checkbox Taxonomies From Widget   */
 /**********************************************/
 if ( ! function_exists( 'nokri_job_search_taxonomies_checkboxes' ) ) {	
- function nokri_job_search_taxonomies_checkboxes($taxonomy_name = '', $instance )
+ function 
+    nokri_job_search_taxonomies_checkboxes($taxonomy_name = '', $instance )
  {
-	 $max_record	=	'';
+	 $max_record	=	 $title ='';
 	 $max_record	=   $instance['no_of_records']  ? $instance['no_of_records'] : 3;
 	 $is_open	    =	$instance['is_open'] == 'open' ? 'in' : '';
 	 $is_show	    =	true;
@@ -449,7 +465,6 @@ if ( ! function_exists( 'nokri_job_search_taxonomies_checkboxes' ) ) {
 		$is_show	=	false;
 		$is_open	=	'in';	 
 	 }
-	 
 	 	global $nokri;
  		$taxonomies = get_terms($taxonomy_name, array('hide_empty' => false , 'orderby'=> 'id', 'order' => 'ASC' ,  'parent'   => 0  )); 
 		$option = '';
@@ -490,39 +505,68 @@ if ( ! function_exists( 'nokri_job_search_taxonomies_checkboxes' ) ) {
 			$option	.=	$more_html;
 		}
 		
-		$cls	=	$is_open == 'in' ? 'active' : '';
+		$cls	    =	$is_open == 'in' ? 'active' : '';
+		$collapsed  = 'collapsed';
+		if($is_open == 'in')
+		{
+			$collapsed = '';
+		}
 		
-		return  '<div class="panel panel-default">
-                                    <div class="panel-heading '.esc_attr($cls).'" role="tab" >
-                                      <h4 class="panel-title">
-                                        <a class="" role="button" data-toggle="collapse" href="#collapse-'.esc_attr($taxonomy_name).'" >												'.$instance['title'].'	
-                                        </a>
-                                      </h4>
-                                    </div>
-                                    <div id="collapse-'.esc_attr($taxonomy_name).'" class="panel-collapse collapse '.esc_attr($is_open).'">
-                                      <div class="panel-body">
-									  <form  method="get" action="'.get_the_permalink( $nokri['sb_search_page'] ).'">
+		if ( ! empty( $instance['title'] ) ) {
+			$title =   apply_filters( 'widget_title', $instance['title'] );
+		    } 
+		                                                    
+                        $form = '<form  method="get" action="'.get_the_permalink( $nokri['sb_search_page'] ).'">
                                         <ul class="list">
                                           '.$option.'
                                        </ul>
-									   '.nokri_search_params( $taxonomy_name ).'
-									  </form>
+				 '.nokri_search_params( $taxonomy_name ).'
+				</form>';
+                   
+		return  '<div class="panel panel-default">
+                                    <div class="panel-heading '.esc_attr($cls).'" role="tab" >
+                                      
+                                        <a class="'.esc_attr($collapsed).'" role="button" data-toggle="collapse" href="#collapse-'.esc_attr($taxonomy_name).'" >												'.$title.'	
+                                        </a>
+                                     
+                                    </div>
+                                    <div id="collapse-'.esc_attr($taxonomy_name).'" class="panel-collapse collapse '.esc_attr($is_open).'">
+                                      <div class="panel-body">
+					'.$form.'				  
                                       </div>
                                     </div>
                                   </div>';	
  }
 }
-
-
-
-
-
-
-
 /* ========================= */
 /*   Get All employess Function   */
 /* ========================= */
-
+if ( ! function_exists( 'nokri_apply_with_external_source' ) )
+{
+	function nokri_apply_with_external_source($job_id = '')
+	 {
+		 	$apply_button      = '';
+			$job_apply_with	   = get_post_meta($job_id, '_job_apply_with', true);
+			$job_apply_url	   = get_post_meta($job_id, '_job_apply_url', true); 
+			$job_apply_mail	   = get_post_meta($job_id, '_job_apply_mail', true);
+			if($job_apply_with == 'exter')
+			{ 
+				$apply_button = '<a href="javascript:void(0)" class="btn n-btn-rounded btn-mid btn-clear external_apply" data-job-id="'. esc_attr( $job_id ).'"  data-job-exter="'.( $job_apply_url ).'">'. esc_html__('Apply now', 'nokri' ).'</a>';
+			}
+			else if ($job_apply_with == 'mail') 
+			{
+				$apply_button = '<a href="javascript:void(0)" class="btn n-btn-rounded btn-mid btn-clear apply_job" data-job-id="'. esc_attr( $job_id ).'" data-toggle="modal" data-target="#modal">'. esc_html__('Apply now', 'nokri' ).'</a>';
+			}
+			else
+			{
+				$apply_button = '<a href="javascript:void(0)" class="btn n-btn-rounded apply_job" data-toggle="modal" data-target="#myModal"  data-job-id='.esc_attr( $job_id ).'>'.esc_html__( 'Apply Now', 'nokri' ).' </a>';
+			}
+			return $apply_button;
+	 }
+ }
+/* ========================= */
+/*   Get All employess Function   */
+/* ========================= */
 if ( ! function_exists( 'nokri_top_employers_lists' ) )
  {
 	function nokri_top_employers_lists( )
@@ -555,8 +599,36 @@ if ( ! function_exists( 'nokri_top_employers_lists' ) )
 		return $employers_array;
 	}
 }
-
-
+/* ================================== */
+/*  Boost job with add on        */
+/* =================================== */
+if (! function_exists ( 'nokri_validate_employer_premium_jobs' )) 
+{
+	function nokri_validate_employer_premium_jobs()
+	{
+		$user_id     =   get_current_user_id();
+		$job_bost    =   false;
+		if( current_user_can('administrator'))
+		{
+			$job_bost    =   true;	
+		}
+		if (get_user_meta( $user_id, '_sb_expire_ads', true ) != '') 
+        {
+			$job_classes =   get_terms( array( 'taxonomy' => 'job_class', 'hide_empty' => false, ) );
+			foreach( $job_classes as $job_class )
+			{
+				$term_id 				= $job_class->term_id;
+				$job_class_user_meta 	= get_user_meta($user_id, 'package_job_class_'.$term_id, true);
+				$emp_class_check     	= get_term_meta($job_class->term_id, 'emp_class_check', true);
+				if( $job_class_user_meta  > 0 && $emp_class_check  != 1)
+				{
+					$job_bost = true;
+				}
+			}
+		}
+		return $job_bost;
+	}
+}
 /************************/
 /* Employer sidebar html  */
 /************************/
@@ -626,10 +698,6 @@ if ( ! function_exists( 'nokri_top_employers_search' ) ) {
 		 }
  	}
 }
-
-
-
-
 /* Getting  Taxonomies Name  From Widget  */
 if ( ! function_exists( 'nokri_job_search_taxonomies' ) ) {	
  function nokri_job_search_taxonomies($taxonomy_name = '', $value = '')
@@ -638,8 +706,7 @@ if ( ! function_exists( 'nokri_job_search_taxonomies' ) ) {
  		$taxonomies = get_terms($taxonomy_name, array('hide_empty' => false , 'orderby'=> 'id', 'order' => 'ASC' ,  'parent'   => 0  )); 
 		$option = '';
 		if( count((array)  $taxonomies ) > 0 )
-		{ 
-			
+		{ 			
 			foreach( $taxonomies as $taxonomy)
 			{	
 				$selected	=	'';
@@ -663,11 +730,7 @@ if ( ! function_exists( 'nokri_job_search_taxonomies' ) ) {
 				</div>'.nokri_search_params( $taxonomy_name ).'</form>';	
  }
 }
-
-
-
 // Job search params
-
 if ( ! function_exists( 'nokri_search_params' ) ) {
 function nokri_search_params( $index, $second = '')
 {
@@ -703,9 +766,6 @@ function nokri_search_params( $index, $second = '')
 	return $res;
 }
 }
-
-
-
 /* Getting Taxonomies Name On Single Page */
 if ( ! function_exists( 'nokri_job_post_single_taxonomies' ) ) {	
  function nokri_job_post_single_taxonomies($taxonomy_name = '', $value = '')
@@ -718,9 +778,31 @@ if ( ! function_exists( 'nokri_job_post_single_taxonomies' ) ) {
 		}
  }
 }
-
-
-
+/* Getting Public Resume */
+if ( ! function_exists( 'nokri_get_resume_publically' ) )
+ {	
+	 function nokri_get_resume_publically($user_id = '',$type = '')
+	 {
+		 	$download_btn  =   $attach_id =  $link = $final_url ='';
+			$ids_array	   =   get_user_meta($user_id, '_cand_resume', true);
+			if(!empty($ids_array))
+			{
+				$ids_array	  =	explode( ',', $ids_array );
+				$attach_id	  =	$ids_array[0];
+				$link         = nokri_set_url_param(get_the_permalink($attach_id), 'attachment_id', esc_attr( $attach_id ));
+				$final_url    = esc_url(nokri_page_lang_url_callback($link));
+				$download_btn = '<a class="btn n-btn-custom btn-block" href="'.$final_url.'&download_file=1"><i class="fa fa-download"></i>'.esc_html__( 'Download Resume', 'nokri' ).'</a>';
+			} 
+			if($type == 'id')
+			{
+				return $attach_id;
+			}
+			else
+			{
+				return $download_btn;
+			}
+	 }  
+}
 /* Getting Taxonomies Name And Colour */
 if ( ! function_exists( 'nokri_job_search_taxonomy' ) ) {	
  function nokri_job_search_taxonomy( $id = '')
@@ -745,7 +827,6 @@ if ( ! function_exists( 'nokri_job_search_taxonomy' ) ) {
 		 }
  }
 }
-
 /* Getting Taxonomies Name And Colour */
 if ( ! function_exists( 'nokri_job_class_taxonomy_colour' ) ) {	
  function nokri_job_class_taxonomy_colour( $id = '')
@@ -768,14 +849,7 @@ if ( ! function_exists( 'nokri_job_class_taxonomy_colour' ) ) {
 		 }
  }
 }
-
-
-
-
-
-
 /* Getting All Sub Level Categories */
-
 if ( ! function_exists( 'nokri_get_ad_cats' ) )
  {
 	function nokri_get_ad_cats( $id , $by = 'name' )
@@ -790,11 +864,7 @@ if ( ! function_exists( 'nokri_get_ad_cats' ) )
 		return $cats;
 	}
 }
-
-
-
 /* Terms Child */
-
 add_action('wp_ajax_get_cats', 'nokri_term_child');
 add_action('wp_ajax_nopriv_get_cats', 'nokri_term_child');
 if( ! function_exists( 'nokri_term_child' ) ) {
@@ -824,10 +894,6 @@ function nokri_term_child()
 	 die();
 	}
 }
-
-
-
-
 // Get sub cats
 add_action('wp_ajax_sb_get_sub_cat_search', 'nokri_get_sub_cats_search');
 add_action( 'wp_ajax_nopriv_sb_get_sub_cat_search', 'nokri_get_sub_cats_search' );
@@ -835,11 +901,7 @@ if ( ! function_exists( 'nokri_get_sub_cats_search' ) ) {
 	function nokri_get_sub_cats_search()
 	{
 		global $nokri;
-		$heading = '';
-		if(isset($nokri['cat_level_2']) && $nokri['cat_level_2'] !="")
-		{
-			$heading = $nokri['cat_level_2'];
-		}
+		$heading = (isset($nokri['cat_level_2']) && $nokri['cat_level_2'] != "") ? $nokri['cat_level_2'] : "";
 		$cat_id	   =	 $_POST['cat_id'];
 		$ad_cats	=	nokri_get_cats('job_category' , $cat_id );
 		$res	=	'';
@@ -858,10 +920,6 @@ if ( ! function_exists( 'nokri_get_sub_cats_search' ) ) {
 		die();
 	}
 }
-
-
-
-
 // Get sub cats Version
 add_action('wp_ajax_sb_get_sub_sub_cat_search', 'nokri_get_sub_sub_cats_search');
 add_action( 'wp_ajax_nopriv_sb_get_sub_sub_cat_search', 'nokri_get_sub_sub_cats_search' );
@@ -892,9 +950,6 @@ if ( ! function_exists( 'nokri_get_sub_sub_cats_search' ) ) {
 		die();
 	}
 }
-
-
-
 // Get sub cats Version 4th Level
 add_action('wp_ajax_sb_get_sub_sub_sub_cat_search', 'nokri_get_sub_sub_sub_cats_forth_search');
 add_action( 'wp_ajax_nopriv_sb_get_sub_sub_sub_cat_search', 'nokri_get_sub_sub_sub_cats_forth_search' );
@@ -925,12 +980,6 @@ if ( ! function_exists( 'nokri_get_sub_sub_sub_cats_forth_search' ) ) {
 		die();
 	}
 }
-
-
-
-
-
-
 // Get Countries
 add_action('wp_ajax_get_countries_search', 'nokri_get_countries_search');
 add_action( 'wp_ajax_nopriv_get_countries_search', 'nokri_get_countries_search' );
@@ -939,9 +988,9 @@ if ( ! function_exists( 'nokri_get_countries_search' ) ) {
 	{
 		global $nokri;
 		$heading = '';
-		if(isset($nokri['cat_level_2']) && $nokri['cat_level_2'] !="")
+		if(isset($nokri['job_country_level_2']) && $nokri['job_country_level_2'] !="")
 		{
-			$heading = $nokri['cat_level_2'];
+			$heading = $nokri['job_country_level_2'];
 		}
 		$country_id	       =	 $_POST['country_id'];
 		$job_countries	   =	 nokri_get_cats('ad_location' , $country_id );
@@ -961,12 +1010,7 @@ if ( ! function_exists( 'nokri_get_countries_search' ) ) {
 		die();
 	}
 }
-
-
-
 // Get States
-
-
 add_action('wp_ajax_get_states_search', 'nokri_get_states_search');
 add_action( 'wp_ajax_nopriv_get_states_search', 'nokri_get_states_search' );
 if ( ! function_exists( 'nokri_get_states_search' ) ) {
@@ -974,9 +1018,9 @@ if ( ! function_exists( 'nokri_get_states_search' ) ) {
 	{
 		global $nokri;
 		$heading = '';
-		if(isset($nokri['cat_level_2']) && $nokri['cat_level_2'] !="")
+		if(isset($nokri['job_country_level_3']) && $nokri['job_country_level_3'] !="")
 		{
-			$heading = $nokri['cat_level_2'];
+			$heading = $nokri['job_country_level_3'];
 		}
 		$country_id	       =	 $_POST['country_id'];
 		$job_countries	   =	 nokri_get_cats('ad_location' , $country_id );
@@ -996,12 +1040,7 @@ if ( ! function_exists( 'nokri_get_states_search' ) ) {
 		die();
 	}
 }
-
-
-
 // Get Cities
-
-
 add_action('wp_ajax_get_cities_search', 'nokri_get_cities_search');
 add_action( 'wp_ajax_nopriv_get_cities_search', 'nokri_get_cities_search' );
 if ( ! function_exists( 'nokri_get_cities_search' ) ) {
@@ -1009,9 +1048,9 @@ if ( ! function_exists( 'nokri_get_cities_search' ) ) {
 	{
 		global $nokri;
 		$heading = '';
-		if(isset($nokri['cat_level_2']) && $nokri['cat_level_2'] !="")
+		if(isset($nokri['job_country_level_4']) && $nokri['job_country_level_4'] !="")
 		{
-			$heading = $nokri['cat_level_2'];
+			$heading = $nokri['job_country_level_4'];
 		}
 		$country_id	       =	 $_POST['country_id'];
 		$job_countries	   =	 nokri_get_cats('ad_location' , $country_id );
@@ -1031,13 +1070,7 @@ if ( ! function_exists( 'nokri_get_cities_search' ) ) {
 		die();
 	}
 }
-
-
-
-
-
 /* Getting Job Post Countries */
-
 if ( ! function_exists( 'nokri_get_job_country' ) ) {
 function nokri_get_job_country( $id , $by = 'name' )
 {
@@ -1051,18 +1084,14 @@ function nokri_get_job_country( $id , $by = 'name' )
 	return $countries;
 }
 }
-
-
-
 /* Getting Job Post Country City States */
-
 if ( ! function_exists( 'nokri_display_adLocation' ) ) {  
 function nokri_display_adLocation( $pid )
 {
  global $nokri;
  $ad_country = '';
  $type = ''; 
- $type = $nokri['cat_and_location'];
+ $type = isset($nokri['cat_and_location']) ? $nokri['cat_and_location'] : '';
  $ad_country = wp_get_object_terms( $pid,  array('ad_location'), array('orderby' => 'term_group') );
  $all_locations = array();
  foreach($ad_country as $ad_count)
@@ -1096,18 +1125,117 @@ function nokri_display_adLocation( $pid )
  
 }
 }
-
-
-
-
-
-
-
-
-
-
+/* Getting Candidate Skills value and bar */ 
+if ( ! function_exists( 'nokri_candidate_skill_bar' ) ) {
+	function nokri_candidate_skill_bar( $user_crnt_id = '' )
+		{
+			$skills_bar = '';
+			$cand_skills   = $cand_skills_values = array();
+			$cand_skills_values	= get_user_meta($user_crnt_id, '_cand_skills_values', true);
+			$cand_skills	= get_user_meta($user_crnt_id, '_cand_skills', true);
+			if( isset($cand_skills) && !empty($cand_skills) &&  count($cand_skills) > 0 )
+				{
+					foreach($cand_skills as $key => $csv )
+					{
+						$term = get_term_by( 'id', $csv , 'job_skills' );		
+						if($term)
+						{
+							$skill_lavel = 100;
+							if( isset($cand_skills_values) && is_array($cand_skills_values))
+							{
+								if(array_key_exists($key,$cand_skills_values))
+								{
+									$skill_lavel = $cand_skills_values[$key];
+								}
+							}			
+							$array_skills[] = array("name" => $term->name, "value" => $skill_lavel);	
+						}
+					}
+				}
+				if(isset($array_skills) && !empty($array_skills))
+				{
+					foreach( $array_skills  as $r )
+					{
+						$skills_bar .= '<div class="bar-wrapper">
+													<span class="progress-text">'.$r["name"].'</span>
+												<div class="progress">
+													<div class="progress-bar" role="progressbar" aria-valuenow="'.$r["value"].'" aria-valuemin="0" aria-valuemax="100" > <span  class="popOver" data-toggle="tooltip" data-placement="top" title="'.$r["value"].'%"> </span> </div>
+												</div>
+												</div>'; 
+					}
+				}
+				return $skills_bar;
+		}
+	}
+/* Getting Candidate Portfolio*/ 
+if ( ! function_exists( 'nokri_candidate_portfolio' ) ) 
+{
+	function nokri_candidate_portfolio( $user_crnt_id = '' )
+		{
+			$portfolio_html = '';
+			if( get_user_meta( $user_crnt_id, '_cand_portfolio', true ) != "" )
+			{	
+				$port = get_user_meta( $user_crnt_id, '_cand_portfolio', true );
+				$portfolios = explode(',', $port);
+				foreach($portfolios as $portfolio)
+				{	
+						$portfolio_image_sm = wp_get_attachment_image_src( $portfolio, 'nokri_job_hundred' );
+						$portfolio_image_lg = wp_get_attachment_image_src( $portfolio, 'nokri_cand_large' );
+						$portfolio_html .= '<li><a class="portfolio-gallery" data-fancybox="gallery" href="'.esc_url($portfolio_image_lg[0]).'"><img src="'.esc_url($portfolio_image_sm[0]).'" alt= "'.esc_html__( 'portfolio image', 'nokri' ).'"></a></li>';
+				}
+			}
+			return $portfolio_html;
+		}
+	}
+/**********************************************/
+/* Getting candidates ids for matched resumes */
+/**********************************************/ 
+if ( ! function_exists( 'nokri_get_candidates_ids_for_matched_resumes' ) ) 
+{
+	function nokri_get_candidates_ids_for_matched_resumes($job_id = '')
+		{
+			$candidates_ids = array();
+			$user_query     = new WP_User_Query(
+						 array( 
+						 'orderby'    => 'meta_value_num',
+						 'meta_key'   => '_cand_skills_sum', 
+						 'meta_query' =>  array(
+						 'relation'   =>  'AND',
+									array(
+									'key'     => '_sb_reg_type',
+									'value'   => '0',
+									'compare' => '='
+									),
+									array(
+										'key'     => '_cand_skills_sum',
+										'value'   => array( 0, 1000000000 ),
+										'type'    => 'numeric',
+										'compare' => 'BETWEEN'
+									),
+									),
+			  )  );
+			  $candidates    = 	$user_query->get_results();
+			  if ( isset ($candidates) && count($candidates) > 0)
+			  {
+					foreach ( $candidates as $candidate ) 
+					 {
+						 $candidate_id   =   $candidate->ID;
+						 $job_skills     =   wp_get_post_terms($job_id, 'job_skills', array("fields" => "ids"));
+						 $cand_skills	 = 	 get_user_meta($candidate_id, '_cand_skills', true);
+					 	 if (is_array($cand_skills) && is_array($job_skills))
+						 {
+							$final_array = array_intersect($cand_skills, $job_skills);
+							if (count($final_array) > 0)
+							{
+								 $candidates_ids[] = $candidate_id; 
+							}
+						 }
+					 }
+				}
+				return $candidates_ids;
+		}
+}
 /* Getting Job Class For Badges */ 
-
 if ( ! function_exists( 'nokri_job_class_badg' ) ) {
 function nokri_job_class_badg( $job_id = '' )
 	{
@@ -1123,12 +1251,9 @@ function nokri_job_class_badg( $job_id = '' )
 		return $term_ids;
 	}
 }
-
-
 /******************************************/		
 /* Calling Funtion Job Class For Badges */
 /******************************************/
-
 if ( ! function_exists( 'nokri_premium_job_class_badges' ) ) 
 {	
 	 function nokri_premium_job_class_badges($job_id = '')
@@ -1156,16 +1281,14 @@ if ( ! function_exists( 'nokri_premium_job_class_badges' ) )
 						
 						$premium_val     =  get_post_meta( $job_id, 'package_job_class_'.$val, true );
 						$featured_html   = ' <div class="features-star-2"><i class="fa fa-star"></i></div>';
-						$job_badge_text .= '<li '.$style_li.'><a href="'.get_the_permalink($nokri['sb_search_page']).'?job_class='.$val.'" class="job-class-tags-anchor" '.$style_anch.'>'.esc_html(ucfirst($terms->name)).'</a></li>';
+						$search_url      = nokri_set_url_param(get_the_permalink($nokri['sb_search_page']), 'job_class',$val);
+						$job_badge_text .= '<li '.$style_li.'><a href="'.esc_url(nokri_page_lang_url_callback($search_url)).'" class="job-class-tags-anchor" '.$style_anch.'>'.esc_html(ucfirst($terms->name)).'</a></li>';
 					}
 					
 					return	$job_badge_ul =  '<ul class="featured-badge-list">'. "".($job_badge_text).'</ul>';
 			 }
 	 }
 }
-
-
-
 /******************************************/		
 /* Getting Selected Skills For Candidate */
 /******************************************/
@@ -1183,24 +1306,19 @@ if ( ! function_exists( 'nokri_candidate_skills' ) ) {
 			foreach( $taxonomies as $taxonomy)
 			{
 				    $selected  = '';
-					if(count((array)  $cand_skills ) > 0)
+					if(count((array)  $cand_skills ) > 0 && is_array($cand_skills))
 					{
 						if (in_array( $taxonomy->term_id, $cand_skills ))
 							{
 								$selected = 'selected="selected"';
 							}
 					}
-				
 				$option .='<option value="'.esc_attr($taxonomy->term_id).'" '.$selected.'>'.esc_html($taxonomy->name).'</option>';
 			}
 		}
-
 		return $option;
  }
 }		
-
-
-
 /******************************************/		
 /* Getting Job Selected Skills For Job */
 /******************************************/
@@ -1234,7 +1352,6 @@ if ( ! function_exists( 'nokri_job_selected_skills' ) )
 				return $option;
 	 }
 }	
-
 /*************************/
 /* Candidates grid layouts*/
 /*************************/ 
@@ -1246,7 +1363,7 @@ if( ! function_exists( 'nokri_candidates_get_grid_layouts' ) )
 					/* Profile Pic  */
 					$image_dp_link  =  nokri_get_user_profile_pic($cand_id,'_cand_dp');
 					/* Getting Employer Skills  */
-					$skill_tags     = nokri_get_candidates_skills($cand_id);
+					$skill_tags     = nokri_get_candidates_skills($cand_id,'');
 					$cand_headline  = get_user_meta($cand_id, '_user_headline', true);
 					$emp_address    = get_user_meta($cand_id, '_cand_address', true);
 					$adress_html = '';
@@ -1254,7 +1371,6 @@ if( ! function_exists( 'nokri_candidates_get_grid_layouts' ) )
 					{
 						$adress_html = '<i class="fa fa-map-marker"></i><p>'.$emp_address.'</p>';
 					}
-					
 					if($layout == 1)
 					{
 						return $layout = '<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
@@ -1299,7 +1415,7 @@ if( ! function_exists( 'nokri_candidates_get_grid_layouts' ) )
 								<div class="cand-btns">
 									<ul>
 										<li><a href="'.esc_url(get_author_posts_url($cand_id)).'">'. esc_html__('View Profile','nokri').'</a></li>
-										<li class="cand-fav saving_resume"><a href="javascript:void(0)" data-cand-id="'.esc_attr($cand_id).'"><i class="fa fa-heart-o"></i></a></li>
+										<li class="cand-fav saving_resume" data-cand-id="'.esc_attr($cand_id).'"><a href="javascript:void(0)"><i class="fa fa-heart-o"></i></a></li>
 									</ul>
 								</div>
 							</div>
@@ -1308,8 +1424,6 @@ if( ! function_exists( 'nokri_candidates_get_grid_layouts' ) )
 					}
 	}
 }
-
-
 /******************************************/		
 /*    Getting User Meta Of Candidate     */
 /******************************************/		
@@ -1326,10 +1440,6 @@ if ( ! function_exists( 'nokri_candidate_user_meta' ) ) {
 	return $candidate_meta_value;
    }
 }
-		
-		
-		
-		
 /******************************************/		
 /*    Getting User Meta Of Candidate     */
 /******************************************/		
@@ -1340,37 +1450,61 @@ if ( ! function_exists( 'nokri_fields_validation' ) ) {
 		return $validation_msg;
    }
 }
-
 /******************************************/		
 /*    Getting Post Counts    */
 /******************************************/
-
 if ( ! function_exists( 'nokri_get_jobs_count' ) )
 {  
  function nokri_get_jobs_count( $user_id,$status)
  {
-  global $wpdb;
-  $listing_count = $wpdb->get_var( "SELECT COUNT(*) AS total FROM  $wpdb->posts WHERE post_type = 'job_post' AND post_status = '$status' AND post_author = '$user_id'" );
-  return number_format($listing_count);
+     $args = array(
+         'post_type'   => 'job_post',
+         'orderby'     => 'date',
+         'order'       => 'DESC',
+         'author' 	  => $user_id,
+         'post_status' => $status,
+     );
+     $args = nokri_wpml_show_all_posts_callback($args);
+     $query = new WP_Query( $args );
+     $job_html = '';
+     if ( $query->have_posts() ) {
+         return $post_found = $query->found_posts;
+     }
+     else {
+             return $post_found = $query->found_posts;
+        }
+
  }
 }
-
-/******************************************/		
+/******************************************/
 /*    Getting Resumes  Counts On Job    */
 /******************************************/
-
 if ( ! function_exists( 'nokri_get_resume_count' ) )
 {  
  function nokri_get_resume_count( $job_id)
  {
-	 
-	global $wpdb;
+	 global $wpdb;
 	$query = $wpdb->get_results("SELECT meta_id FROM $wpdb->postmeta WHERE (meta_key LIKE '_job_applied_resume_%' AND post_id = '".$job_id."')");
-	return count((array) $query);
- }
+	$query2 = $wpdb->get_results("SELECT * FROM $wpdb->postmeta WHERE post_id = '$job_id' AND meta_key LIKE '_job_applied_resume_%'");
+	if( !empty( $query2 ))
+	{
+		foreach ( $query2 as $resumes ) 
+		{
+			$value   = $resumes->meta_value;
+			$cand_id = explode("|",$value); 
+			if(!empty($cand_id))
+			{
+				$user    = get_userdata( $cand_id[0]);
+				if ( $user === false )
+				 {
+					delete_post_meta($job_id, '_job_applied_resume_'.$cand_id[0]); 
+				}
+			}
+		}
+	}
+		return count((array) $query);
+  }
 }
-
-
 /******************************************/		
 /*    Replace Ul in pagination   */
 /******************************************/
@@ -1385,7 +1519,6 @@ if ( ! function_exists( 'nokri_strip_single_tag' ) )
 		return $str;
 	}
 }
-
 /******************************************/		
 /*    WP Query  pagination   */
 /******************************************/
@@ -1417,12 +1550,9 @@ if ( ! function_exists( 'nokri_job_pagination' ) )
 	 }
 	}
 }
-
 /******************************************/		
 /*    WP User Query  pagination   */
 /******************************************/
-
-
 if ( ! function_exists( 'nokri_user_pagination' ) )
 {
  function nokri_user_pagination($total_records,$current_page)
@@ -1449,14 +1579,9 @@ if ( ! function_exists( 'nokri_user_pagination' ) )
     }
 
 }
-
-
-
-
 /* ========================= */
 /*   Salary Type Values Function   */
 /* ========================= */
-
 if ( ! function_exists( 'nokri_salary_type_values' ) )
  {
 	function nokri_salary_type_values($getvalue = '' )
@@ -1470,11 +1595,9 @@ if ( ! function_exists( 'nokri_salary_type_values' ) )
 		return ( $getvalue == "" ) ? $salary_array : $salary_array["$getvalue"];
 	}
 }
-
 /* ========================= */
 /*   Salary Type Function   */
 /* ========================= */
-
 if ( ! function_exists( 'nokri_job_post_salary_type' ) )
 {
 	function nokri_job_post_salary_type($select_val = '')
@@ -1501,11 +1624,9 @@ if ( ! function_exists( 'nokri_job_post_salary_type' ) )
 			return $salary_values ;
 	}
 }
-
 /* ========================= */
 /*  User Registration   */
 /* ========================= */
-
 if( !function_exists('nokri_authorization') )
 {
  	function nokri_authorization()
@@ -1516,7 +1637,6 @@ if( !function_exists('nokri_authorization') )
   		endif;
  	}
 }
-
 function nokri_redirect_to_request( $redirect_to, $request, $user ){
     //is there a user to check?
     if ( isset( $user->roles ) && is_array( $user->roles ) ) {
@@ -1531,15 +1651,10 @@ function nokri_redirect_to_request( $redirect_to, $request, $user ){
         return $redirect_to;
     }
 }
-
-	add_filter('login_redirect', 'nokri_redirect_to_request', 10, 3);
-
-
+add_filter('login_redirect', 'nokri_redirect_to_request', 10, 3);
 /* ========================= */
 /*  User loged In   */
 /* ========================= */
-
-
 if (! function_exists ( 'nokri_check_if_not_logged' )) 
 {
 	function nokri_check_if_not_logged()
@@ -1550,13 +1665,9 @@ if (! function_exists ( 'nokri_check_if_not_logged' ))
 		 }
 	}
 }
-
-
 /* ================================== */
 /*  Check User Log In Before Action   */
 /* =================================== */
-
-
 if (! function_exists ( 'nokri_check_user_activity' )) 
 {
 	function nokri_check_user_activity()
@@ -1568,13 +1679,9 @@ if (! function_exists ( 'nokri_check_user_activity' ))
 			}
 	}
 }
-
-
 /* ================================== */
 /*  Check User Type Activity         */
 /* =================================== */
-
-
 if (! function_exists ( 'nokri_check_user_type' )) 
 {
 	function nokri_check_user_type()
@@ -1588,8 +1695,27 @@ if (! function_exists ( 'nokri_check_user_type' ))
 			}
 	}
 }
-
-
+/* ========================= */
+/*  Footer Logo  */
+/* ========================= */
+if ( ! function_exists( 'nokri_footer_logo' ) )
+{
+	function nokri_footer_logo()
+	{
+		global $nokri;
+		$footerlogo = '';
+		if( isset( $nokri['footer_bg']['url'] ) && $nokri['footer_bg']['url'] != "" )
+		{
+			$logo = ( $nokri['footer_bg']['url'] ); 
+			$footerlogo = '<img class="img-responsive footer-logo" src="'.$logo.'"  alt="'.esc_attr__("logo", "nokri").'" >';
+		}
+		else 
+		{
+			$footerlogo = '<img class="img-responsive footer-logo" src="'.get_template_directory_uri().'/images/logo-white.png" alt="'.esc_attr__("logo", "nokri").'" >';
+		}
+		return $footerlogo;
+	}
+}
 /* ========================= */
 /*  Employer Menu Sorter  */
 /* ========================= */
@@ -1603,88 +1729,107 @@ if ( ! function_exists( 'nokri_employer_menu_sorter' ) )
 		{
 			$menus = $nokri['employer_menu_sorter'];
 		}
-			if(count((array)  $menus ) > 0)
+		if(count((array)  $menus ) > 0)
 			{
 				foreach($menus as $optn => $valu)
 				{
-					if($optn == 'Dashboard' && $valu != "" )
+					if( ($optn == 'dashboard' || $optn == 'Dashboard') && $valu != "" )
 					{
 						$label    =  isset($valu) ? $valu:  esc_html__( 'Dashboard', 'nokri' );
 						$sorter .= '<li><a href="'.get_the_permalink().'"><span class="la la-tachometer"></span>'.($valu).'</a></li>';
 					}
-					if($optn == 'udpdate profile' && $valu != "" )
+					if( ($optn == 'update_profile' || $optn == 'Udpdate Profile' ) && $valu != "" )
 					{
 						$label    =  isset($valu) ? $valu:  esc_html__( 'Udpdate Profile', 'nokri' );
-						$sorter .= '<li><a href="'.get_the_permalink().'?tab-data=edit-profile"><span class="la la-edit"></span>'.($label).'</a></li>';
+						$dashboard_update_url = nokri_set_url_param(get_the_permalink(), 'tab-data', 'edit-profile');
+						$sorter .= '<li><a href="'.esc_url(nokri_page_lang_url_callback($dashboard_update_url)).'"><span class="la la-edit"></span>'.($label).'</a></li>';
 					}
-					if($optn == 'View My Profile' && $valu != "" )
+					if( ($optn == 'view_my_profile' || $optn == 'View My Profile' ) && $valu != "" )
 					{
 						$label    =  isset($valu) ? $valu:  esc_html__( 'View My Profile', 'nokri' );
 						$sorter .= '<li><a href="'.esc_url(get_author_posts_url($user_id)).'"><span class="la la-user"></span>'.($label).'</a></li>';
 					}
-					if($optn == 'My Jobs' && $valu != "" )
+					if(($optn == 'my_jobs' || $optn == 'My Jobs') &&  $valu != "" )
 					{
 						$label    =  isset($valu) ? $valu:  esc_html__( 'My Jobs', 'nokri' );
+						$active_job_url = nokri_set_url_param(get_the_permalink(), 'tab-data', 'active-jobs');
+						$inactive_job_url = nokri_set_url_param(get_the_permalink(), 'tab-data', 'inactive-jobs');
+						$pending_job_url = nokri_set_url_param(get_the_permalink(), 'tab-data', 'pending-jobs');
 						$sorter .= '<li>
                             <div class="profile-menu-link">
-                              <span class="la la-bars"></span>'.($label).'
+							  <span class="la la-bars"></span>'.($label).'<i class="fa fa-angle-down"></i>
                             </div>
                             <ul class="submenu">
-                              <li><a href="'.get_the_permalink().'?tab-data=active-jobs">'. esc_html__( ' Active Jobs', 'nokri' ).'</a></li>
-                              <li><a href="'.get_the_permalink().'?tab-data=inactive-jobs">'.esc_html__( ' In-Active Jobs', 'nokri' ).'</a></li>
-                              <li><a href="'.get_the_permalink().'?tab-data=pending-jobs">'.esc_html__( 'Pending Jobs', 'nokri' ).'</a></li>
+                              <li><a href="'.esc_url(nokri_page_lang_url_callback($active_job_url)).'">'. esc_html__( ' Active Jobs', 'nokri' ).'</a></li>
+                              <li><a href="'.esc_url(nokri_page_lang_url_callback($inactive_job_url)).'">'.esc_html__( 'In-Active Jobs', 'nokri' ).'</a></li>
+                              <li><a href="'.esc_url(nokri_page_lang_url_callback($pending_job_url)).'">'.esc_html__( 'Pending Jobs', 'nokri' ).'</a></li>
                             </ul>
                           </li>';
 					}
-					if($optn == 'Email Templates' && $valu != "" )
+					if( ($optn == 'email_templates' || $optn == 'Email Templates' ) && $valu != "" )
 					{
-						$label    =  isset($valu) ? $valu:  esc_html__( 'Email Templates', 'nokri' );
+						$label               =  isset($valu) ? $valu:  esc_html__( 'Email Templates', 'nokri' );
+						$email_temp_url      =  nokri_set_url_param(get_the_permalink(), 'tab-data', 'email-templates');
+						$email_temp_list_url =  nokri_set_url_param(get_the_permalink(), 'tab-data', 'email-templates-list');
 						$sorter .= '<li>
                             <div class="profile-menu-link">
                               <span class="fa fa-envelope-o"></span>'.($label).'<i class="fa fa-angle-down"></i>
                             </div>
                             <ul class="submenu">
-                              <li><a href="'. get_the_permalink().'?tab-data=email-templates">'. esc_html__( 'Add Email Template', 'nokri' ).'</a></li>
-                              <li><a href="'.get_the_permalink().'?tab-data=email-templates-list">'. esc_html__( 'Email Templates', 'nokri' ).'</a></li>
+                              <li><a href="'.esc_url(nokri_page_lang_url_callback($email_temp_url)).'">'. esc_html__( 'Add Email Template', 'nokri' ).'</a></li>
+                              <li><a href="'.esc_url(nokri_page_lang_url_callback($email_temp_list_url)).'">'. esc_html__( 'Email Templates', 'nokri' ).'</a></li>
                             </ul>
                           </li>';
 					}
-					if($optn == 'Matched Resumes' && $valu != "" )
+					if( ($optn == 'matched_resumes' || $optn == 'Matched Resumes')  && $valu != "" )
 					{
-						$label    =  isset($valu) ? $valu:  esc_html__( 'Matched Resumes', 'nokri' );
-						$sorter .= '<li><a href="'.get_the_permalink().'?tab-data=matched-resumes"><span class="la la-external-link"></span>'.($label).'</a></li>';
+						$label              =  isset($valu) ? $valu:  esc_html__( 'Matched Resumes', 'nokri' );
+						$matched_resume_url =  nokri_set_url_param(get_the_permalink(), 'tab-data', 'matched-resumes');
+						$sorter .= '<li><a href="'.esc_url(nokri_page_lang_url_callback($matched_resume_url)).'"><span class="la la-external-link"></span>'.($label).'</a></li>';
 					}
-					if($optn == 'Saved Resumes' && $valu != "" )
+					if( ($optn == 'saved_resumes' || $optn == 'Saved Resumes' )  && $valu != "" )
 					{
 						$label    =  isset($valu) ? $valu:  esc_html__( 'Saved Resumes', 'nokri' );
-						$sorter .= '<li><a href="'.get_the_permalink().'?tab-data=saved-resumes"><span class="la la-file-pdf-o"></span>'.($label).'</a></li>';
+						$saved_resume_url =  nokri_set_url_param(get_the_permalink(), 'tab-data', 'saved-resumes');
+						$sorter .= '<li><a href="'.esc_url(nokri_page_lang_url_callback($saved_resume_url)).'"><span class="la la-file-pdf-o"></span>'.($label).'</a></li>';
 					}
-					if($optn == 'Followers' && $valu != "" )
+					if(($optn == 'followers' || $optn == 'Followers') && $valu != "" )
 					{
-						$label    =  isset($valu) ? $valu:  esc_html__( 'Followers', 'nokri' );
-						$sorter .= '<li><a href="'.get_the_permalink().'?tab-data=our-followers"><span class="fa fa-users"></span>'.($label).'</a></li>';
+						$label         =  isset($valu) ? $valu:  esc_html__( 'Followers', 'nokri' );
+						$followers_url =  nokri_set_url_param(get_the_permalink(), 'tab-data', 'our-followers');
+						$sorter .= '<li><a href="'.esc_url(nokri_page_lang_url_callback($followers_url)).'"><span class="fa fa-users"></span>'.($label).'</a></li>';
 					}
-					if($optn == 'My Package' && $valu != "" )
+					if(($optn == 'my_package' || $optn == 'My Package') && $valu != "" )
 					{
-						$label    =  isset($valu) ? $valu:  esc_html__( 'My Package', 'nokri' );
-						$sorter .= '<li><a href="'.get_the_permalink().'?tab-data=my-packages"><span class="la la-list-alt"></span>'.($label).'</a></li>';
+						$label        =  isset($valu) ? $valu:  esc_html__( 'My Package', 'nokri' );
+						$packages_url =  nokri_set_url_param(get_the_permalink(), 'tab-data', 'my-packages');
+						$sorter      .= '<li><a href="'.esc_url(nokri_page_lang_url_callback($packages_url)).'"><span class="la la-list-alt"></span>'.($label).'</a></li>';
 					}
-					if($optn == 'My Orders' && $valu != "" )
+					if(($optn == 'my_orders' || $optn == 'My Orders') && $valu != "" )
 					{
-						$label    =  isset($valu) ? $valu:  esc_html__( 'My Orders', 'nokri' );
-						$sorter .= '<li><a href="'.get_the_permalink().'?tab-data=my-orders"><span class="la la-check-circle"></span>'.($label).'</a></li>';
+						$label        =  isset($valu) ? $valu:  esc_html__( 'My Orders', 'nokri' );
+						$orders_url   =  nokri_set_url_param(get_the_permalink(), 'tab-data', 'my-orders');
+						$sorter .= '<li><a href="'.esc_url(nokri_page_lang_url_callback($orders_url)).'"><span class="la la-check-circle"></span>'.($label).'</a></li>';
 					}
-					if($optn == 'Logout' && $valu != "" )
+					if(($optn == 'cart' || $optn == 'Cart') && $valu != "" )
+					{
+						if(in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) 
+						{
+							global $woocommerce;
+							$label        =  isset($valu) ? $valu:  esc_html__( 'Cart', 'nokri' );
+							$sorter .= '<li><a href="'.wc_get_cart_url().'"><span class="la la-shopping-cart"></span>'.($label).'</a></li>';
+						}
+					}
+					if(($optn == 'logout' || $optn == 'Logout') && $valu != "" )
 					{
 						$label    =  isset($valu) ? $valu:  esc_html__( 'Logout', 'nokri' );
 						$sorter .= '<li><a href="'.wp_logout_url( home_url() ).'"><span class="la la-sign-out"></span>'.($label).'</a></li>';
 					}
 				}
 			}
-				return $sorter;
+	    return $sorter;
 	}
 }
-
 /* ========================= */
 /*  Candidate Menu Sorter  */
 /* ========================= */
@@ -1706,57 +1851,74 @@ $job_alerts = ( isset($nokri['job_alerts_switch']) && $nokri['job_alerts_switch'
 			{
 				foreach($menus as $optn => $valu)
 				{
-					if($optn == 'Dashboard' && $valu != "" )
+					if(($optn == 'dashboard' || $optn == 'Dashboard') && $valu != "" )
 					{
 						$label    =  isset($valu) ? $valu:  esc_html__( 'Dashboard', 'nokri' );
 						$sorter .= '<li><a href="'.get_the_permalink().'"><span class="la la-tachometer"></span>'.($label).'</a></li>';
 					}
-					if($optn == 'udpdate profile' && $valu != "" )
+					if(($optn == 'update_profile' || $optn == 'Update Profile') && $valu != "" )
 					{
 						$label    =  isset($valu) ? $valu:  esc_html__( 'Update Profile', 'nokri' );
-						$sorter .= '<li><a href="'.get_the_permalink().'?candidate-page=edit-profile"><span class="la la-edit"></span>'.($label).'</a></li>';
+						$dashboard_update_url = nokri_set_url_param(get_the_permalink(), 'candidate-page', 'edit-profile');
+						$sorter .= '<li><a href="'.esc_url(nokri_page_lang_url_callback($dashboard_update_url)).'"><span class="la la-edit"></span>'.($label).'</a></li>';
 					}
-					if($optn == 'View My Profile' && $valu != "" )
+					if(($optn == 'view_my_profile' || $optn == 'View My Profile') && $valu != "" )
 					{
 						$label    =  isset($valu) ? $valu:  esc_html__( 'View My Profile', 'nokri' );
 						$sorter .= '<li><a href="'.esc_url(get_author_posts_url($user_id)).'"><span class="la la-user"></span>'.($label).'</a></li>';
 					}
-					if($optn == 'My Resumes' && $valu != "" )
+					if(($optn == 'my_resumes' || $optn == 'My Resumes') && $valu != "" )
 					{
-						$label    =  isset($valu) ? $valu:  esc_html__( 'My Resumes', 'nokri' );
-						$sorter .=   '<li><a href="'.get_the_permalink().'?candidate-page=resumes-list"><span class="la la-file-pdf-o"></span>'.($label).'</a></li>';
+						$label        =  isset($valu) ? $valu:  esc_html__( 'My Resumes', 'nokri' );
+						$resumes_list =  nokri_set_url_param(get_the_permalink(), 'candidate-page', 'resumes-list');
+						$sorter .=   '<li><a href="'.esc_url(nokri_page_lang_url_callback($resumes_list)).'"><span class="la la-file-pdf-o"></span>'.($label).'</a></li>';
 					}
-					if($optn == 'Jobs Applied' && $valu != "" )
+					if(($optn == 'jobs_applied' || $optn == 'Jobs Applied') && $valu != "" )
 					{
-						$label    =  isset($valu) ? $valu:  esc_html__( 'Jobs Applied', 'nokri' );
-						$sorter .= '<li><a href="'.get_the_permalink().'?candidate-page=jobs-applied"><span class="la la-bars"></span>'.($label).'</a></li>';
+						$label        =  isset($valu) ? $valu:  esc_html__( 'Jobs Applied', 'nokri' );
+						$jobs_applied =  nokri_set_url_param(get_the_permalink(), 'candidate-page', 'jobs-applied');
+						$sorter .= '<li><a href="'.esc_url(nokri_page_lang_url_callback($jobs_applied)).'"><span class="la la-bars"></span>'.($label).'</a></li>';
 					}
-					if($optn == 'Saved Jobs' && $valu != "" )
+					if(($optn == 'saved_jobs' || $optn == 'Saved Jobs') && $valu != "" )
 					{
 						$label    =  isset($valu) ? $valu:  esc_html__( 'Saved Jobs', 'nokri' );
-						$sorter .= '<li><a href="'.get_the_permalink().'?candidate-page=saved-jobs"><span class="la la-bookmark"></span>'.($label).'</a></li>';
+						$saved_jobs =  nokri_set_url_param(get_the_permalink(), 'candidate-page', 'saved-jobs');
+						$sorter .= '<li><a href="'.esc_url(nokri_page_lang_url_callback($saved_jobs)).'"><span class="la la-bookmark"></span>'.($label).'</a></li>';
 					}
-					if($optn == 'Followed Companies' && $valu != "" )
+					if(($optn == 'followed_companies' || $optn == 'Followed Companies') && $valu != "" )
 					{
-						$label    =  isset($valu) ? $valu:  esc_html__( 'Followed Companies', 'nokri' );
-						$sorter .= '<li><a href="'.get_the_permalink().'?candidate-page=followed-companies"><span class="la la-external-link"></span>'.($label).'</a></li>';
+						$label      		=  isset($valu) ? $valu:  esc_html__( 'Followed Companies', 'nokri' );
+						$followed_companies =  nokri_set_url_param(get_the_permalink(), 'candidate-page', 'followed-companies');
+						$sorter .= '<li><a href="'.esc_url(nokri_page_lang_url_callback($followed_companies)).'"><span class="la la-external-link"></span>'.($label).'</a></li>';
 					}
-					if($optn == 'Job Alerts' && $valu != "" && $job_alerts )
+					if(($optn == 'job_alerts' || $optn == 'Job Alerts')  &&  $valu != "" && $job_alerts )
 					{
-						$label    =  isset($valu) ? $valu:  esc_html__( 'Job Alerts', 'nokri' );
-						$sorter .= '<li><a href="'.get_the_permalink().'?candidate-page=job-alerts"><span class="la la-bell"></span>'.($label).'</a></li>';
+						$label      =  isset($valu) ? $valu:  esc_html__( 'Job Alerts', 'nokri' );
+						$job_alerts =  nokri_set_url_param(get_the_permalink(), 'candidate-page', 'job-alerts');
+						$sorter .= '<li><a href="'.esc_url(nokri_page_lang_url_callback($job_alerts)).'"><span class="la la-bell"></span>'.($label).'</a></li>';
 					}
-					if($optn == 'My Package' && $valu != ""  && $is_apply_pkg_base)
+					if(($optn == 'my_package' || $optn == 'My Package' ) && $valu != ""  && $is_apply_pkg_base)
 					{
-						$label    =  isset($valu) ? $valu:  esc_html__( 'My Package', 'nokri' );
-						$sorter .= '<li><a href="'.get_the_permalink().'?candidate-page=my-packages"><span class="la la-list-alt"></span>'.($label).'</a></li>';
+						$label       =  isset($valu) ? $valu:  esc_html__( 'My Package', 'nokri' );
+						$my_packages =  nokri_set_url_param(get_the_permalink(), 'candidate-page', 'my-packages');
+						$sorter .= '<li><a href="'.esc_url(nokri_page_lang_url_callback($my_packages)).'"><span class="la la-list-alt"></span>'.($label).'</a></li>';
 					}
-					if($optn == 'My Orders' && $valu != "" && $is_apply_pkg_base)
+					if(($optn == 'my_orders' || $optn == 'My Orders') && $valu != "" && $is_apply_pkg_base)
 					{
-						$label    =  isset($valu) ? $valu:  esc_html__( 'My Orders', 'nokri' );
-						$sorter .= '<li><a href="'.get_the_permalink().'?candidate-page=my-orders"><span class="la la-check-circle"></span>'.($label).'</a></li>';
+						$label      =  isset($valu) ? $valu:  esc_html__( 'My Orders', 'nokri' );
+						$my_orders  =  nokri_set_url_param(get_the_permalink(), 'candidate-page', 'my-orders');
+						$sorter .= '<li><a href="'.esc_url(nokri_page_lang_url_callback($my_orders)).'"><span class="la la-check-circle"></span>'.($label).'</a></li>';
 					}
-					if($optn == 'Logout' && $valu != "" )
+					if(($optn == 'cart' || $optn == 'Cart') && $valu != "" )
+					{
+						if(in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) 
+						{
+							global $woocommerce;
+							$label        =  isset($valu) ? $valu:  esc_html__( 'Cart', 'nokri' );
+							$sorter .= '<li><a href="'.wc_get_cart_url().'"><span class="la la-shopping-cart"></span>'.($label).'</a></li>';
+						}
+					}
+					if(($optn == 'logout' || $optn == 'Logout') && $valu != "" )
 					{
 						$label    =  isset($valu) ? $valu:  esc_html__( 'Logout', 'nokri' );
 						$sorter .= '<li><a href="'.wp_logout_url( home_url() ).'"><span class="la la-sign-out"></span>'.($label).'</a></li>';
@@ -1766,67 +1928,82 @@ $job_alerts = ( isset($nokri['job_alerts_switch']) && $nokri['job_alerts_switch'
 				return $sorter;
 	}
 }
-
-
-
 /* ================================== */
 /*  Return Job Country                */
 /* =================================== */
-
 if ( ! function_exists( 'nokri_job_country' ) ) 
 {	 
-	function nokri_job_country( $pid )
+	function nokri_job_country($pid,$icon = '')
+	{
+		global $nokri;
+		$ad_country 		= 	'';
+		$ad_country 		= 	wp_get_object_terms( $pid,  array('ad_location'), array('orderby' => 'term_group') );
+		$all_locations 		= 	array();
+		foreach($ad_country as $ad_count)
 		{
-			global $nokri;
-			$ad_country 		= 	'';
-			$ad_country 		= 	wp_get_object_terms( $pid,  array('ad_location'), array('orderby' => 'term_group') );
-			$all_locations 		= 	array();
-			foreach($ad_country as $ad_count)
-			{
-				$country_ads = get_term( $ad_count);
-				$item = array(
-					'term_id' => $country_ads->term_id, 
-					'location' => $country_ads->name
-					);
-				$all_locations[] = $item;
-			}
-			$location_html	=	'';
-			if(count( $all_locations ) > 0 )
-			{
-				$limit = count( $all_locations ) - 1;
-				for( $i = $limit; $i>=0; $i-- )
-				{
-					$location_html	.= '<a href="'.get_the_permalink($nokri['sb_search_page']).'?job_location='.$all_locations[$i]['term_id'].'">'.esc_html( $all_locations[$i]['location'] ).'</a>, ';
-				}
-				
-			}
-			 return rtrim($location_html, ', ');
+			$country_ads = get_term( $ad_count);
+			$item = array(
+				'term_id' => $country_ads->term_id, 
+				'location' => $country_ads->name
+				);
+			$all_locations[] = $item;
 		}
+		$location_html	=	'';
+		if(count( $all_locations ) > 0 )
+		{
+			$limit = count( $all_locations ) - 1;
+			for( $i = $limit; $i>=0; $i-- )
+			{
+				$link      = nokri_set_url_param(get_the_permalink($nokri['sb_search_page']), 'job-location', esc_attr($all_locations[$i]['term_id']));
+				$final_url = esc_url(nokri_page_lang_url_callback($link));
+				if($icon == 'yes')
+				{
+					$location_html	.= '<li><a href="'.$final_url.'"> <i class="fa fa-map-marker" aria-hidden="true"></i>'.esc_html( $all_locations[$i]['location'] ).'</a></li>, ';
+				}
+				else
+				{
+					$location_html	.= '<a href="'.$final_url.'">'.esc_html( $all_locations[$i]['location'] ).'</a>, ';
+				}
+			}
+		}
+		 return rtrim($location_html, ', ');
+	}
 }
-
-
 /* ================================== */
 /*  Return Job Categories         */
 /* =================================== */
-
 if ( ! function_exists( 'nokri_job_categories_with_chlid' ) ) 
 {	 
 	function nokri_job_categories_with_chlid( $pid )
 	{
 			global $nokri;
 			$post_categories = wp_get_object_terms( $pid,  array('job_category'), array('orderby' => 'term_group') );
+			$cats_html	     =	'';
+			foreach($post_categories as $c)
+			{
+				$cat        = get_term( $c );
+				$link       = nokri_set_url_param(get_the_permalink($nokri['sb_search_page']), 'cat-id', esc_attr( $cat->term_id));
+		        $final_url  = esc_url(nokri_page_lang_url_callback($link));
+				$cats_html	.= '<a href="'.$final_url .'">'.esc_html($cat->name ).'</a>, ';
+			}
+			 return rtrim($cats_html, ', ');
+	}
+}
+if ( ! function_exists( 'nokri_job_categories_with_chlid_no_href' ) ) 
+{	 
+	function nokri_job_categories_with_chlid_no_href( $pid,$taxonomy = '' )
+	{
+			global $nokri;
+			$post_categories = wp_get_object_terms( $pid,  array($taxonomy), array('orderby' => 'term_group') );
 			$cats_html	    =	'';
 			foreach($post_categories as $c)
 			{
 				$cat = get_term( $c );
-				$cats_html	.= '<a href="'.get_the_permalink($nokri['sb_search_page']).'?cat_id='.esc_attr($cat->term_id) .'">'.esc_html($cat->name ).'</a>, ';
+				$cats_html	.= esc_html($cat->name)." ".',';
 			}
-			
 			 return rtrim($cats_html, ', ');
 	}
 }
-
-
 // Get parents of custom taxonomy
 if ( ! function_exists( 'nokri_get_taxonomy_parents' ) ) {	 
 function nokri_get_taxonomy_parents($id, $taxonomy, $link = true, $separator = ' &raquo; ', $nicename = false, $visited = array()) 
@@ -1863,9 +2040,6 @@ if ($parent -> parent && ($parent -> parent != $parent -> term_id) && !in_array(
 
 }
 }
-
-
-
 if ( ! function_exists( 'nokri_jspopup' ) ) 
 {	 
 	function nokri_jspopup($msg = '', $type = '')
@@ -1884,8 +2058,6 @@ if ( ! function_exists( 'nokri_js_redirect' ) )
 		echo("<script>jQuery(document).ready(function($) { window.location = '".$url."' });</script>");
 	}
 }
-
-
 //Allow Pending jobs to be viewed by listing/product owner
 if ( ! function_exists( 'posts_for_current_author' ) ) {
 function posts_for_current_author($query)
@@ -1912,11 +2084,9 @@ function posts_for_current_author($query)
 }
 }
 add_filter('pre_get_posts', 'posts_for_current_author');
-
 /* ======================================== */
 /*  Return Candidate Information From Linkedin */
 /* ======================================== */
-
 if ( ! function_exists( 'nokri_linkedin_access' ) ) 
 {	 
 	function nokri_linkedin_access($code)
@@ -1944,7 +2114,6 @@ if ( ! function_exists( 'nokri_section_bg_url' ) )
 		return $section_bg_img_url;
 	}
 }
-
 /* =============== */
 /* Is Page function */
 /* ===============*/
@@ -1989,8 +2158,6 @@ if ( ! function_exists( 'nokri_is_page_check' ) )
 		return $is_valid;
 	}
 }
-
-
 /* =============== */
 /* Maptype function */
 /* ===============*/
@@ -2007,7 +2174,6 @@ if ( ! function_exists( 'nokri_mapType' ) )
 	 return $mapType;
  }
 }
-
 // get post description as per need. 
 if ( ! function_exists( 'nokri_words_count' ) ) {	
 	function nokri_words_count($contect = '', $limit = 180)
@@ -2045,26 +2211,20 @@ if ( ! function_exists( 'nokri_demo_mode' ) )
 	 return $is_demo_mode;
  }
 }
-
 /* Getting Selected Taxonomies Name */
 if ( ! function_exists( 'nokri_cand_skills_values' ) ) {	
  function nokri_cand_skills_values( $skill_value = '')
  {
-	
-		
 		 for ($i = 5; $i <= 100;)
 		 {
 			$array_values[] =  $i;
 			$i = $i+5;
 		 }
-		 
-		 
 		 $option        =  '';
 		 if(empty($skill_value))
 		 {
 		 	$skill_value    =  array();
 		 }
-		 
 				if( count((array)  $array_values ) > 0 )
 				{ 
 					foreach( $array_values as $array_value)
@@ -2086,7 +2246,6 @@ if ( ! function_exists( 'nokri_cand_skills_values' ) ) {
 			
  }
 }
-
 if ( ! function_exists( 'nokri_cand_skills_values' ) ) 
 {
 	function nokri_user_id_exists($user)
@@ -2096,8 +2255,6 @@ if ( ! function_exists( 'nokri_cand_skills_values' ) )
 		if($count == 1){ return true; }else{ return false; }
 	}
 }
-
-
 if ( ! function_exists( 'nokri_cand_del_resume_keys' ) ) 
 {
 	function nokri_cand_del_resume_keys($candidate_id= '')
@@ -2110,7 +2267,6 @@ if ( ! function_exists( 'nokri_cand_del_resume_keys' ) )
 	   } 
 	}
 }
-
 /* Employer Allowed Candidate search*/
 if( ! function_exists( 'nokri_is_cand_search_allowed' ) )
 {
@@ -2147,29 +2303,69 @@ if( ! function_exists( 'nokri_is_cand_search_allowed' ) )
 /************************/
 if( ! function_exists( 'nokri_get_opening_count' ) )
 {
-	function nokri_get_opening_count($term_id = '')
+	function nokri_get_opening_count($term_id = '',$tax_name = '')
 	{
 		$custom_count = '';
+		if($tax_name == '')
+		{
+			$tax_name = 'job_cateory';
+		}
 		$query = new WP_Query( 
 		array('post_type' => 'job_post','meta_query' => array(
-		array('key'     => '_job_status','value'   => 'active','compare' => '=',),),
-		'tax_query' => array(
-		'relation' => 'AND',
+		array('key'       => '_job_status','value'   => 'active','compare' => '=',),),
+		'tax_query'       => array(
+		'relation'        => 'AND',
 		array(
-			'taxonomy' => 'job_category',
+			'taxonomy' => $tax_name,
 			'field'    => 'term_id',
 			'terms'    => array( $term_id ),
 			'operator' => 'IN',
 		),
 	),																		
 	));
-		 
 		$custom_count =  $query->found_posts;
 		wp_reset_postdata();
 	 	return $custom_count;
 	}
 }
 
+if ( ! function_exists( 'nokri_get_products_theme_options' ) )
+{
+	function nokri_get_products_theme_options($for = '')
+	{
+		$packages_arr = array('' =>__('Select a package','nokri'));
+		if ( !class_exists( 'WooCommerce' ) ) 
+		{
+			//return $packages_arr;
+		}
+		else
+		{
+			$args	=	array(
+			'post_type' => 'product',
+			'post_status' => 'publish',
+			'fields'=>'ids',
+			'posts_per_page' => -1,
+			'order'=> 'DESC',
+			'orderby' => 'ID',
+			'meta_query' => array(array('key' => 'op_pkg_for','value' => $for,'compare' => '=',),)
+                            ,);
+			$the_query = new WP_Query( $args );
+			// The Loop
+			if ( $the_query->have_posts() ) :
+			while ( $the_query->have_posts() ) : $the_query->the_post();
+			 global $post;
+			 $packages_arr[$post] = get_the_title($post);
+			endwhile;
+			endif;
+			// Reset Post Data
+			wp_reset_postdata();
+			return $packages_arr;
+		}
+	}
+}
+/************************/
+/* Assign Free Package*/
+/************************/
 if( ! function_exists( 'nokri_assign_free_package' ) )
 {
 	function nokri_assign_free_package()
@@ -2183,18 +2379,36 @@ if( ! function_exists( 'nokri_assign_free_package' ) )
 		   return $package_id;
 	}
 }
-
+/************************/
+/* Assign Free Package Candidate*/
+/************************/
+if( ! function_exists( 'nokri_candidate_assign_free_package' ) )
+{
+	function nokri_candidate_assign_free_package()
+	{
+		global $nokri;
+		$package_id = '';
+		if( isset( $nokri['cand_register_package'] ) && $nokri['cand_register_package'] != '' )
+		   {
+			   $package_id = $nokri['cand_register_package'];
+		   }
+		   return $package_id;
+	}
+}
+// Removing on add to cart if an item is already in cart
+add_filter( 'woocommerce_add_cart_item_data', 'nokri_remove_before_add_to_cart' );
+function nokri_remove_before_add_to_cart( $cart_item_data ) {
+    WC()->cart->empty_cart();
+    return $cart_item_data;
+}
 /******************************/
 /* Job post feilds operations*/
 /*****************************/
-
 if( ! function_exists( 'nokri_job_post_feilds_operations' ) )
 {
 	function nokri_feilds_operat($key = '', $type = 'show')
 	{
 		global $nokri;
-		
-		
 		if($type == 'show')
 		{
 			if((!empty($nokri["$key"]) && $nokri["$key"] == 'show') || !empty($nokri["$key"]) && $nokri["$key"] == 'required') 
@@ -2205,23 +2419,19 @@ if( ! function_exists( 'nokri_job_post_feilds_operations' ) )
 			{
 				return false;	
 			}
-			
 		}
-		
 		if($type == 'required')
 		{			
 			return (!empty($nokri["$key"]) && $nokri["$key"]== 'required') ?  ' data-parsley-required="true"' : '';	
 		}
-		
 	}
 }
-
 /******************************/
 /* Getting candidates skills*/
 /*****************************/
 if( ! function_exists( 'nokri_get_candidates_skills' ) )
 {
-	function nokri_get_candidates_skills($user_id = '')
+	function nokri_get_candidates_skills($user_id = '',$layout = '')
 	{
 		global $nokri;
 		$emp_skills     = get_user_meta($user_id, '_cand_skills', true);
@@ -2236,7 +2446,16 @@ if( ! function_exists( 'nokri_get_candidates_skills' ) )
 					{
 						 if (in_array( $taxonomy->term_id, $emp_skills ))
 						 {
-							 $skill_tags .=   '<a href="'.esc_url(get_the_permalink( $nokri['candidates_search_page'] )).'?cand_skills='.esc_attr($taxonomy->term_id).'">'.esc_html($taxonomy->name).'</a>';
+							$link      = nokri_set_url_param(get_the_permalink($nokri['candidates_search_page']), 'cand_skills', esc_attr( $taxonomy->term_id ));
+							$final_url = esc_url(nokri_page_lang_url_callback($link));
+							 if($layout == 'ul')
+							 {
+								 $skill_tags .=   '<li><a href="'.$final_url.'">'.esc_html($taxonomy->name).'</a></li>';
+							 }
+							 else
+							 {
+								 $skill_tags .=   '<a href="'.$final_url.'">'.esc_html($taxonomy->name).'</a>';
+							 }
 							 if($count == 2)
 							 {
 								 break;
@@ -2262,7 +2481,7 @@ if( ! function_exists( 'nokri_get_candidates_location' ) )
 			if ( ! empty( $job_locations ) ) { 
 				foreach($job_locations as $location)
 				{
-				   $last_location = '<a href="'.get_the_permalink($nokri['sb_search_page']).'?job_location='.$location->term_id.'">'.$location->name.'</a>';
+				   $last_location = '<a href="'.get_the_permalink($nokri['sb_search_page']).'?job-location='.$location->term_id.'">'.$location->name.'</a>';
 				}
 			}
 	}
@@ -2292,7 +2511,6 @@ if (! function_exists ( 'nokri_emp_saved_resumes_ids' ))
 		 return $resumesArray;
 	}
 }
-
 /* ================================== */
 /*  Getting All candidaites skills  */
 /* =================================== */
@@ -2316,17 +2534,17 @@ if (! function_exists ( 'nokri_jobs_matches_candidates' ))
 		$users         =   $wp_user_query->get_results();
 		$total_users   =   $wp_user_query->get_total();
 		$notification  =   array();
-		if (!empty($users))
+		if (!empty($users) && $job_id != '')
 		{
 			 // Loop through results
 			 foreach ($users as $user) 
 			 {
-				$cand_id            =   $user->ID; 
-				$cand_name          =   $user->display_name;
-				$cand_skills_value	= 	get_user_meta($cand_id, '_cand_skills_values', true);
-				$cand_skills_sum	=   array_sum($cand_skills_value);
-				update_user_meta($cand_id, '_cand_skills_sum', sanitize_text_field($cand_skills_sum));
-				$notification[]     =   $cand_id; 
+				$cand_id = $user->ID;
+                $cand_name = $user->display_name;
+                $cand_skills_value = get_user_meta($cand_id, '_cand_skills_values', true);
+                $cand_skills_sum   = isset($cand_skills_value) && !empty($cand_skills_value) && is_array($cand_skills_value) ? array_sum($cand_skills_value) : '';
+                update_user_meta($cand_id, '_cand_skills_sum', sanitize_text_field($cand_skills_sum));
+                $notification[] = $cand_id; 
 			}
 		}
 		return $notification;
@@ -2353,3 +2571,814 @@ if (! function_exists ( 'nokri_get_user_profile_pic' ))
 		 return $image_dp_link[0];
 	}
 }
+/* ================================== */
+/*  Getting Job Informations   */
+/* =================================== */
+if (! function_exists ( 'nokri_get_jobs_informations' )) 
+{
+	function nokri_get_jobs_informations($job_id = '',$term_name = '')
+	{
+		global $nokri;
+		$user_id         =   get_current_user_id();
+		$post_author_id  =   get_post_field('post_author', $job_id );
+		$job_type        =   wp_get_post_terms($job_id, 'job_type', array("fields" => "ids"));
+		$job_type	     =   isset( $job_type[0] ) ? $job_type[0] : '';
+		$job_salary      =   wp_get_post_terms($job_id, 'job_salary', array("fields" => "ids"));
+		$job_salary	     =   isset( $job_salary[0] ) ? $job_salary[0] : '';
+		$job_currency    =   wp_get_post_terms($job_id, 'job_currency', array("fields" => "ids"));
+		$job_currency	 =   isset( $job_currency[0] ) ? $job_currency[0] : '';
+		$job_salary_type =   wp_get_post_terms($job_id, 'job_salary_type', array("fields" => "ids"));
+		$job_salary_type =	 isset( $job_salary_type[0] ) ? $job_salary_type[0] : '';
+		/* Getting Profile Photo */
+		$rel_image_link  =  nokri_get_user_profile_pic($post_author_id,'_sb_user_pic');
+        /* Calling Funtion Job Class For Badges */ 
+		$job_badge_text = nokri_premium_job_class_badges($job_id);
+		if($job_badge_text != '')
+		{
+			$featured_html = '<div class="features-star"><i class="fa fa-star"></i></div>';
+		}
+		/* Getting Last country value*/
+		$job_locations   = array();
+		$last_location   =  '';
+		$job_locations   =  wp_get_object_terms( $job_id,  array('ad_location'), array('orderby' => 'term_group') );
+		if ( ! empty( $job_locations ) ) { 
+			foreach($job_locations as $location)
+			{
+				$search_url      = nokri_set_url_param(get_the_permalink($nokri['sb_search_page']), 'job-location',$location->term_id); 	
+				$last_location   = '<a href="'.esc_url(nokri_page_lang_url_callback($search_url)).'">'.$location->name.'</a>';
+			}
+		}
+		/* save job */
+		$user_id         = '';
+		if(is_user_logged_in())
+		{
+			$user_id         =  get_current_user_id();
+		}
+		$job_bookmark = get_post_meta( $job_id, '_job_saved_value_'.$user_id, true);
+		if ( $job_bookmark == '' ) 
+		{
+			$save_job = '<a href="javascript:void(0)" class="n-job-saved save_job" data-value = "'.$job_id.'"><i class="ti-heart"></i></a>';
+		}
+		else
+		{
+			$save_job = '<a href="javascript:void(0)" class="n-job-saved saved"><i class="fa fa-heart"></i></a>';
+		}
+	}
+}
+/* ================== */
+/*  Get Custom Feilds  */
+/* ==================*/
+if (! function_exists ( 'nokri_get_custom_feilds' )) 
+{
+	function nokri_get_custom_feilds($author_id = '',$feilds_for = '',$id = '',$edit_profile = '',$show_profile = '')
+	{
+		if($author_id == '')
+		{
+			$user_id          =    get_current_user_id();
+		}
+		else
+		{
+			$user_id          =     $author_id;
+		}
+		$edit_profile         =    $edit_profile;
+		$args                 =    array(
+		    'p'               =>   $id,
+			'post_type'       =>   'custom_feilds',
+			'post_status'     =>   'publish',
+			'posts_per_page'  =>   -1,
+			'meta_query'      =>    array( array( 'key' => '_custom_feild_for', 'value' => $feilds_for )),
+		);
+		$args = nokri_wpml_show_all_posts_callback($args);
+		$posts = new WP_Query( $args );
+		$custom_feilds = '';
+		if ( $posts -> have_posts() )
+		{
+			while ( $posts -> have_posts() )
+			 {
+				 $posts->the_post();
+				 the_content();
+				 $id                = get_the_id();
+				 $custom_feilds_for = get_post_meta($id, '_custom_feild_for', true );
+				 $custom_feilds     = json_decode(get_post_meta( $id, '_custom_feilds', true ));
+			}
+		}
+		wp_reset_query();
+		$custom_feilds_html =  $read_only =  $requires     =  '';
+		if (is_array($custom_feilds))
+	    {
+			 foreach($custom_feilds as $value) 
+			 {
+				 $field_type   = $value->feild_type;
+				 $field_label  = $value->feild_label;
+				 $field_value  = $value->feild_value;
+				 $field_req    = $value->feild_req;
+				 $field_pub    = $value->feild_pub;
+				 $field_values = (explode("|",$field_value));
+				 if(!$show_profile)
+				 {
+					 /* Check boxes */
+					 if($field_type == 'RadioButton')
+					 {
+						$check_html = '';
+						foreach($field_values as $value ) 
+						{
+							$field_slug   =  preg_replace('/\s+/', '', $field_label);
+							$meta_value   =  get_user_meta($user_id, $field_slug, true);
+							$checked      =  ($meta_value == $value) ? 'checked="checked"' : '';
+							if($field_req)
+							{
+								$message  = 'data-parsley-error-message="'. __( 'This field is required.', 'nokri' ) .'"';
+								$requires = 'data-parsley-required="true" '. $message;
+							}
+							$check_html .= '<li><input type="radio" name="_custom_['. $field_slug . ']" class="input-icheck-others" '.esc_attr($checked).'  value="'.esc_attr($value).'" '.$requires.'><p>'.esc_html($value).'</p></li>';
+						}
+							$custom_feilds_html .= '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+														<div class="form-group">
+														 <label class="">'.esc_html__($field_label).'</label>
+															<ul class="custom-radiobox">
+																'.$check_html.'	
+															</ul>
+														</div>
+													</div>';
+					}
+					 /* Input */
+					 if($field_type == 'Input')
+					 {
+							$field_slug   =  preg_replace('/\s+/', '', $field_label);
+							$meta_value   =  get_user_meta($user_id, $field_slug, true);
+							if($field_req == 'Yes')
+							{
+								$message  =  'data-parsley-error-message="'.__( 'This field is required.', 'nokri' ).'"';
+								$requires =  'data-parsley-required="true" '.$message;
+							}
+							$custom_feilds_html .= '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"><div class="form-group">
+							<input placeholder="'.$field_label.'" class="form-control" type="text" '.$requires.' name="_custom_['. $field_slug . ']" value="'.$meta_value.'">
+						</div></div>';
+					 }
+					 /* Number */
+					 if($field_type == 'Number')
+					 {
+							$field_slug   =  preg_replace('/\s+/', '', $field_label);
+							$meta_value   =  get_user_meta($user_id, $field_slug, true);
+							$requires = '';
+							if($field_req == 'Yes')
+							{
+								$message  =  'data-parsley-error-message="'.__( 'This field is required.', 'nokri' ).'"';
+								$requires =  'data-parsley-required="true" '. $message;
+							}
+							$custom_feilds_html .= '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"><div class="form-group">
+							<input placeholder="'.$field_label.'" class="form-control" type="Number" data-parsley-type="digits" '.$requires.' name="_custom_['. $field_slug . ']" value="'.$meta_value.'">
+						</div></div>';
+					 }
+					 /* Text Area */
+					 if($field_type == 'Text Area')
+					 {
+							$field_slug   =  preg_replace('/\s+/', '', $field_label);
+							$meta_value   =  get_user_meta($user_id, $field_slug, true);
+							$requires     =  '';
+							if($field_req == 'Yes')
+							{
+								$message  =  'data-parsley-error-message="'.__( 'This field is required.', 'nokri' ).'"';
+								$requires =  'data-parsley-required="true" '.$message;
+							}
+							$custom_feilds_html .= '<div class="col-md-12 col-xs-12 col-sm-12">
+													<div class="form-group">
+														<label class="">'.esc_html__($field_label).'</label>
+														<textarea  name="_custom_['. $field_slug . ']" class="form-control"   cols="30" rows="10" '.($requires).'>'.esc_html($meta_value).'</textarea>
+													</div>
+												</div>';
+					 }
+					  /* Select Box */
+					 if($field_type == 'Select Box')
+					 {
+							$options      =  $selected = '';
+							$field_slug   =  preg_replace('/\s+/', '', $field_label);
+							$meta_value   =  get_user_meta($user_id, $field_slug, true);
+							foreach($field_values as $value ) 
+							{
+								$selected     = ($value == $meta_value) ? 'selected="selected"' : '';
+								$options     .= '<option value="'.esc_attr($value).'" '.esc_attr($selected).'>'.esc_html($value).'</option>';
+							}
+							$requires = '';
+							if($field_req == 'Yes')
+							{
+								$message  =  'data-parsley-error-message="'.__( 'This field is required.', 'nokri' ).'"';
+								$requires =  'data-parsley-required="true" '. $message;
+							}
+							$custom_feilds_html .= '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+														<div class="form-group">
+															<label>'.esc_html($field_label).'</label>
+																<select class="js-example-basic-single" name="_custom_['. $field_slug . ']" '.$requires.'>
+																	'.($options).' 
+																</select>
+														</div>
+													</div>';
+						}
+					  /* Date  */
+					 if($field_type == 'Date')
+					 {
+							$field_slug   =  preg_replace('/\s+/', '', $field_label);
+							$meta_value   =  get_user_meta($user_id, $field_slug, true);
+							$requires = '';
+							if($field_req == 'Yes')
+							{
+								$message  =  'data-parsley-error-message="'.__( 'This field is required.', 'nokri' ).'"';
+								$requires =  'data-parsley-required="true" '. $message;
+							}
+							
+							
+							$custom_feilds_html .= '<div class="col-md-12 col-xs-12 col-sm-6">
+														<div class="form-group">
+															<label >'.esc_html($field_label).'</label>
+															<input type="text"   value="'.esc_attr($meta_value).'" name="_custom_['. $field_slug . ']" class="datepicker-custom-feilds form-control" '.($requires).'/>
+														</div>
+													</div>';
+					 }
+				 }
+				 else
+				 {  
+					 if($field_pub == 'Yes')
+					 {
+							 $field_slug   =  preg_replace('/\s+/', '', $field_label);
+							 $meta_value   =  get_user_meta($user_id, $field_slug, true);
+							 if($meta_value != '')
+							 $custom_feilds_html .=  '<li><small>'.$field_label.'</small><strong>'.$meta_value.'</li></strong>';
+							 else
+							 $custom_feilds_html .= '';
+					 }
+				 }
+			 }
+		}
+		return $custom_feilds_html;
+	}
+}
+/* ======================== */
+/*  Get Questions Answers  */
+/* =======================*/
+if (! function_exists ( 'nokri_get_questions_answers' )) 
+{
+	function nokri_get_questions_answers($job_id = '',$candidate_id = '')
+	{
+		$qstn_ans_html      =   '';
+		$job_questions      =   $cand_answers = array();
+		$job_questions      =   get_post_meta( $job_id, '_job_questions', true);
+		$cand_answers       =   get_user_meta( $candidate_id, '_job_answers'.$candidate_id, true);
+		if( isset($job_questions) && !empty($job_questions) &&  count($job_questions) > 0 )
+		{
+			foreach($job_questions as $key => $csv )
+			{
+				if( isset($cand_answers) && is_array($cand_answers))
+				{
+					if(array_key_exists($key,$cand_answers))
+					{
+						$skill_lavel = $cand_answers[$key];
+					}
+				}			
+				$qstn_ans[] = array("question" => $csv, "answer" => $skill_lavel);	
+			}
+		}
+		if(isset($qstn_ans) && !empty($qstn_ans))
+		{
+			foreach( $qstn_ans  as $res )  
+			{
+				$qstn_ans_html .=  '<label> '.esc_html__( "Question","nokri").' : '.esc_html($res['question']).'</label><p>'.esc_html__( "Answer","nokri").' : '.esc_html($res['answer']).'</p>';
+			}
+		}
+			return $qstn_ans_html;
+	}
+}
+/* ====================================== */
+/*  Computing Candidate Profile Percent  */
+/* =====================================*/
+if (! function_exists ( 'nokri_updating_candidate_profile_percent' )) 
+{
+	function nokri_updating_candidate_profile_percent()
+	{
+		$user_crnt_id   =  get_current_user_id();
+		global $nokri;
+		$profile_percent          = isset($nokri['default_info']) ? $nokri['default_info']  : 5;                           
+		/* Personal Info */
+		$person          = isset($nokri['person_info']) ? $nokri['person_info']  : 10;                 
+		$cand_pesonal 	 = get_user_meta($user_crnt_id, '_cand_intro', true);    
+               
+		if ($cand_pesonal !='' )
+		{
+		$profile_percent = $person + $profile_percent;
+                                 
+		}
+		/* Skills */
+		$skill          = isset($nokri['skill_info']) ? $nokri['skill_info']  : 20;
+		$cand_skills 	 = get_user_meta($user_crnt_id, '_cand_skills', true);
+              
+                
+		if (isset($cand_skills) && !empty($cand_skills) && $cand_skills[0] !=0 )
+		{
+                 
+	          $profile_percent = $skill + $profile_percent;
+		}
+		/* Education */
+		$edu          = isset($nokri['edu_info']) ? $nokri['edu_info']  : 20;
+		$cand_education  = get_user_meta($user_crnt_id, '_cand_education', true); 
+               
+		if ( $cand_education  && $cand_education[0]['degree_name'] != '' ) 
+		{ 
+                       
+			$profile_percent = $edu + $profile_percent;
+		}
+		/* Profession */
+		$prof               = isset($nokri['prof_info']) ? $nokri['prof_info']  : 20;
+		$cand_profession	= get_user_meta($user_crnt_id, '_cand_profession', true);
+               
+		if ( $cand_profession  && $cand_profession[0]['project_organization'] != '' )
+		{                     
+			$profile_percent = $prof + $profile_percent;
+		}
+		/* Certification */
+		$cert              = isset($nokri['cert_info']) ? $nokri['cert_info']  : 20;
+		$cand_certif       = get_user_meta($user_crnt_id, '_cand_certifications', true);
+	         
+                if ( $cand_certif  && $cand_certif[0]['certification_name'] != '' )
+		{                   
+			$profile_percent = $cert + $profile_percent;
+		}
+		/* Social */
+		$social        =  isset($nokri['social_info']) ? $nokri['social_info']  : 5;
+		$cand_fb       =  get_user_meta($user_crnt_id, '_cand_fb', true);
+		$cand_tw       =  get_user_meta($user_crnt_id, '_cand_twiter', true);
+		$cand_gog      =  get_user_meta($user_crnt_id, '_cand_google', true);
+		$cand_lk       =  get_user_meta($user_crnt_id, '_cand_linked', true);
+		if ($cand_fb || $cand_tw || $cand_gog || $cand_lk )
+		{                        
+		  $profile_percent = $social + $profile_percent;
+		}
+		if($profile_percent != '')
+		{       
+                        if($profile_percent > 100){
+                            $profile_percent = 100;
+                        }
+			update_user_meta( $user_crnt_id, '_cand_profile_percent', $profile_percent);                
+		}
+               
+                
+	}
+}
+/************************************/
+/* if parameter are multiple like 4 */
+/************************************/
+if (!function_exists('nokri_set_url_params_multi')) {
+    function nokri_set_url_params_multi($nokri_listing = '', $key1 = '', $value1 = '', $key2 = '', $value2 = '',$key3 ='',$val3 = '')
+	 {
+        if ($nokri_listing != '')
+		 {
+			$nokri_listing = add_query_arg(array($key1 => $value1, $key2 => $value2,$key3 => $val3), $nokri_listing);
+            $nokri_listing = nokri_page_lang_url_callback($nokri_listing);
+        }
+        return $nokri_listing;
+    }
+}
+/************************************/
+/* == set url params for wpml == */
+/************************************/
+if (!function_exists('nokri_set_url_param'))
+{
+	function nokri_set_url_param($nokri_listing = '', $key = '', $value = '')
+	 {
+		if ($nokri_listing != '') 
+		{
+			$nokri_listing = add_query_arg(array($key => $value), $nokri_listing);
+		}
+			return $nokri_listing;
+	}
+}
+/************************************/
+/* Getting origional Term ID*/
+/************************************/
+if (!function_exists('nokri_get_origional_term_id'))
+{
+	function nokri_get_origional_term_id($term_id = '')
+	 {
+		global $sitepress;
+		if (function_exists('icl_object_id'))
+		 {
+		   $term_id     =   icl_object_id($term_id, 'job_class', false, $sitepress->get_default_language());
+		 }
+		return $term_id;
+	}
+}
+/************************************/
+/* get current page id for redirect in  wpml*/
+/************************************/
+if (!function_exists('nokri_language_page_id_callback')) {
+
+    function nokri_language_page_id_callback($page_id = '') {
+        global $sitepress;
+        if (function_exists('icl_object_id') && function_exists('wpml_init_language_switcher') && $page_id != '' && is_numeric($page_id)) {
+            $language_code = $sitepress->get_current_language();
+            $lang_page_id = icl_object_id($page_id, 'page', false, $language_code);
+            if ($lang_page_id <= 0) {
+                $lang_page_id = $page_id;
+            }
+            return $lang_page_id;
+        } else {
+            return $page_id;
+        }
+    }
+}
+/************************************/
+/* == check page language url for wpml  == */
+/************************************/
+if (!function_exists('nokri_page_lang_url_callback')) {
+    function nokri_page_lang_url_callback($page_url = '') {
+        global $sitepress;
+        if (function_exists('icl_object_id') && $page_url != '') {
+            $page_url = apply_filters('wpml_permalink', $page_url, ICL_LANGUAGE_CODE, true);
+        }
+        return $page_url;
+    }
+}
+/************************************/
+/* == check page language url for wpml  == */
+/************************************/
+if (!function_exists('nokri_get_origional_product_id'))
+ {
+    function nokri_get_origional_product_id($product_id = '')
+	 {
+		global $sitepress;
+        if (function_exists('icl_object_id')) 
+		{
+            $wpml_options =  get_option( 'icl_sitepress_settings' );
+            $default_lang =  $wpml_options['default_language'];
+			$product_id   =  icl_object_id($product_id, 'product', false, $default_lang);
+        }
+        return $product_id; 
+	 }
+ }
+/************************************/
+/* include hidden value for language parameter */
+/************************************/
+if (!function_exists('nokri_form_lang_field_callback'))
+ {
+    function nokri_form_lang_field_callback($echo = false)
+	 {
+        global $sitepress;
+        $hidden_lang_html = '';
+        if (function_exists('icl_object_id')) 
+		{
+            if ($sitepress->get_setting('language_negotiation_type') == 3) 
+			{
+                $hidden_lang_html = '<input name="lang" type="hidden" value="' . ICL_LANGUAGE_CODE . '">';
+            }
+        }
+        if ($echo)
+		 {
+            echo nokri_returnEcho($hidden_lang_html);
+         }
+		else
+		  {
+            return $hidden_lang_html;
+          }
+    }
+}
+function nokri_returnEcho($html = '')
+{
+    return $html; 
+}
+/************************************/
+/* Adding supress in query */
+/************************************/
+if (!function_exists('nokri_wpml_show_all_posts_callback')) {
+    function nokri_wpml_show_all_posts_callback($query_args = array()) {
+		global $nokri;
+        global $sitepress;
+        $nokri_show_posts          = isset($nokri['nokri_display_all_lang']) ? $nokri['nokri_display_all_lang']  : false;
+        if (function_exists('icl_object_id') && $query_args != '' && $nokri_show_posts) {
+			nokri_reset_wpml_taxonomy_data();
+            $query_args['suppress_filters'] = true;
+        }
+        return $query_args;
+    }
+}
+/************************************/
+/* Duplicate post in all language or in current language */
+/************************************/
+if (!function_exists('nokri_duplicate_posts_lang_callback')) 
+{
+    function nokri_duplicate_posts_lang_callback($org_post_id = 0) 
+	{
+        global $sitepress;
+        $nokri_duplicate_post = false;
+        if (class_exists('Redux')) {
+            $_duplicate_post = Redux::getOption('nokri', 'nokri_duplicate_jobs');
+        }
+        if (function_exists('icl_object_id') && $org_post_id != 0 && $_duplicate_post) {
+            $language_details_original = $sitepress->get_element_language_details($org_post_id, 'post_job_post');
+            if (!class_exists('TranslationManagement'))
+			 {
+                include(ABSPATH . 'wp-content/plugins/sitepress-multilingual-cms/inc/translation-management/translation-management.class.php');
+             }
+               foreach ($sitepress->get_active_languages() as $lang => $details) 
+			   {
+					if ($lang != $language_details_original->language_code)
+					 {
+						$iclTranslationManagement = new TranslationManagement();
+						$iclTranslationManagement->make_duplicate($org_post_id, $lang);
+					}
+            }
+        }
+    }
+}
+if (!function_exists('nokri_show_taxonomy_all')) {
+    function nokri_show_taxonomy_all($taxo_id, $taxo_nme) {
+        global $sitepress;
+        $nokri_show_posts = false;
+        if (class_exists('Redux')) {
+            $nokri_show_posts = Redux::getOption('nokri', 'nokri_display_all_lang');
+        }
+        if (function_exists('icl_object_id') && $nokri_show_posts ) {
+            $languages = apply_filters('wpml_active_languages', NULL, 'orderby=id&order=desc');
+            $taxo = array();
+            foreach ($languages as $val) {
+                $taxo[] = apply_filters('wpml_object_id', $taxo_id, $taxo_nme, FALSE, $val['code']);
+            }
+            //return original id if only one language.
+            return $taxo;
+        } else {
+            return $taxo_id;
+        }
+    }
+}
+/************************************/
+/* Resetting taxonomy arguments wpml */
+/************************************/
+if (!function_exists('nokri_reset_wpml_taxonomy_data')) 
+{
+	 function nokri_reset_wpml_taxonomy_data() 
+	 {
+		if(!is_admin())
+		{
+			global $sitepress;
+			remove_filter('get_terms_args', array($sitepress, 'get_terms_args_filter'), 10);
+		    remove_filter('get_term', array($sitepress, 'get_term_adjust_id'), 1);
+		    remove_filter('terms_clauses', array($sitepress, 'terms_clauses'), 10);
+		}
+	 }
+}
+/************************************/
+/* Language Switcher Front End */
+/************************************/
+if (!function_exists('nokri_language_switcher'))
+ {
+	function nokri_language_switcher()
+	 {
+		global $nokri;
+		if (function_exists('icl_object_id'))
+		 {
+            $lang_link = '';
+            $languages = icl_get_languages('skip_missing=0&orderby=code');
+            $final_img = esc_url(trailingslashit(get_template_directory_uri()) . 'images/translation.png');
+			if( isset( $nokri['all_lang_img']['url'] ) && $nokri['all_lang_img']['url'] != "" )
+			{
+				$final_img = $nokri['all_lang_img']['url'];	
+			}
+			$lang_name = ( isset($nokri['all_lang_txt']) && $nokri['all_lang_txt'] != ""  ) ? $nokri['all_lang_txt'] : esc_html__('All Languages', 'nokri');
+            if (!empty($languages)) 
+			{
+                ?>
+			<div class="dropup ad-language">
+                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <img src="<?php echo esc_url($final_img); ?>" alt=""/>
+			          <?php echo $lang_name; ?>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                <?php
+				foreach ($languages as $lang) 
+				{
+					if ($lang['active']) 
+					{
+						$lang_link = "javascript:void(0)";
+					} 
+					else
+					{
+						$lang_link = esc_url($lang['url']);
+					}
+					?>
+                  <li>
+                  	<a href="<?php echo $lang_link; ?>">
+                  		<img src="<?php echo $lang['country_flag_url']; ?>"><?php echo icl_disp_language($lang['native_name']); ?>
+                  	</a>
+                  </li>
+                  <?php } ?>
+                </ul>
+            </div>
+                <?php
+            }
+        }
+    }
+}
+/************************************/
+/* Wpml theme options hook */
+/************************************/
+add_action('nokri_wpml_settings_options', 'nokri_wpml_settings_options_callback', 10, 1);
+if (!function_exists('nokri_wpml_settings_options_callback')) {
+    function nokri_wpml_settings_options_callback($opt_name = '') {
+		$options = '';
+        if (!function_exists('icl_object_id')) {
+            return $options;
+        }
+        $options = array(
+            'title' => __('WPML Settings', 'nokri'),
+            'id' => 'sb-wpml-settings',
+            'desc' => '',
+            'icon' => 'el el-globe',
+            'fields' => array(
+                array(
+					'id'       => 'nokri_display_wpml_in_nav',
+					'type'     => 'switch',
+					'title'    => esc_html__( 'Display Languages in Navigation Menu', 'nokri' ),
+					'subtitle' => esc_html__( 'Enable/Disable in all languages in nav menu ', 'nokri' ),
+					'default'  => false,
+					),
+					array(
+					'id'       => 'nokri_duplicate_jobs',
+					'type'     => 'switch',
+					'title'    => esc_html__( 'Duplicate new jobs in all languages', 'nokri' ),
+					'subtitle' => esc_html__( 'Enable/Disable duplication ', 'nokri' ),
+					'default'  => false,
+					),
+					array(
+					'id'       => 'nokri_display_all_lang',
+					'type'     => 'switch',
+					'title'    => esc_html__( 'Display jobs in all languages', 'nokri' ),
+					'subtitle' => esc_html__( 'Enable/Disable in all languages ', 'nokri' ),
+					'default'  => false,
+					),
+					array(
+					'id'       => 'nokri_lang_switch_frnt',
+					'type'     => 'switch',
+					'title'    => esc_html__( 'Show/Hide language switcher at front end', 'nokri' ),
+					'subtitle' => esc_html__( 'Enable/Disable switcher ', 'nokri' ),
+					'default'  => false,
+                    ),
+                    array(
+                        'required' => array( 'nokri_lang_switch_frnt', '=', array( '1' ) ),
+                        'id'       => 'all_lang_txt',
+                        'type'     => 'text',
+                        'title'    => __( 'Language Dropup Text', 'nokri' ),
+                        'default'  => '',    
+                     ),
+                     array(
+                        'required' => array( 'nokri_lang_switch_frnt', '=', array( '1' ) ),
+                        'id'       => 'all_lang_img',
+                        'type'     => 'media',
+                        'url'      => true,
+                        'title'    => esc_html__( 'Language Dropup Image', 'nokri' ),
+                        'compiler' => 'true',
+                        'subtitle' => esc_html__( 'Dimensions: 200 x 200', 'nokri' ),
+                        'default'  => array( 'url' => get_template_directory_uri (). '/images/translation.png'),
+                    ),
+            )
+        );
+        Redux::setSection($opt_name, $options);
+    }
+}
+/************************************/
+/* Wpml page translation */
+/************************************/
+if (!function_exists('nokri_language_page_id_callback')) {
+    function nokri_language_page_id_callback($page_id = '') 
+	{
+        global $sitepress;
+        if (function_exists('icl_object_id') && function_exists('wpml_init_language_switcher') && $page_id != '' && is_numeric($page_id)) {
+            $language_code = $sitepress->get_current_language();
+            $lang_page_id  = icl_object_id($page_id, 'page', false, $language_code);
+            if ($lang_page_id <= 0)
+			{
+                $lang_page_id = $page_id;
+            }
+            return $lang_page_id;
+        } 
+		else 
+		{
+            return $page_id;
+        }
+    }
+}
+
+/*change candidate status received  to viewed when emp view profilew*/
+add_action('wp_ajax_can_set_auto_viewed', 'nokri_can_set_auto_viewed');
+add_action( 'wp_ajax_can_set_auto_viewed', 'nokri_can_set_auto_viewed' );
+if ( ! function_exists( 'nokri_can_set_auto_viewed' ) ) {    
+    function nokri_can_set_auto_viewed(){        
+        
+     $cand_status  =    $_POST['cand_status'];
+     $cand_id      =    $_POST['cand_id'];
+     $job_id       =    $_POST['job_id'];
+     
+     
+     
+     if($cand_status != '' && $cand_id != ''  && $job_id != ''){
+       
+         update_post_meta( $job_id, '_job_applied_status_'.$cand_id,$cand_status+1);        
+         echo "1";
+     }   
+      else {        
+        echo "0";
+      }     
+        die();
+    }
+    
+}
+
+function strip_tags_content($text, $tags = '', $invert = FALSE) {
+
+    preg_match_all('/<(.+?)[\s]*\/?[\s]*>/si', trim($tags), $tags);
+    $tags = array_unique($tags[1]);
+    $output = '';
+    if (is_array($tags) AND count($tags) > 0) {
+        if ($invert == FALSE) {
+            $output = preg_replace('@<(?!(?:' . implode('|', $tags) . ')\b)(\w+)\b.*?>.*?</\1>@si', '', $text);
+        } else {
+            $output = preg_replace('@<(' . implode('|', $tags) . ')\b.*?>.*?</\1>@si', '', $text);
+        }
+    } elseif ($invert == FALSE) {
+        $output = preg_replace('@<(\w+)\b.*?>.*?</\1>@si', '', $text);
+    }
+    if (strpos($output, ">") != '') {
+        return '';
+    } else {
+        return esc_html($output);
+    }
+}
+/*counting avg user rating */
+if (!function_exists('avg_user_rating')) {
+
+        function avg_user_rating($user_id = '') {
+            $total_ratings_count = nokri_employer_review_count($user_id);
+            $args = array(
+                'user_id' => $user_id,
+                'type' => 'dealer_review',
+            );
+
+            $get_rating = get_comments($args);
+            if (count((array) $get_rating) > 0) {
+                $avg_array = array();
+                foreach ($get_rating as $get_ratings) {
+                    $comment_ids = $get_ratings->comment_ID;
+
+                    $service_stars = get_comment_meta($comment_ids, '_rating_service', true);
+                    $process_stars = get_comment_meta($comment_ids, '_rating_proces', true);
+                    $selection_stars = get_comment_meta($comment_ids, '_rating_selection', true);
+
+                    $single_avg = 0;
+                    $total_stars = $service_stars + $process_stars + $selection_stars;
+                    $single_avg = round($total_stars / "3", 1);
+
+
+                    $avg_array[] = $single_avg;
+                }
+                $total_sum = array_sum($avg_array);
+
+                $total_avg = round($total_sum / $total_ratings_count, 1);
+                //return $avg_array ;
+                $html = '<ul class="review-stars">';
+                for ($i = 1; $i <= 5; $i++) {
+                    if ($i <= $total_avg)
+                        $html .= '<li class="star colored-star"><i class="fa fa-star"></i></li>';
+                    else
+                        $html .= '<li class="star"><i class="fa fa-star"></i></li>';
+                }
+                $html .= '</ul>';
+                return $html;
+            }
+        }
+
+    }
+     if (!function_exists('review_pagination')) {
+
+        function review_pagination($total_records, $current_page) {
+            //$total_record.'' ;
+            //$current_page.'b';
+            // Check if a records is set.
+            if (!isset($total_records))
+                return;
+            if (!isset($current_page))
+                return;
+            $next_text = esc_html__('Next Page »', 'nokri');
+            $prev_text = esc_html__('« Previous Page', 'nokri');
+            $args = array(
+                'base' => add_query_arg('paged', '%#%'),
+                'format' => '?paged=%#%',
+                'total' => $total_records,
+                'current' => $current_page,
+                'show_all' => false,
+                'end_size' => 1,
+                'mid_size' => 2,
+                'prev_next' => true,
+                'prev_text' => $prev_text,
+                'next_text' => $next_text,
+                'type' => 'plain');
+            return paginate_links($args);
+        }
+
+    }

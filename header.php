@@ -3,12 +3,16 @@
 <head>
 <?php
 global $nokri;
+
+		//update_post_meta( $pid, '_job_level', $job_level_id);
 /* Linkedin response after logged in */
 //include( 'template-parts/linkedin-access.php' );
+/*Language Switcher*/
+$language_switcher = isset($nokri['nokri_lang_switch_frnt']) ? $nokri['nokri_lang_switch_frnt'] : '0';
 ?>
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
-<?php global $nokri; 
+<?php 
 if( isset( $nokri['banners_code'] ) && $nokri['banners_code'] != '')
 {
 	echo ($nokri['banners_code']);
@@ -31,13 +35,14 @@ if((isset($nokri['search_page_layout'])) && $nokri['search_page_layout']  != '' 
 </head>
 <body <?php body_class(); ?>>
 <?php
-global $nokri;
 /* header style  */
 $header_style = '';
 if((isset($nokri['main_header_style'])) && $nokri['main_header_style']  != '' )
 {
 	 $header_style =  ($nokri['main_header_style']);
 }
+/*Topbar style*/
+$top_bar_style = isset($nokri['header_top_bar_style']) ? $nokri['header_top_bar_style'] : '1';
  if((isset($nokri['loader_img_switch'])) && $nokri['loader_img_switch']  == 1 ) { 
 $loader_text = ( isset($nokri['loader_text']) && $nokri['loader_text'] != ""  ) ? $nokri['loader_text'] : '';
 /* Profile Pic  */
@@ -62,49 +67,17 @@ if(wp_basename(get_page_template()) == 'page-search.php' &&  $search_page_layout
 if(basename(get_page_template()) == 'page-dashboard.php' || $is_map)
 {
 echo '<div class="navbar-fixed-top">'; 
-if ($header_style == '1') {
-?>
-<div class="top-bar">
-         <div class="container">
-            <div class="row">
-            	<?php if((isset($nokri['social_switch'])) && $nokri['social_switch']  == 1 ) { ?>
-               <div class="col-lg-7 col-md-5 col-sm-5 col-xs-12">
-                      <?php echo nokri_top_bar_social_sorter(); ?>
-               </div>
-               <?php } if((isset($nokri['contact_switch'])) && $nokri['contact_switch']  == 1 ) { ?>
-               <div class="col-lg-5 col-md-7 col-sm-7 col-xs-12">
-                  <div class="header-info">
-                    <?php echo nokri_top_bar_sorter(); ?>
-                  </div>
-               </div>
-               <?php } ?>
-            </div>
-         </div>
-      </div> 
- <?php
-}
+	if ($header_style == '1' && isset($nokri['header_top_bar']) && $nokri['header_top_bar']  == 1)
+	{
+		get_template_part( 'template-parts/layouts/top-bars/topbar', $top_bar_style );
+	}
 } 
+
  if((isset($nokri['header_top_bar'])) && $nokri['header_top_bar']  == 1  && $header_style != '1')
-{ 
-?>
-  <div class="top-bar">
-         <div class="container">
-            <div class="row">
-            	<?php if((isset($nokri['social_switch'])) && $nokri['social_switch']  == 1 ) { ?>
-               <div class="col-lg-7 col-md-5 col-sm-5 col-xs-12">
-                      <?php echo nokri_top_bar_social_sorter(); ?>
-               </div>
-               <?php } if((isset($nokri['contact_switch'])) && $nokri['contact_switch']  == 1 ) { ?>
-               <div class="col-lg-5 col-md-7 col-sm-7 col-xs-12">
-                  <div class="header-info">
-                    <?php echo nokri_top_bar_sorter(); ?>
-                  </div>
-               </div>
-               <?php } ?>
-            </div>
-         </div>
-      </div>
-<?php }  
+{
+     
+	get_template_part( 'template-parts/layouts/top-bars/topbar', $top_bar_style );
+}  
 if($header_style == '2')
 {
 	get_template_part( 'template-parts/headers/header', '2' );
@@ -114,3 +87,5 @@ else
 	$header = '1';
 	get_template_part( 'template-parts/headers/header', $header );
 }
+if($language_switcher)
+echo nokri_language_switcher();

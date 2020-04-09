@@ -200,27 +200,44 @@ function nokri_cats( $taxonomy = 'ad_cats' , $all = 'yes' )
 }
 }
 
-if ( ! function_exists( 'nokri_get_parests' ) ) {
-function nokri_get_parests( $taxonomy , $all = 'yes' )
+if ( ! function_exists( 'nokri_get_parests' ) )
 {
-	if(taxonomy_exists($taxonomy))
+	function nokri_get_parests( $taxonomy , $all = 'yes' )
 	{
-		$ad_cats = nokri_get_cats($taxonomy , 0 );
-		if( $all == 'yes' )
-			$cats	= array( 'All' => 'all' );
-		else
-		$cats	= array();
-		if( count((array)  $ad_cats ) > 0 && $ad_cats !="" )
+		if(taxonomy_exists($taxonomy))
 		{
-			foreach( $ad_cats as $cat )
+			$ad_cats = nokri_get_cats($taxonomy , 0 );
+			if( $all == 'yes' ) $cats	= array( 'All' => 'all' );
+			else $cats	= array();
+			if( count((array)  $ad_cats ) > 0 && $ad_cats !="" )
 			{
-				$cats[$cat->name .' (' . $cat->count . ')']	=	$cat->slug;
+				foreach( $ad_cats as $cat )
+				{
+					$cats[$cat->name .' (' . $cat->count . ')']	=	$cat->slug;
+				}
 			}
+			return $cats;
 		}
-	return $cats;
 	}
 }
+
+
+if ( ! function_exists( 'nokri_sort_sections' ) )
+{
+	function nokri_sort_sections($values = array())
+	{
+			$options = array();
+			if( count((array)$values ) > 0 && $values !="" )
+			{
+				foreach( $values as $key => $value  )
+				{
+					$options[$value]	=	$key;
+				}
+			}
+			return $options;
+	}
 }
+
 
 if ( ! function_exists( 'nokri_get_all' ) ) {
 function nokri_get_all( $taxonomy , $all = 'yes' )
@@ -569,18 +586,20 @@ function nokri_reviews_cats( $taxonomy = 'reviews_cats' , $all = 'yes' )
 }
 
 
-if ( ! function_exists( 'nokri_cat_link_page' ) ) {
-function nokri_cat_link_page( $category_id, $type = '' )
+if ( ! function_exists( 'nokri_cat_link_page' ) ) 
 {
-	global $nokri;
-	$link = get_the_permalink($nokri['sb_search_page']).'?cat_id='.$category_id;
-	if( $type == 'category' )
+	function nokri_cat_link_page( $category_id, $type = '' )
 	{
-		$link = get_category_link( $category_id );	
+		global $nokri;
+		$final_url = '';
+		$link      = nokri_set_url_param(get_the_permalink($nokri['sb_search_page']), 'cat-id', esc_attr( $category_id ));
+		$final_url = esc_url(nokri_page_lang_url_callback($link));
+		if( $type == 'category' )
+		{
+			$link = get_category_link( $category_id );	
+		}
+		return $final_url;
 	}
-	return $link;
-		
-}
 }
 
 if ( ! function_exists( 'nokri_texnomy_link_page' ) ) {
@@ -598,15 +617,17 @@ function nokri_texnomy_link_page( $texnomy_type, $type = '' )
 }
 
 if ( ! function_exists( 'nokri_location_page_link' ) ) {
-function nokri_location_page_link( $location_id, $type = '' )
+function nokri_location_page_link( $location_id = '', $type = '' )
 {
-	global $nokri_theme;
-	$link = get_the_permalink($nokri_theme['sb_search_page']).'?country_id='.$location_id;
+	global $nokri;
+	$final_url = '';
+	$link      = nokri_set_url_param(get_the_permalink($nokri['sb_search_page']), 'job-location', esc_attr( $location_id ));
+	$final_url = esc_url(nokri_page_lang_url_callback($link));
 	if( $type == 'category' )
 	{
 		$link = get_category_link( $location_id );	
 	}
-	return $link;
+	return $final_url;
 }
 }
 
@@ -634,4 +655,18 @@ function nokri_get_products()
 	return $products;
 	
 }
+}
+if ( ! function_exists( 'nokri_color_text' ) ) 
+{
+	function nokri_color_text( $str )
+	{
+		preg_match('~{color}([^{]*){/color}~i', $str, $match);
+		if( isset( $match[1] ) )
+		{
+			$search   = "{color}" . $match[1]  . "{/color}";
+			$replace  = '<span>'.$match[1].'</span>';
+			$str	  =	 str_replace($search,$replace,$str);
+		}
+		return $str;
+	}
 }

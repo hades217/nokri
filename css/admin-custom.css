@@ -1,7 +1,7 @@
 /*
 Theme Name: Nokri - Job Board WordPress Theme
 Author: ScriptsBundle
-Version: 1.1.6
+Version: 1.2.4
 Designed and Development by: ScriptsBundle
 
 ====================================
@@ -141,7 +141,7 @@ Designed and Development by: ScriptsBundle
 	padding-top:129px;
 }
 .dashboard-new.no-topbar {
-	padding-top:102px;	
+	padding-top:90px;	
 }
 .dashboard-new .menu-avtr-box {
 	padding:15px;
@@ -616,8 +616,8 @@ Designed and Development by: ScriptsBundle
 	font-size: 14px;
 	margin-bottom:15px;
 }
-.dashboard-new .main-body input {
-	height: 50px;
+.dashboard-new .main-body input, .dashboard-new .main-body  .file-input {
+    height: 50px;
 }
 .dashboard-new .main-body form .dashboard-heading {
 	margin: 20px 0 30px 0;
@@ -626,7 +626,7 @@ Designed and Development by: ScriptsBundle
 	margin-bottom: 25px;
 }
 .dashboard-new .select2-container .select2-selection--multiple {
-	height: 55px;
+	height: auto;
 	padding: 0 10px;
 	border-radius: 0;
 	border: 1px solid #EEE;
@@ -726,6 +726,13 @@ Designed and Development by: ScriptsBundle
 	background-color:#242424;
 	color:#FFF;
 }
+.dashboard-new .main-body .dashboard-posted-jobs .header-title {
+	border-bottom: 1px solid #ddd;
+	padding: 15px 10px;
+	background-color:#242424;
+	color:#FFF;
+}
+
 .dashboard-new .main-body .dashboard-posted-jobs .posted-job-list.header-title li {
 	font-weight: 500;
 	font-size: 16px;
@@ -735,11 +742,16 @@ Designed and Development by: ScriptsBundle
 	margin-top:10px;	
 }
 .dashboard-new .main-body .dashboard-posted-jobs .posted-job-list ul {
-	margin-bottom: 0;
+    display: flex;	
+    margin-bottom: 0;
 }
 .dashboard-new .main-body .dashboard-posted-jobs .posted-job-list ul.list-inline li.posted-job-title {
-	width: 45%;
+	width: 40%;
 	vertical-align: middle;
+}
+.dashboard-new .main-body .dashboard-posted-jobs .posted-job-list ul.list-inline li.posted-job-title a {
+	font-size:18px;
+	font-weight:500;	
 }
 .dashboard-new .main-body .dashboard-posted-jobs .posted-job-list ul.list-inline li.posted-job-title .posted-job-title-meta a {
 	font-size: 16px;
@@ -789,7 +801,7 @@ Designed and Development by: ScriptsBundle
 	color:#777;
 }
 .dashboard-new .main-body .dashboard-posted-jobs .posted-job-list ul.list-inline li.posted-job-action {
-	width: 16%;
+	width: 20%;
 }
 .dashboard-new .main-body .dashboard-posted-jobs .posted-job-list ul.list-inline li.posted-job-action li {
 	padding: 0;
@@ -952,6 +964,56 @@ Designed and Development by: ScriptsBundle
 }
 .dashboard-new .main-body .dashboard-job-stats.followers .posted-job-list ul.list-inline li.posted-job-action {
 	width: 10%;
+}
+
+.dashboard-table {
+    position: relative;
+    width: 100%;
+}
+.dashboard-table thead tr th {
+    color: #FFF;
+    width: auto !important;
+    font-weight: 500;
+    font-family: "Poppins", sans-serif;
+    text-transform: capitalize;
+    border-top: 1px solid #f5f5f5;
+    border-bottom: none;
+    padding: 20px 10px;
+    vertical-align: middle;
+}
+.dashboard-table tbody tr td {
+    color: #999;
+	width: auto !important;
+	font-weight: 400;
+	font-family: "Poppins", sans-serif;
+	border-top: 1px solid
+    #f5f5f5;
+    border-bottom: none;
+    padding: 20px 10px;
+    vertical-align: middle;
+}
+.dashboard-table tbody tr td a.job-title {
+	font-size:18px;
+	font-weight:500;	
+}
+.n-btn-custom {
+	border-radius: 4px;
+	text-transform: capitalize;
+	font-weight: 400;
+	color: #FFF;
+	font-size:14px;
+	background-color: #242424;
+	border: 1px solid #242424;
+	z-index:1;
+	position:relative;
+	-webkit-transition: all .5s ease-out 0s;
+	-moz-transition: all .5s ease-out 0s;
+	-ms-transition: all .5s ease-out 0s;
+	-o-transition: all .5s ease-out 0s;
+	transition: all .5s ease-out 0s
+}
+.n-btn-custom.btn-small {
+	padding:6px 10px;	
 }
 /*MY PACKAGE*/
 
@@ -1286,8 +1348,6 @@ Designed and Development by: ScriptsBundle
 .main-body .skills {
     position: relative;
     overflow: hidden;
-    border-top: 1px solid #f5f5f5;
-    padding: 20px 0;
 }
 .main-body .skills h5 {
     font-weight: 500;
@@ -2053,7 +2113,6 @@ Designed and Development by: ScriptsBundle
 	position: absolute;
 	right: 15px;
 	top: 24px;
-	border-radius: 0;
 	color: #FFF;
 	border: none;
 	border-radius:0 4px 4px 0;
@@ -2696,6 +2755,46 @@ aside .widget .contact-box .view-profile {
 .n-candidate-detail .locked-profile i {
 	font-size:20px;
 }
+
+
+
+
+
+
+.dashboard-new .main-body .dashboard-posted-jobs .posted-job-title-img {
+    float: left;
+    margin-right: 15px;
+}
+.dashboard-new .main-body .dashboard-posted-jobs .posted-job-title-img img {
+	width:50px;	
+}
+.dashboard-new .main-body .dashboard-posted-jobs .posted-job-title-meta a {
+	font-size:18px;
+	font-weight:500;
+	text-transform:capitalize;	
+}
+.dashboard-new .main-body .dashboard-posted-jobs .posted-job-action .label.label-success {
+    background-color: transparent;
+    border: none;
+    color: #5cb85c;
+}
+.dashboard-new .main-body .dashboard-posted-jobs .posted-job-action li i {
+    font-size: 22px;
+    vertical-align: middle;
+    background-color: #eee;
+    padding: 5px;
+    border-radius: 4px;
+    color: #999;
+}
+
+
+
+
+
+
+
+
+
 /*MEDIA QUERIES*/
 @media (min-width: 1367px) and (max-width: 1920px) {
 	.dashboard-new .profile-menu {
@@ -2933,9 +3032,6 @@ aside .widget .contact-box .view-profile {
 	display:inline-block;
 	margin-right:10px;	
 }
-.dashboard-new .main-body .dashboard-heading {
-	font-size: 16px;
-}
 .candidate-resume-page .main-body .timeline-box ul.education {
 	padding: 0;
 }
@@ -3100,6 +3196,9 @@ aside .widget .contact-box .view-profile {
     float: left;
     position: absolute;
     top: 64px;
+}
+.dashboard-new .main-body {
+    padding: 15px;
 }
 
 }

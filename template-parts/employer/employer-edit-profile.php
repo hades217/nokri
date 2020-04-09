@@ -1,8 +1,8 @@
 <?php
 global $nokri;
-$user_info = wp_get_current_user();
+$user_info    = wp_get_current_user();
 $user_crnt_id = $user_info->ID;
-$mapType = nokri_mapType();
+$mapType      = nokri_mapType();
 if($mapType == 'google_map')
 {
 	wp_enqueue_script( 'google-map-callback',false);
@@ -21,17 +21,13 @@ if(get_user_meta($user_crnt_id, '_emp_map_long', true) == '')
 {
 	$ad_map_long = $nokri['sb_default_long'];
 }
-
 nokri_load_search_countries(1);
 /* Getting All Jobs */
 $terms = get_terms(array( 'taxonomy' => 'job_category', 'hide_empty' => false, 'parent' => 0, ));
-
 /* Getting Company Search Selected radio Btn */
 $comp_search = get_user_meta($user_crnt_id, '_emp_search', true);
-/*Setting profile option*/
-$profile_setting_option = isset($nokri['user_profile_setting_option']) ? $nokri['user_profile_setting_option']  : false;
 /*Is map show*/
-$is_lat_long = isset($nokri['allow_lat_lon']) ? $nokri['allow_lat_lon']  : false;
+$is_lat_long = isset($nokri['emp_map_switch']) ? $nokri['emp_map_switch']  : false;
 /*Is account del option*/
 $is_acount_del = isset($nokri['user_profile_delete_option']) ? $nokri['user_profile_delete_option']  : false;
 /* For job Location level text */
@@ -92,15 +88,12 @@ if( $levelz >= 3 )
 			$selected	=	'selected="selected"';
 		}
 		$country_cities	.=	'<option value="'.$ad_city->term_id.'" '.$selected.'>' . $ad_city->name .  '</option>';
-		
 	}
-	
 }
 $country_towns = '';
 if( $levelz >= 4 )
 {
 	$ad_country_town	=	nokri_get_cats('ad_location' , $cand_custom_loc[2] );
-	
 	$country_towns	=	'';
 	foreach( $ad_country_town as $ad_town )
 	{
@@ -110,166 +103,198 @@ if( $levelz >= 4 )
 			$selected	=	'selected="selected"';
 		}
 		$country_towns	.=	'<option value="'.$ad_town->term_id.'" '.$selected.'>' . $ad_town->name .  '</option>';
-		
 	}
-	
 }
-
-if (!empty($nokri['sb_comp_gallery']))
+/* Hide/show section */
+$detail_sec  = (isset($nokri['emp_spec_switch'])) ? $nokri['emp_spec_switch'] : false;
+$soc_sec     = (isset($nokri['emp_social_section_switch'])) ? $nokri['emp_social_section_switch'] : false;
+$loc_sec     = (isset($nokri['emp_loc_switch'])) ? $nokri['emp_loc_switch'] : false;
+$cust_sec    = (isset($nokri['emp_custom_switch'])) ? $nokri['emp_custom_switch'] : false;
+$port_sec    = (isset($nokri['emp_port_switch'])) ? $nokri['emp_port_switch'] : false;
+/* Custom feilds for registration */
+$custom_feilds_html = $custom_feilds_emp = $custom_feild_cand = '';
+$custom_feild_txt   = (isset($nokri['user_custom_feild_txt'])) ? $nokri['user_custom_feild_txt'] : '';
+$custom_feild_id    = (isset($nokri['custom_registration_feilds'])) ? $nokri['custom_registration_feilds'] : '';
+if($custom_feild_id != '')
 {
-	$images =  $you_link = false;
-	foreach ($nokri['sb_comp_gallery'] as $key => $value) 
-	{
-		if($value == '1')
-		$images = true;
-		if($value == '2')
-		$you_link = true;
-	}
+	$custom_feilds_html = nokri_get_custom_feilds($user_crnt_id,'Registration',$custom_feild_id,true);
 }
+/* Custom feilds for employer */
+$custom_feild_emp  = (isset($nokri['custom_employer_feilds'])) ? $nokri['custom_employer_feilds'] : '';
+if($custom_feild_emp != '')
+{
+	$custom_feilds_emp = nokri_get_custom_feilds($user_crnt_id,'Employer',$custom_feild_emp,true);
+}
+/* required message */
+$req_mess = esc_html__( 'This value is required', 'nokri' );
 ?>
-
 <form id="sb-emp-profile" method="post">
   <div class="main-body">
     <div class="dashboard-edit-profile">
-      <h4 class="dashboard-heading"><?php echo esc_html__('Basic Information','nokri'); ?></h4>
+      <h4 class="dashboard-heading">
+	  	<?php echo nokri_feilds_label('emp_section_label',esc_html__('Basic Information', 'nokri' )); ?> 
+      </h4>
       <div class="cp-loader"></div>
-      
       <!-- Basic Informations -->
       <div class="dashboard-social-links">
         <div class="col-md-6 col-xs-12 col-sm-6">
           <div class="form-group">
-            <label class=""><?php echo esc_html__('Company Name*','nokri'); ?></label>
+            <label class=""><?php echo nokri_feilds_label('emp_name_label',esc_html__('Company Name', 'nokri' )); ?></label>
             <input type="text" value="<?php echo esc_attr($user_info->display_name); ?>" data-parsley-required="true" data-parsley-error-message="<?php echo esc_html__( 'This field is required.', 'nokri' ); ?>" name="emp_name" class="form-control">
           </div>
         </div>
+        <?php  if( nokri_feilds_operat('emp_heading_setting', 'show')) { ?>
         <div class="col-md-6 col-xs-12 col-sm-6">
           <div class="form-group">
-            <label class=""><?php echo esc_html__('Headline:','nokri'); ?></label>
-            <input type="text" value="<?php echo get_user_meta($user_crnt_id, '_user_headline', true); ?>" name="emp_headline" class="form-control">
+            <label class=""><?php echo nokri_feilds_label('emp_heading_label',esc_html__('Headline', 'nokri' )); ?></label>
+            <input type="text" value="<?php echo get_user_meta($user_crnt_id, '_user_headline', true); ?>" name="emp_headline" class="form-control" placeholder="<?php echo nokri_feilds_label('emp_heading_plc',esc_html__('Headline', 'nokri' )); ?>" <?php echo nokri_feilds_operat('emp_heading_setting', 'required'); ?> data-parsley-error-message="<?php echo esc_html__( 'This field is required.', 'nokri' ); ?>">
           </div>
         </div>
+        <?php } ?>
         <div class="col-md-6 col-xs-12 col-sm-6">
           <div class="form-group">
-            <label class=""><?php echo esc_html__('Email*','nokri'); ?></label>
+            <label class=""><?php echo nokri_feilds_label('emp_email_label',esc_html__('Email*', 'nokri' )); ?></label>
             <input type="text" disabled placeholder="<?php echo  $user_info->user_email; ?>"  name="emp_email" class="form-control">
-          </div>
+          </div> 
         </div>
+        <?php  if( nokri_feilds_operat('emp_phone_setting', 'show')) { ?>
         <div class="col-md-6 col-xs-12 col-sm-6">
           <div class="form-group">
-            <label class=""><?php echo esc_html__('Phone','nokri'); ?> </label>
-            <input type="text" name="sb_reg_contact" data-parsley-error-message="<?php echo esc_html__('Should be in digits with out space','nokri'); ?>" data-parsley-error-message="<?php echo esc_html__('Should be in digits','nokri'); ?>" data-parsley-type="digits"  required placeholder="<?php echo esc_html__('Company Phone','nokri'); ?>" value="<?php echo get_user_meta($user_crnt_id, '_sb_contact', true); ?>" class="form-control">
-            
-            
+            <label class=""><?php echo nokri_feilds_label('emp_phone_label',esc_html__('Phone', 'nokri' )); ?> </label>
+            <input type="text" name="sb_reg_contact" data-parsley-error-message="<?php echo esc_html__('Should be in digits with out space','nokri'); ?>" data-parsley-type="digits"   placeholder="<?php echo nokri_feilds_label('emp_phone_plc',esc_html__('Company Phone', 'nokri' )); ?>" value="<?php echo get_user_meta($user_crnt_id, '_sb_contact', true); ?>" class="form-control" <?php echo nokri_feilds_operat('emp_phone_setting', 'required'); ?>>
           </div>
         </div>
+        <?php } if( nokri_feilds_operat('emp_web_setting', 'show')) { ?>
         <div class="col-md-6 col-xs-12 col-sm-6">
           <div class="form-group">
-            <label class=""><?php echo esc_html__('Website','nokri'); ?></label>
-            <input type="text" data-parsley-error-message="<?php echo esc_html__('Should be in url','nokri'); ?>" data-parsley-type="url"   placeholder="<?php echo esc_html__('Company Web Url','nokri'); ?>" value="<?php echo get_user_meta($user_crnt_id, '_emp_web', true); ?>" name="emp_web" class="form-control">
+            <label class=""><?php echo nokri_feilds_label('emp_web_label',esc_html__('Website', 'nokri' )); ?></label>
+            <input type="text" data-parsley-error-message="<?php echo esc_html__('Should be in url','nokri'); ?>" data-parsley-type="url"   placeholder="<?php echo nokri_feilds_label('emp_web_plc',esc_html__('Company Web Url', 'nokri' )); ?>" value="<?php echo get_user_meta($user_crnt_id, '_emp_web', true); ?>" name="emp_web" class="form-control" <?php echo nokri_feilds_operat('emp_web_setting', 'required'); ?>>
           </div>
         </div>
+        <?php } if( nokri_feilds_operat('emp_dp_setting', 'show')) { ?>
         <div class="col-md-6 col-xs-12 col-sm-6">
           <div class="form-group">
-            <label class=""><?php echo esc_html__('Profile Image:','nokri'); ?></label>
+            <label class=""><?php echo nokri_feilds_label('emp_dp_label',esc_html__('Profile Image', 'nokri' )); ?></label>
             <input id="input-b1" name="my_file_upload[]" type="file" class="file form-control sb_files-data" data-show-preview="false" data-allowed-file-extensions='["jpg", "png", "jpeg"]' data-show-upload="false">
-            
           </div>
         </div>
-        <?php if($profile_setting_option) { ?>
+        <?php } if( nokri_feilds_operat('emp_prof_setting', 'show')) { ?>
         <div class="col-md-12 col-xs-12 col-sm-12">
                 <div class="form-group">
-                    <label class=""><?php echo esc_html__( 'Set your profile', 'nokri' ); ?></label>
+                    <label class=""><?php echo nokri_feilds_label('emp_prof_label',esc_html__('Set your profile','nokri' )); ?></label>
                     <select  class="select-generat form-control" name="emp_profile">
                         <option value="pub" <?php if ( $emp_profile == 'pub') { echo "selected"; } ; ?>><?php echo esc_html__( 'Public', 'nokri' ); ?></option>
                         <option value="priv" <?php if ( $emp_profile == 'priv') { echo "selected"; } ; ?>><?php echo esc_html__( 'Private', 'nokri' ); ?></option>
                     </select>
                 </div>
             </div>
-            <?php } ?>
+            <?php } if( nokri_feilds_operat('emp_about_setting', 'show')) { ?>
         <div class="col-md-12 col-xs-12 col-sm-12">
           <div class="form-group">
-            <label class=""><?php echo esc_html__('About yourself','nokri'); ?></label>
+            <label class=""><?php echo nokri_feilds_label('emp_about_label',esc_html__('About yourself', 'nokri' )); ?></label>
             <textarea  name="emp_intro" class="form-control rich_textarea" id=""  cols="30" rows="10"><?php echo  nokri_candidate_user_meta('_emp_intro'); ?></textarea>
           </div>
         </div>
+        <?php }  ?>
       </div>
       <!-- End Basic Informations --> 
-      
+      <?php if($detail_sec) { ?>
       <!-- Company Specialization -->
       <div class="row">
         <div class="col-md-12 col-xs-12 col-sm-12">
-          <h4 class="dashboard-heading"><?php echo esc_html__('Company Details','nokri'); ?></h4>
+          <h4 class="dashboard-heading"><?php echo nokri_feilds_label('emp_detail_label',esc_html__('Company Details', 'nokri' )); ?></h4>
         </div>
+        <?php if( nokri_feilds_operat('emp_spec_setting', 'show')) { ?>
         <div class="col-md-12 col-xs-12 col-sm-12">
           <div class="form-group">
-            <label class=""><?php echo esc_html__('Company Specialization','nokri'); ?></label>
+            <label class=""><?php echo nokri_feilds_label('emp_spec_label',esc_html__('Company Specialization', 'nokri' )); ?></label>
             <select class="select-generat form-control" name="emp_cat[]" id="change_term" multiple="multiple">
               <?php echo nokri_candidate_skills('job_skills','_emp_skills'); ?>
             </select>
           </div>
         </div>
+        <?php } if( nokri_feilds_operat('emp_no_emp_setting', 'show')) { ?>
         <div class="col-md-6 col-sm-12 col-xs-12">
           <div class="form-group">
-            <label><?php echo esc_html__('No. of Employees','nokri'); ?></label>
-            <input type="text" placeholder="<?php echo esc_html__('Enter number of employes','nokri'); ?>" value="<?php echo get_user_meta($user_crnt_id, '_emp_nos', true); ?>"  name="emp_nos" class="form-control">
+            <label><?php echo nokri_feilds_label('emp_no_emp_label',esc_html__('No. of Employees', 'nokri' )); ?></label>
+            <input type="text" placeholder="<?php echo nokri_feilds_label('emp_no_emp_plc',esc_html__('Enter number of employes', 'nokri' )); ?>" value="<?php echo get_user_meta($user_crnt_id, '_emp_nos', true); ?>"  name="emp_nos" class="form-control" <?php echo nokri_feilds_operat('emp_no_emp_setting', 'required'); ?> data-parsley-error-message="<?php echo ($req_mess); ?>">
           </div>
         </div>
+        <?php } if( nokri_feilds_operat('emp_est_setting', 'show')) { ?>
         <div class="col-md-6 col-xs-12 col-sm-6">
           <div class="form-group">
-            <label class=""><?php echo esc_html__('Company Established In','nokri'); ?></label>
-            <input type="text" value="<?php echo get_user_meta($user_crnt_id, '_emp_est', true); ?>" name="emp_est" class="datepicker-here-canidate form-control"  />
+            <label class=""><?php echo nokri_feilds_label('emp_est_label',esc_html__('Established Date', 'nokri' )); ?></label>
+            <input type="text" value="<?php echo get_user_meta($user_crnt_id, '_emp_est', true); ?>" name="emp_est" class="datepicker-here-canidate form-control" <?php echo nokri_feilds_operat('emp_est_setting', 'required'); ?> />
           </div>
         </div>
-        
-       
-        
         <!--End Company Specialization --> 
+        <?php } ?>
+      </div>       
+       <?php  } 
+               
+        if($custom_feilds_html != '' ||  $custom_feilds_emp != '' ) { ?>
+        <!-- Custom feilds -->
+          <div class="col-md-12 col-xs-12 col-sm-12">
+              <div class="dashboard-social-links">
+                <div class="col-md-12 col-xs-12 col-sm-12">
+                  <h4 class="dashboard-heading"><?php echo $custom_feild_txt; ?></h4>
+                </div>
+                <?php echo  $custom_feilds_html.$custom_feilds_emp; ?>
+              </div>
+          </div>
+         <?php } if($soc_sec) { ?>
         <!-- Company Soical Links -->
         <div class="col-md-12 col-xs-12 col-sm-12">
           <div class="dashboard-social-links">
             <div class="col-md-12 col-xs-12 col-sm-12">
-              <h4 class="dashboard-heading"><?php echo esc_html__('Company Social Links','nokri'); ?></h4>
+              <h4 class="dashboard-heading"><?php echo nokri_feilds_label('emp_social_section_label',esc_html__('Company Social Links', 'nokri' )); ?></h4>
             </div>
+            <?php if( nokri_feilds_operat('emp_fb_setting', 'show')) { ?>
             <div class="col-md-6 col-sm-12">
               <div class="form-group">
-                <label><?php echo esc_html__('Facebook','nokri'); ?></label>
-                <input type="text" placeholder="<?php echo esc_html__('Profile URL','nokri'); ?>" value="<?php echo get_user_meta($user_crnt_id, '_emp_fb', true); ?>" name="emp_fb" class="form-control">
+                <label><?php echo nokri_feilds_label('emp_fb_label',esc_html__('Facebook', 'nokri' )); ?></label>
+                <input type="text" placeholder="<?php echo nokri_feilds_label('emp_fb_plc',esc_html__('Profile URL', 'nokri' )); ?>" value="<?php echo get_user_meta($user_crnt_id, '_emp_fb', true); ?>" name="emp_fb" class="form-control" <?php echo nokri_feilds_operat('emp_fb_setting', 'required'); ?> data-parsley-error-message="<?php echo ($req_mess); ?>">
               </div>
             </div>
+            <?php } if( nokri_feilds_operat('emp_twtr_setting', 'show')) { ?>
             <div class="col-md-6 col-sm-12">
               <div class="form-group">
-                <label><?php echo esc_html__('Twitter','nokri'); ?></label>
-                <input type="text" placeholder="<?php echo esc_html__('Profile URL','nokri'); ?>" value="<?php echo get_user_meta($user_crnt_id, '_emp_twitter', true); ?>" name="emp_twitter" class="form-control">
+                <label><?php echo nokri_feilds_label('emp_twtr_label',esc_html__('Twitter', 'nokri' )); ?></label>
+                <input type="text" placeholder="<?php echo nokri_feilds_label('emp_twtr_plc',esc_html__('Profile URL', 'nokri' )); ?>" value="<?php echo get_user_meta($user_crnt_id, '_emp_twitter', true); ?>" name="emp_twitter" class="form-control" <?php echo nokri_feilds_operat('emp_twtr_setting', 'required'); ?> data-parsley-error-message="<?php echo ($req_mess); ?>">
               </div>
             </div>
+            <?php } if( nokri_feilds_operat('emp_linked_setting', 'show')) { ?>
             <div class="col-md-6 col-sm-12">
               <div class="form-group">
-                <label><?php echo esc_html__('LinkedIn','nokri'); ?></label>
-                <input type="text" placeholder="<?php echo esc_html__('Profile URL','nokri'); ?>" value="<?php echo get_user_meta($user_crnt_id, '_emp_linked', true); ?>" name="emp_linked" class="form-control">
+                <label><?php echo nokri_feilds_label('emp_linked_label',esc_html__('LinkedIn', 'nokri' )); ?></label>
+                <input type="text" placeholder="<?php echo nokri_feilds_label('emp_linked_plc',esc_html__('Profile URL', 'nokri' )); ?>" value="<?php echo get_user_meta($user_crnt_id, '_emp_linked', true); ?>" name="emp_linked" class="form-control" <?php echo nokri_feilds_operat('emp_linked_setting', 'required'); ?> data-parsley-error-message="<?php echo ($req_mess); ?>">
               </div>
             </div>
+            <?php } if( nokri_feilds_operat('emp_insta_setting', 'show')) { ?>
             <div class="col-md-6 col-sm-12">
               <div class="form-group">
-                <label><?php echo esc_html__('Instagram','nokri'); ?></label>
-                <input type="text" placeholder="<?php echo esc_html__('Profile URL','nokri'); ?>" value="<?php echo get_user_meta($user_crnt_id, '_emp_google', true); ?>" name="emp_google" class="form-control">
+                <label><?php echo nokri_feilds_label('emp_insta_label',esc_html__('Instagram', 'nokri' )); ?></label>
+                <input type="text" placeholder="<?php echo nokri_feilds_label('emp_insta_plc',esc_html__('Profile URL', 'nokri' )); ?>" value="<?php echo get_user_meta($user_crnt_id, '_emp_google', true); ?>" name="emp_google" class="form-control" <?php echo nokri_feilds_operat('emp_insta_setting', 'required'); ?> data-parsley-error-message="<?php echo ($req_mess); ?>">
               </div>
             </div>
+            <?php }  ?>
           </div>
         </div>
         <!--End Company Soical Links --> 
-        
+        <?php } if ($loc_sec) { ?>
         <!-- Company Locations-->
         <input type="hidden" id="is_profile_edit" value="1" />
         <?php if($is_lat_long) { ?>
         <div class="col-md-12 col-xs-12 col-sm-12">
           <div class="row">
             <div class="dashboard-location">
-             <div class="col-md-12 col-xs-12 col-sm-12">
-             <h4 class="dashboard-heading"><?php echo $job_country_level_heading; ?></h4>
+              <div class="col-md-12 col-xs-12 col-sm-12">
+             <h4 class="dashboard-heading"><?php echo nokri_feilds_label('emp_loc_section_label',esc_html__('Set your location', 'nokri' )); ?></h4>
              </div>
+             <?php if($is_lat_long) { ?>
               <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="form-group">
-                  <label class="control-label"><?php echo esc_html__( 'Set your location', 'nokri' ); ?></label>
+                  <label class="control-label"><?php echo nokri_feilds_label('emp_address_label',esc_html__('Set your location', 'nokri' )); ?></label>
                   <input class="form-control" name="sb_user_address" id="sb_user_address" value="<?php echo esc_attr($ad_mapLocation); ?>">
                   <?php if($mapType == 'google_map') { ?>
                       <a href="javascript:void(0);" id="your_current_location" title="<?php echo esc_html__('You Current Location', 'nokri' ); ?>"><i class="fa fa-crosshairs"></i></a>
@@ -283,20 +308,21 @@ if (!empty($nokri['sb_comp_gallery']))
               </div>
               <div class="col-md-6 col-sm-12">
                 <div class="form-group">
-                  <label class="control-label"><?php echo esc_html__( 'Latitude', 'nokri' ); ?></label>
+                  <label class="control-label"><?php echo nokri_feilds_label('emp_lat_label',esc_html__('Latitude', 'nokri' )); ?></label>
                   <input class="form-control" type="text" name="ad_map_lat" id="ad_map_lat" value="<?php echo esc_attr($ad_map_lat); ?>">
                 </div>
               </div>
               <div class="col-md-6 col-sm-12">
                 <div class="form-group">
-                  <label class="control-label"><?php echo esc_html__( 'Longitude', 'nokri' ); ?></label>
+                  <label class="control-label"><?php echo nokri_feilds_label('emp_long_label',esc_html__('Longitude', 'nokri' )); ?></label>
                   <input class="form-control" name="ad_map_long" id="ad_map_long" value="<?php echo esc_attr($ad_map_long); ?>" type="text">
                 </div>
               </div>
+                  <?php } ?>
             </div>
           </div>
         </div>
-         <?php } ?>
+        <?php if($cust_sec) { ?>
          <div class="col-md-12 col-xs-12 col-sm-12">
           <div class="row">
             <div class="dashboard-location">
@@ -324,7 +350,7 @@ if (!empty($nokri['sb_comp_gallery']))
              <div class="col-md-6 col-sm-6 col-xs-12" id="ad_country_sub_sub_div" <?php if($country_cities == "" ){echo 'style="display: none;"';}?>>
            <div class="form-group">
            <label><?php echo esc_html($job_country_level_3 ); ?></label>
-              <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo esc_html__( 'Select State', 'nokri' ); ?>" id="ad_country_cities" name="cand_country_cities">
+              <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo esc_html__( 'Select City', 'nokri' ); ?>" id="ad_country_cities" name="cand_country_cities">
                 
                   <?php echo "".($country_cities);?>
               </select>
@@ -334,7 +360,7 @@ if (!empty($nokri['sb_comp_gallery']))
              <div class="col-md-6 col-sm-6 col-xs-12" id="ad_country_sub_sub_sub_div" <?php if($country_towns == "" ){echo 'style="display: none;"';}?>>
            <div class="form-group">
             <label><?php echo esc_html($job_country_level_4 ); ?></label>
-              <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo esc_html__( 'Select State', 'nokri' ); ?>" id="ad_country_towns" name="cand_country_towns">
+              <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo esc_html__( 'Select Town', 'nokri' ); ?>" id="ad_country_towns" name="cand_country_towns">
                 
                   <?php echo "".($country_towns);?>
               </select>
@@ -343,8 +369,7 @@ if (!empty($nokri['sb_comp_gallery']))
             </div>
           </div>
         </div>
-         
-         
+         <?php } } }?>
         <!-- Company Locations-->
         <div class="col-md-12 col-xs-12 col-sm-12">
           <input type="submit" id="emp_save" value="<?php echo esc_html__( 'Save Profile', 'nokri' ); ?>" class="btn n-btn-flat">
@@ -352,40 +377,37 @@ if (!empty($nokri['sb_comp_gallery']))
 		   <button class="btn n-btn-flat" type="button" id="emp_redir" disabled><?php echo  esc_html__( 'Redirecting...','nokri' ); ?></button>
         </div>
       </div>
-    </div>
   </div>
-
-<?php if($images || $you_link) { ?>
+<?php   if($port_sec) { ?>
 <div class="main-body change-password">
   <div class="dashboard-edit-profile">
-    <h4 class="dashboard-heading"><?php echo esc_html__('Company Portfolio','nokri'); ?></h4>
+    <h4 class="dashboard-heading"><?php echo nokri_feilds_label('emp_port_section_heading',esc_html__('Company Portfolio', 'nokri' )); ?></h4>
     <div class="row">
-                <div class="col-md-12 col-xs-12 col-sm-12">
-                    <div class="row">
-                    <?php if($images) { ?>
-                    <div class="col-md-12 col-lg-12 col-xs-12 col-sm-12">
-                     <div class="form-group">
-                        <label class="control-label"><?php echo esc_html__('Company Gallery','nokri'); ?><small><?php echo " ".esc_html__('Drag drop or click to upload your company images','nokri'); ?></small></label>
-                        <div id="company-dropzone" class="dropzone"></div>
-                        </div>
+        <div class="col-md-12 col-xs-12 col-sm-12">
+           <div class="row">
+				<?php if( nokri_feilds_operat('emp_port_setting', 'show')) { ?>
+                <div class="col-md-12 col-lg-12 col-xs-12 col-sm-12">
+                 <div class="form-group">
+                    <label class="control-label"><?php echo nokri_feilds_label('emp_port_section_label',esc_html__('Drag drop or click to upload your company image', 'nokri' )); ?></label>
+                    <div id="company-dropzone" class="dropzone"></div>
                     </div>
-                    <?php } if($you_link) { ?>
-                    <div class="col-md-12 col-sm-12">
-                        <div class="form-group">
-                            <label><?php echo esc_html__('Video url (only youtube) ','nokri'); ?></label>
-                            <input type="text" placeholder="<?php echo esc_attr__('Put youtube video link','nokri'); ?>" value="<?php echo  nokri_candidate_user_meta('_emp_video'); ?>" name="emp_video" class="form-control" data-parsley-pattern="^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/.+">
-                        </div>
-                    </div>
-                    <?php } ?>
-                   </div>
                 </div>
-            </div>
-             <input type="submit"  value="<?php echo esc_html__( 'Save Profile', 'nokri' ); ?>" class="btn n-btn-flat">
+                <?php } if( nokri_feilds_operat('emp_port_vid_setting', 'show')) { ?>
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                        <label><?php echo nokri_feilds_label('emp_port_vid_label',esc_html__('Video url (only youtube)', 'nokri' )); ?></label>
+                        <input type="text" placeholder="<?php echo nokri_feilds_label('emp_port_vid_plc',esc_html__('Put youtube video link', 'nokri' )); ?>" value="<?php echo  nokri_candidate_user_meta('_emp_video'); ?>" name="emp_video" class="form-control" data-parsley-pattern="^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/.+" <?php echo nokri_feilds_operat('emp_port_vid_setting', 'required'); ?> >
+                    </div>
+                </div>
+                <?php } ?>
+           </div>
+        </div>
+    </div>
+      <input type="submit"  value="<?php echo esc_html__( 'Save Profile', 'nokri' ); ?>" class="btn n-btn-flat">
   </div>
 </div>
 <?php } ?>
 </form>
-
 <!-- update password-->
 <div class="main-body change-password">
   <div class="dashboard-edit-profile">
@@ -414,15 +436,15 @@ if (!empty($nokri['sb_comp_gallery']))
         <?php if($is_acount_del) { ?>
           <input type="button" value="<?php echo esc_html__('Delete account?','nokri'); ?>" class="btn btn-custom del_acount">
           <?php } ?>
+          <input type="submit" value="<?php echo esc_html__('Processing...','nokri'); ?>" class="btn n-btn-flat cand_pass_pro">
           <input type="submit" value="<?php echo esc_html__('Update password','nokri'); ?>" class="btn n-btn-flat change_password">
         </div>
       </div>
     </form>
   </div>
 </div>
-
 <?php
-if($mapType == 'leafletjs_map')
+if($mapType == 'leafletjs_map' && $is_lat_long)
 {
 	echo $lat_lon_script = '<script type="text/javascript">
 	var mymap = L.map(\'dvMap\').setView(['.$ad_map_lat.', '.$ad_map_long.'], 13);
@@ -458,4 +480,3 @@ if($mapType == 'leafletjs_map')
 		});
 	</script>';
 }
- ?>

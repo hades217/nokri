@@ -77,7 +77,19 @@ function search_tabs()
 
 			)
 		),
-		
+		array(
+			"group" => esc_html__("Countries", "nokri"),
+			"type" => "dropdown",
+			"heading" => esc_html__("Do you want to show Sub Categories", 'nokri') ,
+			"param_name" => "want_to_show_loc",
+			"admin_label" => true,
+			"value" => array(
+				esc_html__('yes', 'nokri') => 'yes',
+				esc_html__('no', 'nokri') => 'no',
+			) ,
+			'edit_field_class' => 'vc_col-sm-12 vc_column',
+			"std" => '',
+		),
 		array
 		(
 			"group" => esc_html__("Countries", "nokri"),
@@ -158,25 +170,21 @@ function search_tabs()
 				),
 			)
 		),
-		
-		
 		),
 	));
 }
 }
-
 add_action('vc_before_init', 'search_tabs');
-
 if (!function_exists('search_tabs_short_base_func')) {
 function search_tabs_short_base_func($atts, $content = '')
 {
-
 	extract(shortcode_atts(array(
 		'cats' => '',
 		'section_title' => '',
 		'section_tagline' => '',
 		'countries' => '',
-		'want_to_show' => '',
+		'want_to_show' => '', 
+		'want_to_show_loc' => '', 
 		'search_section_img' => '',
 		'hot_cats' => '',
 		'hot_title' => '',  
@@ -184,141 +192,209 @@ function search_tabs_short_base_func($atts, $content = '')
 		'cats_title' => '',
 		'cats_link' => '',
 	) , $atts));
-	global $nokri;
-	
-	if(isset($want_to_show) && $want_to_show == "yes")
-	{
-		
-	}
-	
-	// For Job Category
-	$rows = vc_param_group_parse_atts( $atts['cats'] );
-		$cats	=	false;
-		$cats_html	=	'';
-		if( count( $rows ) > 0 )
+		global $nokri;
+		if(isset($want_to_show) && $want_to_show == "yes")
 		{
-			$cats_html .= '';
-			foreach($rows as $row )
+			
+		}
+	    // For Job Category
+		if(isset($atts['cats']) && !empty($atts['cats']) != '')
+       {
+			$rows = vc_param_group_parse_atts( $atts['cats'] );
+			$cats	=	false;
+			$cats_html	=	'';
+			if( count( $rows ) > 0 )
 			{
-				if( isset( $row['cat'] )  )
+				$cats_html .= '';
+				foreach($rows as $row )
 				{
-					if($row['cat'] == 'all' )
+					if( isset( $row['cat'] )  )
 					{
-						$cats = true;
-						$cats_html = '';
-						break;
-					}
-					$category = get_term_by('slug', $row['cat'], 'job_category');
-					if( count( $category ) == 0 )
-					continue;
-					
-					if(isset($want_to_show) && $want_to_show == "yes")
-					{
-					
-						$ad_cats_sub	=	nokri_get_cats('job_category' , $category->term_id );
-						if(count($ad_cats_sub) > 0 )
+						if($row['cat'] == 'all' )
 						{
-							$cats_html .= '<option value="'.$category->term_id.'" >'.$category->name.'  ('.$category->count.')' ;
-							foreach( $ad_cats_sub as $ad_cats_subz )
+							$cats = true;
+							$cats_html = '';
+							break;
+						}
+						$category = get_term_by('slug', $row['cat'], 'job_category');
+						if( count( $category ) == 0 )
+						continue;
+						
+						if(isset($want_to_show) && $want_to_show == "yes")
+						{
+						
+							$ad_cats_sub	=	nokri_get_cats('job_category' , $category->term_id );
+							if(count($ad_cats_sub) > 0 )
 							{
-								$cats_html .= '<option value="'.$ad_cats_subz->term_id.'">'.'&nbsp;&nbsp; - &nbsp;' .$ad_cats_subz->name.'  ('.$ad_cats_subz->count.') </option>';
+								$cats_html .= '<option value="'.$category->term_id.'" >'.$category->name.'  ('.$category->count.')' ;
+								foreach( $ad_cats_sub as $ad_cats_subz )
+								{
+									$cats_html .= '<option value="'.$ad_cats_subz->term_id.'">'.'&nbsp;&nbsp; - &nbsp;' .$ad_cats_subz->name.'  ('.$ad_cats_subz->count.') </option>';
+								}
+								$cats_html .='</option>';
 							}
-							$cats_html .='</option>';
+							else
+							{
+								$cats_html .= '<option value="'.$category->term_id.'">'.$category->name. '   ('.$category->count.')</option>';
+							}
 						}
 						else
 						{
 							$cats_html .= '<option value="'.$category->term_id.'">'.$category->name. '   ('.$category->count.')</option>';
 						}
+						
 					}
-					else
-					{
-						$cats_html .= '<option value="'.$category->term_id.'">'.$category->name. '   ('.$category->count.')</option>';
-					}
-					
 				}
-			}
-			
-			if( $cats )
-			{
-				$ad_cats = nokri_get_cats('job_category', 0 );
-				foreach( $ad_cats as $cat )
-				{
 				
-					if(isset($want_to_show) && $want_to_show == "yes")
+				if( $cats )
+				{
+					$ad_cats = nokri_get_cats('job_category', 0 );
+					foreach( $ad_cats as $cat )
 					{
-					//sub cat
-						$ad_sub_cats	=	nokri_get_cats('job_category' , $cat->term_id );
-						if(count($ad_sub_cats) > 0 )
+						if(isset($want_to_show) && $want_to_show == "yes")
 						{
-							$cats_html .= '<option value="'.$cat->term_id.'" >'.$cat->name.'  ('.$cat->count.')' ;
-							foreach( $ad_sub_cats as $sub_cat )
+						   //sub cat
+							$ad_sub_cats	=	nokri_get_cats('job_category' , $cat->term_id );
+							if(count($ad_sub_cats) > 0 )
 							{
-								$cats_html .= '<option value="'.$sub_cat->term_id.'">'.'&nbsp;&nbsp; - &nbsp;' .$sub_cat->name.'  ('.$sub_cat->count.') </option>';
+								$cats_html .= '<option value="'.$cat->term_id.'" >'.$cat->name.'  ('.$cat->count.')' ;
+								foreach( $ad_sub_cats as $sub_cat )
+								{
+									$cats_html .= '<option value="'.$sub_cat->term_id.'">'.'&nbsp;&nbsp; - &nbsp;' .$sub_cat->name.'  ('.$sub_cat->count.') </option>';
+									 //sub sub cat
+									 $ad_sub_sub_cats	=	nokri_get_cats('job_category' , $sub_cat->term_id );
+									 if(count($ad_sub_sub_cats) > 0 )
+										{
+											foreach( $ad_sub_sub_cats as $sub_cat_sub )
+											{
+												$cats_html .= '<option value="'.$sub_cat_sub->term_id.'">'.'&nbsp;&nbsp; - &nbsp; - &nbsp;' .$sub_cat_sub->name.'  ('.$sub_cat_sub->count.') </option>';
+												//sub sub sub cat
+												 $ad_sub_sub_sub_cats	=	nokri_get_cats('job_category' , $sub_cat_sub->term_id );
+												 if(count($ad_sub_sub_sub_cats) > 0 )
+												 {
+													foreach( $ad_sub_sub_sub_cats as $sub_cat )
+													{
+														$cats_html .= '<option value="'.$sub_cat->term_id.'">'.'&nbsp;&nbsp; - &nbsp; - &nbsp;- &nbsp;' .$sub_cat->name.'  ('.$sub_cat->count.') </option>';
+													}
+												 }
+											}
+										}
+								}
+								$cats_html .='</option>';	
 							}
-							$cats_html .='</option>';	
+							else
+							{
+								$cats_html .= '<option value="'.$cat->term_id.'">'.$cat->name.'   ('.$cat->count.')</option>';
+							}
 						}
 						else
 						{
 							$cats_html .= '<option value="'.$cat->term_id.'">'.$cat->name.'   ('.$cat->count.')</option>';
 						}
 					}
-					else
+					
+				}
+			}
+	   }
+		// countries
+		if(isset($atts['countries']) && !empty($atts['countries']) != '')
+       {
+			$rows = vc_param_group_parse_atts( $atts['countries'] );
+			$countries_sub	=	false;
+			$countries_html 	=	'';
+			if( count( $rows ) > 0 )
+			{
+				$countries_html  .= '';
+				foreach($rows as $row )
+				{
+					if( isset( $row['country'] )  )
 					{
-						$cats_html .= '<option value="'.$cat->term_id.'">'.$cat->name.'   ('.$cat->count.')</option>';
+						if($row['country'] == 'all' )
+						{
+							$countries_sub = true;
+							$countries_html  = '';
+							break;
+						}
+						$locations = get_term_by('slug', $row['country'], 'ad_location');
+						if( count( array($category) ) == 0 )
+						continue;
+						if(isset($want_to_show_loc) && $want_to_show_loc == "yes")
+						{
+							$ad_cats_sub	=	nokri_get_cats('ad_location' , $category->term_id );
+							if(count($ad_cats_sub) > 0 )
+							{
+								$countries_html  .= '<option value="'.$category->term_id.'" >'.$category->name.'  ('.$category->count.')' ;
+								foreach( $ad_cats_sub as $ad_cats_subz )
+								{
+									$countries_html  .= '<option value="'.$ad_cats_subz->term_id.'">'.'&nbsp;&nbsp; - &nbsp;' .$ad_cats_subz->name.'  ('.$ad_cats_subz->count.') </option>';
+								}
+								$countries_html  .='</option>';
+							}
+							else
+							{
+								$countries_html  .= '<option value="'.$category->term_id.'">'.$category->name. '   ('.$category->count.')</option>';
+							}
+						}
+						else
+						{
+							$countries_html  .= '<option value="'.$category->term_id.'">'.$category->name. '  ('.$category->count.')</option>';
+						}
+						
 					}
 				}
-				
-			}
-		}
-		
-	
-		//For countries
-		$rows_countries = vc_param_group_parse_atts( $atts['countries'] );
-		$year_countries	=	false;
-		$countries_html	=	'';
-		$get_year = '';
-		if( count( $rows_countries ) > 0 )
-		{
-			$countries_html .= '';
-			foreach($rows_countries as $rows_country )
-			{
-				if( isset( $rows_country['country'] )  )
+				if( $countries_sub )
 				{
-					if($rows_country['country'] == 'all' )
+					$ad_cats = nokri_get_cats('ad_location', 0 );
+					foreach( $ad_cats as $cat )
 					{
-						$year_countries = true;
-						$countries_html = '';
-						break;
+						if(isset($want_to_show_loc) && $want_to_show_loc == "yes")
+						{
+						   //sub cat
+							$ad_sub_cats	=	nokri_get_cats('ad_location' , $cat->term_id );
+							if(count($ad_sub_cats) > 0 )
+							{
+								$countries_html  .= '<option value="'.$cat->term_id.'" >'.$cat->name.'  ('.$cat->count.')' ;
+								foreach( $ad_sub_cats as $sub_cat )
+								{
+									$countries_html  .= '<option value="'.$sub_cat->term_id.'">'.'&nbsp;&nbsp; - &nbsp;' .$sub_cat->name.'  ('.$sub_cat->count.') </option>';
+									 //sub sub cat
+									 $ad_sub_sub_cats	=	nokri_get_cats('ad_location' , $sub_cat->term_id );
+									 if(count($ad_sub_sub_cats) > 0 )
+										{
+											foreach( $ad_sub_sub_cats as $sub_cat_sub )
+											{
+												$countries_html  .= '<option value="'.$sub_cat_sub->term_id.'">'.'&nbsp;&nbsp; - &nbsp; - &nbsp;' .$sub_cat_sub->name.'  ('.$sub_cat_sub->count.') </option>';
+												//sub sub sub cat
+												 $ad_sub_sub_sub_cats	=	nokri_get_cats('ad_location' , $sub_cat_sub->term_id );
+												 if(count($ad_sub_sub_sub_cats) > 0 )
+												 {
+													foreach( $ad_sub_sub_sub_cats as $sub_cat )
+													{
+														$countries_html  .= '<option value="'.$sub_cat->term_id.'">'.'&nbsp;&nbsp; - &nbsp; - &nbsp;- &nbsp;' .$sub_cat->name.'  ('.$sub_cat->count.') </option>';
+													}
+												 }
+											}
+										}
+								}
+								$countries_html  .='</option>';	
+							}
+							else
+							{
+								$countries_html  .= '<option value="'.$cat->term_id.'">'.$cat->name.'   ('.$cat->count.')</option>';
+							}
+						}
+						else
+						{
+							$countries_html  .= '<option value="'.$cat->term_id.'">'.$cat->name.'  ('.$cat->count.')</option>';
+						}
 					}
-					$get_country = get_term_by('slug', $rows_country['country'], 'ad_location');
-					if( count( $get_country ) == 0 )
-					continue;
-					$countries_html .= '<option value="'.$get_country->term_id.'">'.$get_country->name.'</option>';
+					
 				}
 			}
-			
-			if( $year_countries )
-			{
-				
-				$all_countries = nokri_get_cats('ad_location', 0 );
-				foreach( $all_countries as $all_year )
-				{
-					$countries_html .= '<option value="'.$all_year->term_id.'">'.$all_year->name.'</option>';
-				}
-				
-				
-				
-				
-			}
-		}
-	
-
-
-	
-	// For hot categories
+	   }
+	    // For hot categories
 		$hot_cats_html = ''; 
-		
-		if(!empty($atts['hot_cats']))
+		if(isset($atts['hot_cats']) && !empty($atts['hot_cats']))
 		{
 		  $rows_hot_cats   = vc_param_group_parse_atts( $atts['hot_cats'] );
 			$year_countries	=	false;
@@ -328,9 +404,6 @@ function search_tabs_short_base_func($atts, $content = '')
 			{
 				foreach($rows_hot_cats as $rows_hot_cat )
 				{
-					
-					
-					
 					if( isset( $rows_hot_cat['hot_cat'] )  )
 					{
 						if($rows_hot_cat['hot_cat'] == 'all' )
@@ -342,105 +415,94 @@ function search_tabs_short_base_func($atts, $content = '')
 						$get_hot_cat = get_term_by('slug', $rows_hot_cat['hot_cat'], 'job_category');
 						if( count( (array)$get_hot_cat ) == 0 )
 						continue;
-						$hot_cats_html .= '<a href="'.get_the_permalink($nokri['sb_search_page']).'?cat_id='.$get_hot_cat->term_id.'">'.$get_hot_cat->name.'</a>';
+						$hot_cats_html .= '<a href="'.nokri_cat_link_page($get_hot_cat->term_id).'">'.$get_hot_cat->name.'</a>';
 					}
 				}
 			}
 		}
-
-
-/*Section Title */
-$main_section_title = (isset($section_title) && $section_title != "") ? ' <h1>'.$section_title.'</h1>' : "";
-/*Section Tagline */
-$main_section_tagline = (isset($section_tagline) && $section_tagline != "") ? ' <p>'.$section_tagline.'</p>' : "";
-/*hot Title */
-$hot_section_title = (isset($hot_title) && $hot_title != "") ? '<span class="n-most-cat-title">'.$hot_title.'</span>' : "";
-
-
- /* Background Image */
-$bg_img = '';
-if( $search_section_img != "" )
-{
-$bgImageURL	=	nokri_returnImgSrc( $search_section_img );
-$bg_img = ( $bgImageURL != "" ) ? ' \\s\\t\\y\\l\\e="background:  url('.$bgImageURL.') no-repeat scroll center center / cover;"' : "";
-}
-
-
-
-
-
- // For cats slider
- $cats_slide_html 	= '';
- if(!empty($atts['cat_sliders']))
- {
-  $rows_sliders = vc_param_group_parse_atts( $atts['cat_sliders'] );
-  $cats_slide 	= false;
-  if( count((array) $rows_sliders ) > 0 )
-  {
-   $cats_slide_html .=  '';
-   foreach($rows_sliders as $rows_slider )
-   {
-		if( isset( $rows_slider['cat_slider'] )  )
+		/*Section Title */
+		$main_section_title = (isset($section_title) && $section_title != "") ? ' <h1>'.$section_title.'</h1>' : "";
+		/*Section Tagline */
+		$main_section_tagline = (isset($section_tagline) && $section_tagline != "") ? ' <p>'.$section_tagline.'</p>' : "";
+		/*hot Title */
+		$hot_section_title = (isset($hot_title) && $hot_title != "") ? '<span class="n-most-cat-title">'.$hot_title.'</span>' : "";
+		 /* Background Image */
+		$bg_img = '';
+		if( $search_section_img != "" )
 		{
-			 if($rows_slider['cat_slider'] == 'all' )
-			 {
-				  $cats_slide = true;
-				  break;
-			 }
-			 $category = get_term_by('slug', $rows_slider['cat_slider'], 'job_category');
-			 if( count((array) $category ) == 0 )
-			 continue;
-			$count_cat = esc_html__( 'Opening', 'nokri' );
-			if ($category->count > 1)
-			{
-				$count_cat = esc_html__( 'Openings', 'nokri' );
-			}
-			
-			 $cats_slide_html .= '<div class="item">
-                                    <div class="n-cats">
-                                        <a href="'.nokri_cat_link_page($category->term_id).'">
-                                            <h4>'.$category->name.'</h4>
-                                            <p>('.$category->count." ".$count_cat.')</p>
-                                        </a>
-                                    </div>
-                                </div>';
-	   }
-	}
-	  if( $cats_slide )
-	   {
-		   $count_cat = '';
-			$ad_cats = nokri_get_cats('job_category', 0 );
-			foreach( $ad_cats as $cat )
-			{
-				if ($cat->count > 1)
+			$bgImageURL	=	nokri_returnImgSrc( $search_section_img );
+			$bg_img     =   ( $bgImageURL != "" ) ? ' \\s\\t\\y\\l\\e="background:  url('.$bgImageURL.') no-repeat scroll center center / cover;"' : "";
+		}
+		// For cats slider
+		 $cats_slide_html 	= '';
+		 if(!empty($atts['cat_sliders']))
+		 {
+		  $rows_sliders = vc_param_group_parse_atts( $atts['cat_sliders'] );
+		  $cats_slide 	= false;
+		  if( count((array) $rows_sliders ) > 0 )
+		  {
+		   $cats_slide_html .=  '';
+		   foreach($rows_sliders as $rows_slider )
+		   {
+				if( isset( $rows_slider['cat_slider'] )  )
 				{
-					$count_cat = esc_html__( 'Openings', 'nokri' );
-				}
-				else
-				{
+					 if($rows_slider['cat_slider'] == 'all' )
+					 {
+						  $cats_slide = true;
+						  break;
+					 }
+					 $category = get_term_by('slug', $rows_slider['cat_slider'], 'job_category');
+					 if( count((array) $category ) == 0 )
+					 continue;
 					$count_cat = esc_html__( 'Opening', 'nokri' );
-				}
-				$cats_slide_html .= '<div class="item">
-                                    <div class="n-cats">
-                                        <a href="'.nokri_cat_link_page($cat->term_id).'">
-                                            <h4>'.$cat->name.'</h4>
-                                            <p>('.$cat->count." ".$count_cat.')</p>
-                                        </a>
-                                    </div>
-                                </div>';
+					if ($category->count > 1)
+					{
+						$count_cat = esc_html__( 'Openings', 'nokri' );
+					}
+					 $cats_slide_html .= '<div class="item">
+											<div class="n-cats">
+												<a href="'.nokri_cat_link_page($category->term_id).'">
+													<h4>'.$category->name.'</h4>
+													<p>('.$category->count." ".$count_cat.')</p>
+												</a>
+											</div>
+										</div>';
+			   }
 			}
-	   }		  
-}
- }
-
-/*Section Title */
-$cats_title = (isset($cats_title) && $cats_title != "") ? ' <h4>'.$cats_title.'</h4>' : "";
-/*Link  */
-$btn = '';
-if( isset( $cats_link) )
-{
-	$btn = nokri_ThemeBtn($cats_link, '',false);	
-}
+			  if( $cats_slide )
+			   {
+				   $count_cat = '';
+					$ad_cats = nokri_get_cats('job_category', 0 );
+					foreach( $ad_cats as $cat )
+					{
+						if ($cat->count > 1)
+						{
+							$count_cat = esc_html__( 'Openings', 'nokri' );
+						}
+						else
+						{
+							$count_cat = esc_html__( 'Opening', 'nokri' );
+						}
+						$cats_slide_html .= '<div class="item">
+											<div class="n-cats">
+												<a href="'.nokri_cat_link_page($cat->term_id).'">
+													<h4>'.$cat->name.'</h4>
+													<p>('.$cat->count." ".$count_cat.')</p>
+												</a>
+											</div>
+										</div>';
+					}
+			   }		  
+		}
+		 }
+		/*Section Title */
+		$cats_title = (isset($cats_title) && $cats_title != "") ? ' <h4>'.$cats_title.'</h4>' : "";
+		/*Link  */
+		$btn = '';
+		if( isset( $cats_link) )
+		{
+			$btn = nokri_ThemeBtn($cats_link, '',false);	
+		}
    return   '<section class="n-hero-section" '.str_replace('\\',"",$bg_img).'>
     <div class="container">
       <div class="row">
@@ -459,16 +521,17 @@ if( isset( $cats_link) )
                         </div>
                         <div class="n-saech-form">
 							<form  method="get" action="'.get_the_permalink($nokri['sb_search_page']).'">
+								'.nokri_form_lang_field_callback(false).'
                             	<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                                 	<div class="row">
                                     	<div class="form-group">
-										 <input type="text" class="form-control" name="job_title" placeholder="'.esc_html__('Search Keyword','nokri').'">
+										 <input type="text" class="form-control" name="job-title" placeholder="'.esc_html__('Search Keyword','nokri').'">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                                 	<div class="row">
-                                        <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="'.esc_html__('Select Category','nokri').'" style="width: 100%" name="cat_id">
+                                        <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="'.esc_html__('Select Category','nokri').'" style="width: 100%" name="cat-id">
                                              <option label="'.esc_html__('Select Category','nokri').'"></option>
                      					'.$cats_html.'
                                         </select>
@@ -476,7 +539,7 @@ if( isset( $cats_link) )
                                 </div>
                                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12" >
                                 	<div class="row">
-                                        <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="'.esc_html__('Select Location','nokri').'" style="width: 100%" name="job_location">
+                                        <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="'.esc_html__('Select Location','nokri').'" style="width: 100%" name="job-location">
                                          <option value="">'.esc_html__('Select Location','nokri').'</option>
                                            '.$countries_html.'
                                         </select>

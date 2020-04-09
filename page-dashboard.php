@@ -8,16 +8,19 @@ if( current_user_can('administrator'))
 {
 	update_user_meta($user_id, '_sb_reg_type', 1);
 }
+/*Admin can post */
+$admin_post = ( isset($nokri['job_post_for_admin']) && $nokri['job_post_for_admin'] != ""  ) ? $nokri['job_post_for_admin'] : '';
+if($admin_post && !current_user_can('administrator') && get_user_meta($user_id, '_sb_reg_type', true) == '' ) {update_user_meta($user_id, '_sb_reg_type', 0); }
 if (get_user_meta($user_id, '_sb_reg_type', true) == '')
 { 
-$term_link = '';
-if((isset($nokri['term_condition'])) && $nokri['term_condition']  != '' )
-{
-	 $term_link =  ($nokri['term_condition']);
-}
-$bg_url        = nokri_section_bg_url();
+	$term_link = '';
+	if((isset($nokri['term_condition'])) && $nokri['term_condition']  != '' )
+	{
+		 $term_link =  ($nokri['term_condition']);
+	}
+	$bg_url        = nokri_section_bg_url();
 ?>
-<section class="n-pages-breadcrumb" <?php echo "".($bg_url); ?>>
+<section class="n-pages-breadcrumb social-choose" <?php echo "".($bg_url); ?>>
   	<div class="container">
     	<div class="row">
         </div>
@@ -38,7 +41,6 @@ $bg_url        = nokri_section_bg_url();
                                    <input type="radio" value="1" name="sb_reg_type" data-parsley-required="true">
                                    <?php echo esc_html__( 'Employer', 'nokri' ); ?>
                                    </label>
-                                  
                                    <label class="btn btn-default btn-md active">
                                    <input type="radio" value="0" data-parsley-required="true" data-parsley-error-message="<?php echo esc_html__( 'Please Select Type', 'nokri' ); ?>" name="sb_reg_type" checked="checked">
 									<?php echo esc_html__( 'Candidate', 'nokri' ); ?>
@@ -62,7 +64,7 @@ $bg_url        = nokri_section_bg_url();
         </div>
     </div>
   </section>
-<?php
+<?php 
 }
 else if(get_user_meta($user_id, '_sb_reg_type', true) == '1')
 {

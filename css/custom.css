@@ -1148,7 +1148,10 @@ section#dwt_listing_products-related {
 .color-switcher ul li a.green {
  background: #00a651;
 }
-
+.color-switcher ul li a.purple {
+    background: 
+    #5e2eb5;
+}
 .picker_close {
 	width: 35px;
 	height: 50px;
@@ -1231,3 +1234,189 @@ select.parsley-error, textarea.parsley-error {
     border-color: rgb(238, 211, 215);
     border-image: initial;
 }*/
+
+.dealers-review-section {
+    overflow: hidden;
+}
+.dealers-review-section .profile-heading {
+    margin-bottom: 30px;
+}
+h3.profile-heading {
+    margin-bottom: 10px;
+    color: #242424;
+    font-weight: 600;
+}
+.profile-heading {
+    position: relative;
+}
+.review-box {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+.review-box .review-avg-rating {
+    display: inline-block;
+    float: left;
+    background-color: #252c35;
+    padding: 20px;
+    color: #FFF;
+    text-align: center;
+    margin-right: 20px;
+}
+.review-box .review-avg-rating span {
+    font-size: 36px;
+    font-family: "Poppins",sans-serif;
+    display: block;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+.review-box .review-avg-rating ul li.colored-star {
+    color: #ffc513 !important;
+}
+.review-box .review-avg-rating ul li.star {
+    display: inline-block;
+    color: #ccc;
+    font-size: 16px;
+}
+.review-content-box {
+    min-height: 110px;
+    position: relative;
+    overflow: hidden;
+}
+.review-content-box .review-text-box {
+    position: relative;
+}
+.review-content-box .review-date {
+    margin-bottom: 10px;
+}
+.rating-stars-box {
+    position: relative;
+    overflow: hidden;
+    display: block;
+    width: 100%;
+}
+.rating-stars-box .rating-stars {
+    width: 33%;
+    float: left;
+    margin-bottom: 10px;
+}
+.rating-stars-box .rating-stars label {
+    display: block;
+    margin-bottom: 0;
+    margin-right: 10px;
+    font-family: "Poppins",sans-serif;
+}
+.rating-stars-box .rating-stars label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: rgba(21, 21, 21, .7);
+    font-weight: 600;
+}
+.rating-stars ul {
+    list-style-type: none;
+    padding: 0;
+    padding-left: 0px;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+}
+.review-form {
+    position: relative;
+    overflow: hidden;
+    background-color: #f5f5f5;
+    padding: 20px;
+}
+.review-form .review-star-box {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+.review-form .review-star-box li {
+    width: 33%;
+    display: inline-block;
+}
+.review-form label {
+    font-family: "Poppins",sans-serif;
+    font-weight: 500;
+    display: block;
+}
+.review-form .rating-xs {
+    font-size: 20px;
+}
+.rating-container .caption {
+    margin-left: 5px;
+    margin-right: 0;
+}
+.review-content-box .review-date .user-profile a {
+    font-family: "Poppins",sans-serif;
+    text-transform: uppercase;
+}
+.rating-stars-box .rating-stars ul {
+    display: inline-block;
+    margin: 0;
+    margin-bottom: 0px;
+}
+.rating-stars ul li.star {
+    display: inline-block;
+    line-height: 1;
+}
+.rating-stars ul li.star.colored-star i.fa {
+    color: #ffc513;
+}
+.profile-title-box {
+    position:relative;
+    margin-bottom:30px;
+}
+.extra-button {
+    margin-bottom: 30px;
+}
+.extra-button {
+    margin-bottom: 30px;
+}
+.profile-meta {
+    position: relative;
+    overflow: hidden;
+    margin-top: 20px;
+}
+.profile-meta ul li {
+    display: inline-block;
+    font-size: 13px;
+    color: #999;
+    font-family: "Poppins",sans-serif;
+    width: 33%;
+    vertical-align: top;
+}
+.profile-meta ul li i.icon {
+    font-size: 40px;
+    float: left;
+    margin-right: 10px;
+    line-height: 50px;
+    font-weight: 400;
+    color: #e52d27;
+}
+ul.review-stars {
+    padding: 0;
+    display: inline-block;
+}
+ul.review-stars li.star {
+    display: inline-block;
+    color: #e1e1e1;
+    font-size: 16px;
+    width: auto;
+}
+.profile-meta .profile-meta-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: #242424;
+    display: block;
+}
+ul.review-stars li.star {
+    display: inline-block;
+    color: #e1e1e1;
+    font-size: 16px;
+    width: auto;
+}
+ul.review-stars li.colored-star {
+    color: #ffc513 !important;
+}

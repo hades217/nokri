@@ -14,6 +14,12 @@ a:hover, a:focus {
 .select2-container--default .select2-results__option--highlighted[aria-selected] {
     background-color: #233d7b;
 }
+.mega-menu .drop-down-multilevel li:hover > a, .mega-menu .drop-down-multilevel li:focus > a {
+    color: #233d7b;
+}
+.n-hero-8 .n-8-container .n-8-product ul li i {
+	background-color: #233d7b;
+}
 .n-btn-rounded { 
 	background-color: #233d7b; 
 	border-color:#233d7b;
@@ -36,6 +42,15 @@ a:hover, a:focus {
 }
 .mega-menu.n-admin-header .menu-button a.n-btn-flat {
     background-color: #233d7b;
+}
+.n-jobs-recomend3 .nav-tabs > li.active a {
+	background-color: #233d7b;
+}
+.n-hero-8 .n-8-container .n-8-content h1 span {
+   color: #233d7b;
+}
+.n-job-listing5 .nav-tabs > li.active > a {
+	background-color: #233d7b;
 }
 .n-hero-section .n-hero-box .n-most-cat .n-most-cat-list a:hover {
 	color:#233d7b;
@@ -464,4 +479,15 @@ aside .app-deadline {
 }
 aside .apply-buttons .btn-theme {
 	color:#233d7b;
+}
+.dashboard-new .main-body .file-upload-wrapper:before {
+    background-color: #233d7b;
+    border: 1px solid #233d7b;
+}
+.dashboard-new .main-body .file-upload-wrapper:hover:before {
+  background-color: #233d7b;
+}
+
+.counter-active { 
+    color: #233d7b !important;
 }

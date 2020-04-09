@@ -83,7 +83,7 @@ $breadcrumb_style = '';
                         <h2><?php the_title(); ?></h2>
                         <div class="job-detail-meta">
                            <ul>
-                              <li><i class="fa fa-map-marker"></i><?php echo nokri_job_country($job_id); ?></li>
+                              <li><i class="fa fa-map-marker"></i><?php echo nokri_job_country($job_id,''); ?></li>
                               <li><i class="fa fa-clock-o"></i><?php echo nokri_job_post_single_taxonomies('job_type', $job_type); ?></li>
                               <li><i class="fa fa-calendar-o"></i><?php echo esc_html__( 'Deadline:', 'nokri' ); ?><strong> <?php echo esc_html($job_deadline); ?></strong></li>
                            </ul>

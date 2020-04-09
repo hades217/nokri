@@ -13,9 +13,9 @@ global $nokri;
 
 /* Getting Title From Query String */ 
 $title	=	'';
-if( isset( $_GET['job_title'] ) && $_GET['job_title'] != "" )
+if( isset( $_GET['job-title'] ) && $_GET['job-title'] != "" )
 {
-	$title	=	$_GET['job_title'];
+	$title	=	$_GET['job-title'];
 }
 /*RTL check*/ 
 $rtl_class = '';
@@ -30,7 +30,7 @@ $search_bg_url = '';
 	$search_bg_url = nokri_getBGStyle('search_bg_img');
 }
  /* Getting All Taxonomy From Query String */
- $taxonomies	=	array('job_type','ad_title', 'cat_id','job_category','job_tags','job_qualifications','job_level','job_salary','job_currency','job_skills','job_experience','job_currency','job_shift','job_class','job_location');
+ $taxonomies	=	array('job_type','ad_title', 'cat_id','job_category','job_tags','job_qualifications','job_level','job_salary','job_currency','job_skills','job_experience','job_currency','job_shift','job_class','job-location');
 foreach( $taxonomies as $tax )
 {
 	$$tax = '';
@@ -41,25 +41,25 @@ foreach( $taxonomies as $tax )
 		}
 }
 $category	=	'';
-if( isset( $_GET['cat_id'] ) && $_GET['cat_id'] != ""  )
+if( isset( $_GET['cat-id'] ) && $_GET['cat-id'] != ""  )
 {
 	$category	=	array(
 		array(
 		'taxonomy' => 'job_category',
 		'field'    => 'term_id',
-		'terms'    => $_GET['cat_id'],
+		'terms'    => $_GET['cat-id'],
 		),
 	);	
 }	
 
 $location	=	'';
-if( isset( $_GET['job_location'] ) && $_GET['job_location'] != ""  )
+if( isset( $_GET['job-location'] ) && $_GET['job-location'] != ""  )
 {
 	$location	=	array(
 		array(
 		'taxonomy' => 'ad_location',
 		'field'    => 'term_id',
-		'terms'    => $_GET['job_location'],
+		'terms'    => $_GET['job-location'],
 		),
 	);	
 }
@@ -109,6 +109,8 @@ if( isset( $_GET['custom'] ) )
 		}
 	}
 }
+
+
 /* Custom feilds search ends */
 
 /* Radius search starts */
@@ -180,6 +182,19 @@ if( isset($_GET['order_job']) )
 		 $order	  =	$_GET['order_job'];
 	}
 }
+$featur_excluded = '';
+
+if( isset( $nokri['premium_jobs_list_switch'] ) && $nokri['premium_jobs_list_switch'] == false   )
+{
+    if( isset( $nokri['premium_jobs_class'] ) && $nokri['premium_jobs_class'] != ''   ){
+	
+	$featur_excluded   =	array(	
+		'taxonomy' => 'job_class',
+		'field'    => 'term_id',
+		'terms'    => $nokri['premium_jobs_class'],
+		'operator' => 'NOT IN',		
+	);	
+}}
 if ( get_query_var( 'paged' ) ) 
 {
 	$paged = get_query_var( 'paged' );
@@ -193,11 +208,10 @@ else
 {
 	$paged = 1;
 }
-
 $args	  =	array(
-'tax_query' => array($category,$job_salary,$title, $job_type,$job_category,$job_tags,$job_qualifications,$job_level,$job_skills,$job_experience,$job_currency,$job_shift,$job_class,$location,$location_keyword),
-'s' 				=> 	$title,
+'tax_query' => array($category,$job_salary,$title, $job_type,$job_category,$job_tags,$job_qualifications,$job_level,$job_skills,$job_experience,$job_currency,$job_shift,$job_class,$location,$location_keyword,$featur_excluded),
 'posts_per_page' 	=> 	 get_option( 'posts_per_page' ),
+ 's'                    =>      $title,
 'post_type' 		=> 	'job_post',
 'post_status' 		=> 	'publish',
 'order'				=> 	$order,
@@ -213,9 +227,9 @@ $args	  =	array(
 		$lat_lng_meta_query,
 	), 
 );
-
-
+$args = nokri_wpml_show_all_posts_callback($args);
 $results = new WP_Query( $args );
+
 if ($results->found_posts > 0)
 {
 	$message = __('Available Jobs','nokri');
@@ -242,8 +256,9 @@ if( isset( $nokri['premium_jobs_class'] ) && $nokri['premium_jobs_class'] != '' 
 	);	
 
 $args_premium	    =	  array(
-'tax_query'         =>    array($job_classes,$category),
-'posts_per_page' 	=> 	 $premium_jobs_class_num,
+'tax_query'         =>    array($job_classes,$category,$location),
+ 's'                    =>      $title,
+'posts_per_page' 	=> 	$premium_jobs_class_num,
 'post_type' 		=> 	'job_post',
 'post_status' 		=> 	'publish',
 'orderby' 			=> 	'rand',
@@ -286,21 +301,27 @@ if($search_page_layout == 1)
 {
 ?>
 <div class="cp-loader"></div>
-<section class="n-search-page">
+<section class="n-search-page" >
          <div class="container">
             <div class="row">
                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                   <div class="row">
-                     <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12">
-                        <aside class="new-sidebar">
+                     <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12">                      
+                                                
+                         <aside class="new-sidebar">
+                             
                            <div class="heading">
                               <h4> <?php  echo esc_html__("Search Filters", "nokri"); ?></h4>
                               <a href="<?php  echo get_the_permalink($nokri['sb_search_page']); ?>"><?php  echo esc_html__("Clear All", "nokri"); ?></a>
-                           </div>
+                              <?php if(wp_is_mobile()){ ?>
+                               <a role="button" class="" data-toggle="collapse" href="#accordion" aria-expanded="true" id="panel_acordian"></a>
+                              <?php }?>
+                           </div>                          
                            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                              <?php get_sidebar( 'widget' ); ?>
                            </div>
-                        </aside>
+                             
+                        </aside>                         
                      </div>
                      <div class="col-lg-6 col-md-8 col-sm-12 col-xs-12">
                         <div class="n-search-main">
@@ -317,11 +338,12 @@ if($search_page_layout == 1)
                                  </div>
                                  <div class="col-md-4 col-sm-4 col-xs-12">
                                     <form method="GET" id="job_order_search">
-                                       <select class="js-example-basic-single form-control change_order" data-allow-clear="true" data-placeholder="<?php  echo esc_html__("Select Option", "nokri"); ?>" style="width: 100%" name="order_job">
+                                       <select class="js-example-basic-single form-control" data-allow-clear="true" data-placeholder="<?php  echo esc_html__("Select Option", "nokri"); ?>" style="width: 100%" name="order_job" id="order_job">
                                           <option value="" ><?php  echo esc_html__("Select Option", "nokri"); ?></option>
                                            <option value="ASC" <?php if ( $order == 'ASC') { echo "selected"; } ; ?>><?php  echo esc_html__("Ascending", "nokri"); ?></option>
                                         <option value="DESC" <?php if ( $order == 'DESC') { echo "selected"; } ; ?>><?php  echo esc_html__("Descending ", "nokri"); ?></option>
                                        </select>
+                                       <?php echo nokri_form_lang_field_callback(true); ?> 
                                     </form>
                                  </div>
                               </div>
@@ -334,7 +356,7 @@ if($search_page_layout == 1)
                                    <p><?php echo esc_html($job_alerts_tagline); ?></p>
                                 </div>
                                 <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
-                                    <a href="javascript:void(0)" class="btn n-btn-flat job_alert"><?php echo esc_html($job_alerts_title); ?></a>
+                                    <a href="javascript:void(0)" class="btn n-btn-flat job_alert"><?php echo esc_html($job_alerts_btn); ?></a>
                                 </div>
                             </div>
                            </div>
@@ -415,28 +437,34 @@ if($search_page_layout == 1)
          </div>
       </section>
 <?php }  else if($search_page_layout == 2) { ?>
-<section class="n-search-page">
+<section class="n-search-page" >
  <div class="container">
     <div class="row">
        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
           <div class="row">
-             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                <aside class="new-sidebar">
+             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">                                            
+                    <aside class="new-sidebar">                       
                    <div class="heading">
                       <h4> <?php  echo esc_html__("Search Filters", "nokri"); ?></h4>
                       <a href="<?php  echo get_the_permalink($nokri['sb_search_page']); ?>"><?php  echo esc_html__("Clear All", "nokri"); ?></a>
-                   </div>
+                      <?php if(wp_is_mobile()){ ?>
+                      <a role="button" class="" data-toggle="collapse" href="#accordion" aria-expanded="true" id="panel_acordian"></a>
+                      <?php }?>
+                   </div>   
+                                    
                    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                      <?php get_sidebar( 'widget' ); ?>
-                   </div>
-                </aside>
+                      <?php get_sidebar( 'widget' ); ?>    
+                       
+                   </div>  
+                       
+                </aside>                   
              </div>
+
              <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
                 <div class="n-search-main">
                    <div class="n-bread-crumb">
                       <ol class="breadcrumb">
                          <li> <a href="javascript:void(0)"><?php  echo esc_html__("Home", "nokri"); ?></a></li>
-                         <li class="job_alert"> <a href="javascript:void(0)"><?php  echo esc_html__("Job Alert", "nokri"); ?></a></li>
                          <li class="active"><a href="javascript:void(0);" class="active"><?php  echo esc_html__("Search Page", "nokri"); ?></a></li>
                       </ol>
                    </div>
@@ -447,11 +475,12 @@ if($search_page_layout == 1)
                          </div>
                          <div class="col-md-4 col-sm-4 col-xs-12">
                             <form method="GET" id="job_order_search">
-                               <select class="js-example-basic-single form-control change_order" data-allow-clear="true" data-placeholder="<?php  echo esc_html__("Select Option", "nokri"); ?>" style="width: 100%" name="order_job">
+                               <select class="js-example-basic-single form-control " data-allow-clear="true" data-placeholder="<?php  echo esc_html__("Select Option", "nokri"); ?>" style="width: 100%" name="order_job" id="order_job">
                                   <option value="" ><?php  echo esc_html__("Select Option", "nokri"); ?></option>
                                    <option value="ASC" <?php if ( $order == 'ASC') { echo "selected"; } ; ?>><?php  echo esc_html__("Ascending", "nokri"); ?></option>
                                 <option value="DESC" <?php if ( $order == 'DESC') { echo "selected"; } ; ?>><?php  echo esc_html__("Descending ", "nokri"); ?></option>
                                </select>
+                               <?php echo nokri_form_lang_field_callback(true); ?>
                             </form>
                          </div>
                       </div>
@@ -464,42 +493,48 @@ if($search_page_layout == 1)
                                    <p><?php echo esc_html($job_alerts_tagline); ?></p>
                                 </div>
                                 <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
-                                    <a href="javascript:void(0)" class="btn n-btn-flat job_alert"><?php echo esc_html($job_alerts_title); ?></a>
+                                    <a href="javascript:void(0)" class="btn n-btn-flat job_alert"><?php echo esc_html($job_alerts_btn); ?></a>
                                 </div>
                             </div>
                            </div>
                    
                    
                    <?php } echo ($advert_up); ?>
-                   <div class="n-search-listing n-featured-jobs featured">
-                   <?php
-				   /*Section Title */
-				   $section_title = (isset($nokri['premium_jobs_class_title']) && $nokri['premium_jobs_class_title'] != "") ? '<h3>'.$nokri['premium_jobs_class_title'].'</h3>' : "";
-						?>
-                   <?php  echo "".($section_title); ?>
-                      <div class="n-featured-job-boxes">
+                   
+               
+				  
+				  
                   		 <?php
 				   if( isset( $nokri['premium_jobs_class_switch'] ) && $nokri['premium_jobs_class_switch'] == '1'   )
 						{
+                                       $section_title = (isset($nokri['premium_jobs_class_title']) && $nokri['premium_jobs_class_title'] != "") ? '<h3>'.$nokri['premium_jobs_class_title'].'</h3>' : "";
+                                       echo       "<div class='n-search-listing n-featured-jobs featured'>" ;                                               
 							  /* Premium jobs in list style*/
 							  $results_premium   = new WP_Query( $args_premium );
 							  $current_layout    =   $nokri['search_layout'];
 							  $layouts		    =   array( 'list_1', 'list_2', 'list_3' );
 								if ( $results_premium->have_posts() )
 								 { 
+                                                                      echo     $section_title ;
+                                                                      echo "<div class='n-featured-job-boxes'>";
 									if (in_array($current_layout, $layouts))  					
 											 {		
 												 require trailingslashit( get_template_directory () ) . "template-parts/layouts/job-style/search-layout-premium-list2.php";
 												 echo($out);
 											 }
 											wp_reset_postdata();
+                                                                                      echo "</div>";
 								}
+                                                            echo "</div>";
+                                                                  
 						}
 					?>
-                     </div>
-                    </div>
-                   <div class="n-search-listing n-featured-jobs">
+                    
+                   
+                   <div class="n-search-listing n-featured-jobs">    
+                       <h3><?php echo esc_html__('Regular Jobs','nokri') ?></h3>
                       <div class="n-featured-job-boxes">
+                           
                        <?php
 						/* Regular Search Query */	
 						 if ( $results->have_posts() ) { 

@@ -17,7 +17,7 @@ function blog_posts_short()
 		   'param_name' => 'order_field_key',
 		   'description' => nokri_VCImage('nokri_blog_posts.png') . esc_html__( 'Ouput of the shortcode will be look like this.', 'nokri' 			),
 		  ),
-		  array(
+		 array(
 		"group" => esc_html__("Basic", "nokri"),
 		"type" => "dropdown",
 		"heading" => esc_html__("Select Posts Order", 'nokri') ,
@@ -120,16 +120,18 @@ function blog_posts_short_base_func($atts, $content = '')
 		'blog_posts_title_no' => '',
 		'link' => '',  
 	) , $atts));
-	$rows = vc_param_group_parse_atts( $atts['blog_posts'] );
-	$cats_arr = array();
-	if( count((array)  $rows ) > 0) 
+	if(isset($atts['blog_posts']) && $atts['blog_posts'] != '')
 	{
-	foreach($rows as $row )
-   		{
-	   		$cats_arr[] = $row['categories'];
-   		}
-   	}
-	
+		$rows = vc_param_group_parse_atts( $atts['blog_posts'] );
+		$cats_arr = array();
+		if( count((array)  $rows ) > 0) 
+		{
+		foreach($rows as $row )
+			{
+				$cats_arr[] = $row['categories'];
+			}
+		}
+	}
 /*View  Link */
 $read_more = '';
 if( isset( $link) )

@@ -68,29 +68,30 @@ function client_with_bg_short_base_func($atts, $content = '')
 		'section_img' 		=> 	'',  
 		'section_heading' 	=> 	'',
 	) , $atts));
-	
-$rows = vc_param_group_parse_atts( $atts['images'] );
-$images_html = '';
-if( (array)count( $rows ) > 0 )
-{
-	foreach($rows as $row ) 
+if(isset($atts['images']) && $atts['images'] != '')
+{	
+	$rows = vc_param_group_parse_atts( $atts['images'] );
+	$images_html = '';
+	if( (array)count( $rows ) > 0 )
 	{
-		$img_html = '';
-		if(isset( $row['section_client']) &&  $row['section_client'] !='') 
+		foreach($rows as $row ) 
 		{
-			$img  		= 	wp_get_attachment_image_src($row['section_client'], 'nokri_job_post_single');
-			$img  		= 	$img[0];
-			$img_html 	= 	'<img class="img-responsive"  src="'.$img.'" alt="'.esc_attr__("image", "nokri").'">';
-		}
-/*Client Link  */
-$link = (isset($row['client_link']) && $row['client_link'] != "") ? $row['client_link'] : "#";	 	
-/*Story Html */		
-$images_html .= '<div class="item">
-                       <a href="'.$link.'">'.$img_html.'</a>
-                    </div>';
-     }
+			$img_html = '';
+			if(isset( $row['section_client']) &&  $row['section_client'] !='') 
+			{
+				$img  		= 	wp_get_attachment_image_src($row['section_client'], 'nokri_job_post_single');
+				$img  		= 	$img[0];
+				$img_html 	= 	'<img class="img-responsive"  src="'.$img.'" alt="'.esc_attr__("image", "nokri").'">';
+			}
+	/*Client Link  */
+	$link = (isset($row['client_link']) && $row['client_link'] != "") ? $row['client_link'] : "#";	 	
+	/*Story Html */		
+	$images_html .= '<div class="item">
+						   <a href="'.$link.'">'.$img_html.'</a>
+						</div>';
+		 }
+	}
 }
- 	
 /*Section Heading */
 $section_heading1 = (isset($section_heading) && $section_heading != "") ? ' <h4>'.$section_heading.'</h4>' : ""; 
 		

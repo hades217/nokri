@@ -1,7 +1,7 @@
 /*
 Template Name: Nokri Job Board Theme
 Author: ScriptsBundle
-Version: 1.2.0
+Version: 1.3.1
 Designed and Development by: ScriptsBundle
 
 ====================================
@@ -62,12 +62,19 @@ Designed and Development by: ScriptsBundle
  $(".js-example-basic-single").select2({
   placeholder: get_strings.template_select,
   allowClear: true,
-  maximumSelectionLength: 5,
+  maximumSelectionLength: 8,
+  language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    },
+	maximumSelected: function (e) {
+            var t =  get_strings.max_select + e.maximum;
+            return t;
+        },
+  }
  });
  $('p:empty').remove();
-
  // Log In Model
-
  $('.search_company').on("click", function() {
   $('form#company_form').submit();
  });
@@ -89,6 +96,20 @@ Designed and Development by: ScriptsBundle
    }
   }
  });
+ 
+ /* add more questions */
+ $('.questions').multifield({
+  section: '.group',
+  btnAdd: '#question_btn',
+  btnRemove: '.btnRemove',
+  locale: {
+   "multiField": {
+    "messages": {
+     "removeConfirmation": get_strings.content,
+    }
+   }
+  }
+ });
 
  // Candidate saving job alerts model
  $(".job_alert").click(function() {
@@ -97,6 +118,11 @@ Designed and Development by: ScriptsBundle
    placeholder: get_strings.option_select,
    allowClear: true,
    maximumSelectionLength: 15,
+   language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    }
+  }
   });
  });
 
@@ -156,7 +182,133 @@ Designed and Development by: ScriptsBundle
     return false;
    });
  });
+ 
+/* Candidate Upload resume at apply time */
+$('body').on('change', '.upload_resume_now', function(e) {
+  var fd = new FormData();
+  var files_data = $('.form-group .upload_resume_now');
+  $.each($(files_data), function(i, obj) {
+   $.each(obj.files, function(j, file) {
+    fd.append('upload_resume_now[' + j + ']', file);
+   });
+  });
+  fd.append('action', 'upload_resume_now');
+  $('.cp-loader').show();
+  $.ajax({
+   type: 'POST',
+   url: nokri_ajax_url,
+   data: fd,
+   contentType: false,
+   processData: false,
+   success: function(res) {
+    $('.cp-loader').hide();
+    var res_arr = res.split("|");
+    if ($.trim(res_arr[0]) == "1") {
+     toastr.success($('#emp_resume_save').val(), '', {
+      timeOut: 2500,
+      "closeButton": true,
+      "positionClass": "toast-top-right"
+     });
+     $("#current_resume").val(res_arr[1]);
+    } else if ($.trim(res_arr[0]) == "2") {
+     toastr.warning($('#demo_mode').val(), '', {
+      timeOut: 2500,
+      "closeButton": true,
+      "positionClass": "toast-top-right"
+     });
+    } else {
+     toastr.error(res_arr[1], '', {
+      timeOut: 2500,
+      "closeButton": true,
+      "positionClass": "toast-top-right"
+     });
+    }
+   }
+  });
 
+
+ });
+ 
+ 
+/* Candidate Upload resume from resume tabs */
+$('body').on('change', '.upload_resume_tab', function(e) {
+  var fd = new FormData();
+  var files_data = $('.form-group .upload_resume_tab');
+  $.each($(files_data), function(i, obj) {
+   $.each(obj.files, function(j, file) {
+    fd.append('upload_resume_tab[' + j + ']', file);
+   });
+  });
+  fd.append('action', 'upload_resume_from_tab');
+  $('.cp-loader').show();
+  $.ajax({
+   type: 'POST',
+   url: nokri_ajax_url,
+   data: fd,
+   contentType: false,
+   processData: false,
+   success: function(res) {
+    $('.cp-loader').hide();
+    var res_arr = res.split("|");
+    if ($.trim(res_arr[0]) == "0") 
+	{
+     toastr.warning(res_arr[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+    } 
+	else if ($.trim(res_arr[0]) == "1") 
+	{
+     toastr.warning(res_arr[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+    } 
+	else if ($.trim(res_arr[0]) == "2") 
+	{
+     toastr.warning(res_arr[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+    } 
+	else if ($.trim(res_arr[0]) == "3") 
+	{
+     toastr.warning(res_arr[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+    } 
+	else if ($.trim(res_arr[0]) == "4") 
+	{
+     toastr.success(res_arr[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+	location.reload();
+    } 
+   }
+  });
+
+
+ }); 
+ 
+$("#input-b1").fileinput({
+ browseLabel: get_strings.browse_btn,
+ removeLabel: get_strings.remove_btn,
+ msgPlaceholder:get_strings.select_btn,
+});
+ 
+ $("#imgdp").fileinput({
+ browseLabel: get_strings.browse_btn,
+ removeLabel: get_strings.remove_btn,
+ msgPlaceholder:get_strings.select_btn,
+});
+ 
  /* Candidate Deleting Saved alerts */
  $(".del_save_alert").on("click", function() {
   var alert_id = $(this).attr("data-value");
@@ -204,7 +356,12 @@ Designed and Development by: ScriptsBundle
       });
      }
     },
-    close: function() {}
+    cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
+            }
+        },
    }
   });
  });
@@ -212,7 +369,7 @@ Designed and Development by: ScriptsBundle
 
 
  /*iCheck for others*/
- $(document).ready(function() {
+ $(window).load(function() {
   $('.input-icheck-others').iCheck({
    checkboxClass: 'icheckbox_square',
    radioClass: 'iradio_square',
@@ -430,6 +587,29 @@ Designed and Development by: ScriptsBundle
   }
  });
 
+
+/*--- Hiring carousel---*/
+$('.hiring-slider').owlCarousel({
+  loop:true,
+  margin:10,
+  autoplay:true,	
+  nav:true,
+  responsive:{
+    0:{
+      items:1
+    },
+    600:{
+      items:3
+    },
+    1000:{
+      items:5
+    }
+  }
+});
+
+
+
+
  /*--- Owl  Carousel --*/
  $(".featured-job-slider").owlCarousel({
   nav: true,
@@ -514,12 +694,7 @@ Designed and Development by: ScriptsBundle
   }
  });
 
-
-
-
-
-
- /*--- MAIN SECTION CATS---*/
+/*--- MAIN SECTION CATS---*/
  $(".featured-cat").owlCarousel({
   nav: false,
   loop: true,
@@ -568,8 +743,45 @@ Designed and Development by: ScriptsBundle
   }
  });
 
+ /*--- job cand cat slider---*/
+ $('.job-cat-cand-slider').owlCarousel({
+    loop:true,
+    margin:10,
+    nav:true,
+    navText: ["<i class='fa fa-angle-left'></i>","<i class='fa fa-angle-right'></i>"],
+    autoplay:false,
+    responsive:{
+        0:{
+            items:1
+        },
+        600:{
+            items:1
+        },
+        1000:{
+            items:1
+        }
+    }
+});
 
- /*--- TESTIMONIAL 1---*/
+$('.success1-slider').owlCarousel({
+    loop:true,
+    margin:10,
+    nav:true,
+    autoplay:false,
+    responsive:{
+        0:{
+            items:1
+        },
+        600:{
+            items:3
+        },
+        1000:{
+            items:3
+        }
+    }
+});
+ 
+  /*--- TESTIMONIAL 1---*/
  $("#owl-testimonial").owlCarousel({
   nav: false,
   //navText:["<i class='ti-angle-left'></i>","<i class='ti-angle-right'></i>"],
@@ -676,6 +888,11 @@ Designed and Development by: ScriptsBundle
   placeholder: get_strings.option_select,
   allowClear: true,
   maximumSelectionLength: 10,
+  language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    }
+  }
  });
 
 
@@ -756,6 +973,76 @@ Designed and Development by: ScriptsBundle
   });
  });
 
+/* Call to action 4 counter */
+ function Counter(data) {
+  var _default = {
+    fps: 20,
+    from: 0,
+    time: 2000,
+  }
+  
+  for (var attr in _default) {
+    if (typeof data[attr] === 'undefined') {
+      data[attr] = _default[attr];
+    }
+  }
+  
+  if (typeof data.to === 'undefined')
+    return;
+  
+  data.fps = typeof data.fps === 'undefined' ? 20 : parseInt(data.fps);
+  data.from = typeof data.from === 'undefined' ? 0 : parseFloat(data.from);
+  
+  var frames = data.time / data.fps,
+      inc = (data.to - data.from) / frames,
+      val = data.from;
+  
+  if (typeof data.start === 'function') {
+    data.start(data.from, data)
+  }
+  var interval = setInterval(function() {
+    frames--;
+    val += inc;
+    
+    if (val >= data.to) {
+      if (typeof data.complete === 'function') {
+        console.log('complete');
+        data.complete(data.to, data)
+      }
+      console.log(interval);
+      clearInterval(interval);
+    } else if (typeof data.progress === 'function') {
+      data.progress(val, data)
+    }
+  }, data.fps);
+
+}
+
+// Auto-counter from HTML API
+var counters = document.getElementsByClassName('counter'),
+    print = function(val, data) {
+      data.element.innerHTML = val;
+    }
+
+for (var i = 0, l = counters.length; i < l; i++) {
+  // Loads from HTML dataset
+  var data = {};
+  for (var attr in counters[i].dataset) {
+    data[attr] = counters[i].dataset[attr];
+  }
+  
+  // Save element and callbacks
+  data.element = counters[i];
+  data.start = print;
+  data.progress = print;
+  data.complete = print;
+  
+  // Creates the counter
+  new Counter(data);
+} 
+
+
+
 
  /******** End New JS **********/
  $('#tags_tag').tagEditor({
@@ -795,28 +1082,53 @@ Designed and Development by: ScriptsBundle
   placeholder: get_strings.option_select,
   allowClear: true,
   maximumSelectionLength: 15,
+  language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    }
+  }
  });
 
  $(".select-category ").select2({
   placeholder: get_strings.option_select,
   allowClear: true,
   maximumSelectionLength: 13,
+  language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    }
+  }
  });
  $(".select-location").select2({
   placeholder: get_strings.option_select,
   allowClear: true,
   maximumSelectionLength: 13,
+  language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    }
+  }
  });
 
  $(".select-resume").select2({
   placeholder: get_strings.option_select,
   allowClear: true,
+  language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    }
+  }
  });
 
  $(".select-generat").select2({
   placeholder: get_strings.option_select,
   allowClear: true,
   maximumSelectionLength: 15,
+  language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    }
+  }
  });
 
  /* Employer deleting candidate resume */
@@ -863,7 +1175,12 @@ Designed and Development by: ScriptsBundle
       });
      }
     },
-    close: function() {}
+    cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
+            }
+        },
    }
   });
  });
@@ -972,7 +1289,7 @@ Designed and Development by: ScriptsBundle
   });
  }
  sbDropzone_comp_image();
- /*--- End Drop Zone For Portfolio---*/
+ /*--- End Drop Zone company gallery---*/
 
 
 
@@ -1189,7 +1506,7 @@ Designed and Development by: ScriptsBundle
    addRemoveLinks: true,
    paramName: "custom_upload",
    maxFiles: $('#sb_upload_limit').val(), //change limit as per your requirements
-   acceptedFiles: '.txt,.doc,.docx,.pdf,.png',
+   acceptedFiles: '.txt,.doc,.docx,.pdf,.png,.jpg,.gif,.jpeg',
    dictMaxFilesExceeded: $('#adforest_max_upload_reach').val(),
    /*acceptedFiles: acceptedFileTypes,*/
    url: nokri_ajax_url + "?action=job_attachments&is_update=" + $('#is_update').val(),
@@ -1210,16 +1527,21 @@ Designed and Development by: ScriptsBundle
      action: 'get_uploaded_job_attachments',
      is_update: $('#is_update').val()
     }).done(function(data) {
-     $.each(data, function(key, value) {
-      var mockFile = {
-       name: value.display_name,
-       size: value.size
-      };
-      thisDropzone.options.addedfile.call(thisDropzone, mockFile);
-      thisDropzone.options.thumbnail.call(thisDropzone, mockFile, value.name);
-      $('a.dz-remove:eq(' + i + ')').attr("data-dz-remove", value.id);
-      i++;
-     });
+     var is_update = $('#is_update').val();
+	 var is_attachment = $('#is_attachment').val();
+	if(is_update && is_attachment == '1')
+	{
+		$.each(data, function(key, value) {
+	  var mockFile = {
+	   name: value.display_name,
+	   size: value.size
+	  };
+	  thisDropzone.options.addedfile.call(thisDropzone, mockFile);
+	  thisDropzone.options.thumbnail.call(thisDropzone, mockFile, value.name);
+	  $('a.dz-remove:eq(' + i + ')').attr("data-dz-remove", value.id);
+	  i++;
+	 });
+	}
      if (i > 0)
       $('.dz-message').hide();
      else
@@ -1324,7 +1646,12 @@ Designed and Development by: ScriptsBundle
       });
      }
     },
-    close: function() {}
+    cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
+            }
+        },
    }
   });
  });
@@ -1370,9 +1697,12 @@ Designed and Development by: ScriptsBundle
       });
      }
     },
-    close: function() {
-     $('.cp-loader').hide();
-    }
+    cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
+            }
+        },
    }
   });
  });
@@ -1897,20 +2227,23 @@ if(is_accordion == '1')
    }
   });
 
-
  });
-
 
  /* Youtube popup */
  if ($("#is_intro_vid").val() == 1) {
   $("a.bla-1").YouTubePopUp();
  }
+ $(document).ready(function(){
+  if ( $( "a.hero-video" ).length ) 
+  {
+    $("a.hero-video").YouTubePopUp();
+  }
+ });
 
  // Upload Employers Cover picture 
  $('body').on('change', '.sb_files-data-cover', function(e) {
   var fd = new FormData();
   var files_data = $('.form-group .sb_files-data-cover');
-
   $.each($(files_data), function(i, obj) {
    $.each(obj.files, function(j, file) {
     fd.append('my_file_upload_cover[' + j + ']', file);
@@ -1997,7 +2330,12 @@ if(is_accordion == '1')
       });
      }
     },
-    close: function() {}
+   cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
+            }
+        },
    }
   });
 
@@ -2105,6 +2443,81 @@ if(is_accordion == '1')
 
  });
 
+/* Validating external email */
+function validateEmail($email) {
+  var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+  return emailReg.test( $email );
+}
+/* External Apply package update */
+$(".external_apply").on("click", function() {
+  var apply_job_id = $(this).attr('data-job-id');
+  var external = $(this).attr('data-job-exter');
+  $.confirm({
+   animationBounce: 1.5,
+   closeAnimation: 'rotateXR',
+   title: get_strings.confirmation,
+   content: get_strings.external_apply,
+   type: 'blue',
+   buttons: {
+    tryAgain: {
+     text: get_strings.btn_cnfrm,
+     btnClass: 'btn-red',
+     action: function() {
+      $('.cp-loader').show();
+      $.post(nokri_ajax_url, {
+       action: 'external_apply_package_base',
+	   'apply_job_id': apply_job_id,
+      }).done(function(response) {
+       $('.cp-loader').hide();
+	   var get_r = response.split('|');
+       if ($.trim(get_r[0]) == "4") {
+		if( validateEmail(external)) 
+		{
+			window.open("mailto:"+external);
+		}  
+		else
+		{
+			window.open(external, '_blank');
+		}
+       }
+       else if ($.trim(get_r[0]) == '2') {
+       toastr.warning(get_r[1], '', {
+       timeOut: 2500,
+       "closeButton": true,
+       "positionClass": "toast-top-right"
+      });
+	   window.location = get_r[2];
+     }
+	   else if ($.trim(get_r[0]) == '3') {
+       toastr.warning(get_r[1], '', {
+       timeOut: 2500,
+       "closeButton": true,
+       "positionClass": "toast-top-right"
+      });
+	   window.location = get_r[2];
+     }
+	 else if ($.trim(get_r[0]) == '1') {
+       toastr.warning(get_r[1], '', {
+       timeOut: 2500,
+       "closeButton": true,
+       "positionClass": "toast-top-right"
+      });
+	   window.location = get_r[2];
+     }
+	   });
+     }
+    },
+	somethingElse: {
+            text: get_strings.btn_cancel,
+            btnClass: 'btn-blue',
+            action: function(){
+            }
+        },
+   }
+  });
+ });
+
+
 
  // Candidate Aplly Job Athentication
  $(".apply_job").on("click", function() {
@@ -2159,11 +2572,43 @@ if(is_accordion == '1')
     }, 2000);
    } else {
     $("#popup-data").html(response);
+	$('.job_textarea').jqte({
+   link: false,
+   unlink: false,
+   formats: [
+    ["p", get_strings.p_text],
+    ["h2", "H2"],
+    ["h3", "H3"],
+    ["h4", "H4"],
+   ],
+   funit: false,
+   fsize: false,
+   fsizes: false,
+   color: false,
+   strike: false,
+   source: false,
+   sub: false,
+   sup: false,
+   indent: false,
+   outdent: false,
+   right: false,
+   left: false,
+   center: false,
+   remove: false,
+   rule: false,
+   title: false,
+   p: true,
+  });
     // Initialize Select After Response
     $(".select-generat").select2({
      placeholder: get_strings.resume_select,
      allowClear: true,
      maximumSelectionLength: 5,
+	 language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    }
+  }
     });
     $("#myModal-job").modal("show");
     $("#input-b2").fileinput({
@@ -2174,9 +2619,31 @@ if(is_accordion == '1')
    }
   });
  });
-
-
- // Candidate short details popups
+/* Toggle for questionares */ 
+if ($('#job_qstns_enable').val() == 1)
+ {
+	$('.job_qstns').hide(); 
+	var exist = $('#job_qstns_exist').val();
+	if(exist)
+	{
+		$('.job_qstns').show();
+	}
+	$(function() {
+	  $(document).on('change', '#job_qstns_toggle', function() {
+	   var is_ad_qstns = $(this).prop('checked');
+	   if (!is_ad_qstns)
+		{
+		   $('.job_qstns').hide();
+		   $('.jobs_questions').val('');  
+	   } 
+	   else
+		{
+			$('.job_qstns').show();
+	   }
+	  });
+	 });
+ }
+// Candidate short details popups
  $(".candidate_short_det").on("click", function() {
   $('.cp-loader').show();
   $("#short-desc-data").html('');
@@ -2200,6 +2667,46 @@ if(is_accordion == '1')
     $("#short-desc-data").html(response);
     $("#short-detail-modal").modal("show");
     $('.cp-loader').hide();
+   }
+  });
+ });
+ // Update resume access package
+ $(".update_pkg").on("click", function() {
+  var candidate_id = $(this).attr('data-candId');  
+  var attach_id = $(this).attr('data-attachId');
+  $.post(nokri_ajax_url, {
+   action: 'update_resume_access',
+   'candidate_id': candidate_id,
+   'attach_id': attach_id,
+  }).done(function(response) {
+   $('.cp-loader').hide();
+   var get_r = response.split('|');
+   if ($.trim(get_r[0]) == '1') {
+	 toastr.error(get_r[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+	window.location = get_r[2];
+   } 
+   else if ($.trim(get_r[0]) == '2') {
+    toastr.error(get_r[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+	window.location = get_r[2];
+   }
+   else if ($.trim(get_r[0]) == '3') {
+    toastr.error(get_r[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+	window.location = get_r[2];
+   }
+   else if ($.trim(get_r[0]) == '4') {
+    window.location = get_r[1];
    }
   });
  });
@@ -2239,7 +2746,8 @@ if(is_accordion == '1')
      "positionClass": "toast-top-right"
     });
     window.location = get_r[2];
-   } else if ($.trim(get_r[0]) == '5') {
+   } 
+   else if ($.trim(get_r[0]) == '5') {
     toastr.warning(get_r[1], '', {
      timeOut: 2500,
      "closeButton": true,
@@ -2280,6 +2788,7 @@ if(is_accordion == '1')
      "closeButton": true,
      "positionClass": "toast-top-right"
     });
+	window.location = get_r[2];
    }
   });
  });
@@ -2463,6 +2972,7 @@ if(is_accordion == '1')
 
  /* ======= Ad Location ======= */
  if ($('#lat').length > 0) {
+       
   var map_type = get_strings.nokri_map_type;
   var lat = $('#lat').val();
   var lon = $('#lon').val();
@@ -2473,7 +2983,11 @@ if(is_accordion == '1')
     attribution: ''
    }).addTo(map);
    L.marker([lat, lon]).addTo(map);
-  } else if (map_type == 'google_map') {
+  } 
+  
+     else if (map_type == 'google_map') {
+         
+        
    var map = "";
    var latlng = new google.maps.LatLng(lat, lon);
    var myOptions = {
@@ -2555,6 +3069,11 @@ if(is_accordion == '1')
     $('#job_tags').tagEditor({
      placeholder: get_strings.select_jobs_tags,
      removeDuplicates: false,
+	 language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    }
+  }
     });
     if ($('#is_category_based').val() == 1) {
      sbDropzone_custom();
@@ -2675,7 +3194,8 @@ if ($('#emp-job-post').length > 0) {
      is_update: $('#is_update').val(),
     }).done(function(response) {
      $('.cp-loader').hide();
-     if ($.trim(response) == "2") {
+     if ($.trim(response) == "2")
+	  {
       toastr.warning($('#demo_mode').val(), '', {
        timeOut: 2500,
        "closeButton": true,
@@ -2683,13 +3203,24 @@ if ($('#emp-job-post').length > 0) {
       });
       $('#job_post').show();
       $('#job_proc').hide();
-     } else if ($.trim(response) == "0") {
+     } 
+	 else if ($.trim(response) == "0") {
       toastr.error($('#job_post_error').val(), '', {
        timeOut: 2500,
        "closeButton": true,
        "positionClass": "toast-top-right"
       });
-     } else {
+     } 
+	 else if ($.trim(response) == "3") {
+      toastr.error($('#only_admin').val(), '', {
+       timeOut: 2500,
+       "closeButton": true,
+       "positionClass": "toast-top-right"
+      });
+	  $('#job_post').show();
+      $('#job_proc').hide();
+     } 
+	 else {
       toastr.success($('#nokri_emp_job_post').val(), '', {
        timeOut: 2500,
        "closeButton": true,
@@ -2738,9 +3269,12 @@ if ($('#emp-job-post').length > 0) {
      $('#third_level').hide();
      $('#forth_level').hide();
     }
-    /*For Category Templates*/
-    getCustomTemplate(nokri_ajax_url, $("#job_cat").val(), $("#is_update").val(), true);
-    /*For Category Templates*/
+	if(get_strings.is_cat_temp == '1')
+	{
+		/*For Category Templates*/
+		getCustomTemplate(nokri_ajax_url, $("#job_cat").val(), $("#is_update").val(), true);
+		/*For Category Templates*/
+	}
    });
   });
 
@@ -2759,10 +3293,12 @@ if ($('#emp-job-post').length > 0) {
     } else {
      $('#third_level').hide();
      $('#forth_level').hide();
-    }
-    /*For Category Templates*/
-    getCustomTemplate(nokri_ajax_url, $("#job_cat").val(), $("#is_update").val(), true);
-    /*For Category Templates*/
+    }if(get_strings.is_cat_temp == '1')
+	{
+		/*For Category Templates*/
+		getCustomTemplate(nokri_ajax_url, $("#job_cat").val(), $("#is_update").val(), true);
+		/*For Category Templates*/
+	}
    });
   });
 
@@ -2782,9 +3318,12 @@ if ($('#emp-job-post').length > 0) {
     } else {
      $('#forth_level').hide();
     }
-    /*For Category Templates*/
-    getCustomTemplate(nokri_ajax_url, $("#job_cat").val(), $("#is_update").val(), true);
-    /*For Category Templates*/
+	if(get_strings.is_cat_temp == '1')
+	{
+		/*For Category Templates*/
+		getCustomTemplate(nokri_ajax_url, $("#job_cat").val(), $("#is_update").val(), true);
+		/*For Category Templates*/
+	}
    });
   });
 
@@ -2824,6 +3363,11 @@ if ($('#emp-job-post').length > 0) {
      placeholder: get_strings.template_select,
      allowClear: true,
      maximumSelectionLength: 5,
+	 language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    }
+  }
     });
     $("#myModalaction").modal("show");
     $('.email-status').hide();
@@ -2845,6 +3389,10 @@ if ($('#emp-job-post').length > 0) {
      submit_cv_data: $("form#submit_cv_form1").serialize(),
     }).done(function(response) {
      $('.cp-loader').hide();
+     if($.trim(response) == '4'){
+         
+         alert("4");
+     }
      if ($.trim(response) == '1') {
       $.dialog({
        title: get_strings.success,
@@ -2920,6 +3468,8 @@ if ($('#emp-job-post').length > 0) {
    action: 'sending_email',
    email_data: $("form#email_template_action").serialize(),
   }).done(function(response) {
+      
+     
    $('.cp-loader').hide();
    if ($.trim(response) == '1') {
     $.dialog({
@@ -2932,7 +3482,7 @@ if ($('#emp-job-post').length > 0) {
      type: 'blue',
     });
     setTimeout(function() {
-     //location.reload();
+     location.reload();
     }, 2000);
    } else if ($.trim(response) == '2') {
     toastr.warning($('#demo_mode').val(), '', {
@@ -2961,6 +3511,7 @@ if ($('#emp-job-post').length > 0) {
    action: 'save_my_job',
    job_id: job_id,
   }).done(function(response) {
+     
    $('.cp-loader').hide();
    if ($.trim(response) == "1") {
     toastr.success($('#saved_job_success').val(), '', {
@@ -3093,7 +3644,12 @@ if ($('#emp-job-post').length > 0) {
       });
      }
     },
-    close: function() {}
+    cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
+            }
+        },
    }
   });
  });
@@ -3109,7 +3665,7 @@ if ($('#emp-job-post').length > 0) {
    type: 'red',
    buttons: {
     tryAgain: {
-     text: 'Confirm',
+     text: get_strings.btn_cnfrm,
      btnClass: 'btn-red',
      action: function() {
       $('.cp-loader').show();
@@ -3145,7 +3701,7 @@ if ($('#emp-job-post').length > 0) {
       });
      }
     },
-    close: function() {}
+    somethingElse: { text: get_strings.btn_cancel,action: function(){}}
    }
   });
  });
@@ -3162,7 +3718,7 @@ if ($('#emp-job-post').length > 0) {
    type: 'red',
    buttons: {
     tryAgain: {
-     text: 'Confirm',
+     text: get_strings.btn_cnfrm,
      btnClass: 'btn-red',
      action: function() {
       $('.cp-loader').show();
@@ -3198,7 +3754,7 @@ if ($('#emp-job-post').length > 0) {
       });
      }
     },
-    close: function() {}
+    somethingElse:{text: get_strings.btn_cancel,action: function(){}}
    }
   });
  });
@@ -3239,7 +3795,7 @@ if ($('#emp-job-post').length > 0) {
      "positionClass": "toast-top-right"
     });
    } else if ($.trim(response) == "5") {
-    toastr.success($('#resume_save_success').val(), '', {
+    toastr.success($('#emp_resume_save').val(), '', {
      timeOut: 2500,
      "closeButton": true,
      "positionClass": "toast-top-right"
@@ -3473,9 +4029,12 @@ if ($('#emp-job-post').length > 0) {
       });
      }
     },
-    close: function() {
-     $('.cp-loader').hide();
-    }
+    cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
+            }
+        },
    }
   });
  });
@@ -3508,7 +4067,6 @@ if ($('#emp-job-post').length > 0) {
 
 
  /* Employer Activating/InActivating Job */
-
  $(".inactive_job").on("click", function() {
   var job_id = $(this).attr("data-value");
   var job_status = $(this).attr('id');
@@ -3562,9 +4120,12 @@ if ($('#emp-job-post').length > 0) {
       });
      }
     },
-    close: function() {
-     $('.cp-loader').hide();
-    }
+	cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
+            }
+        },
    }
   });
  });
@@ -3591,8 +4152,7 @@ if ($('#emp-job-post').length > 0) {
     $('#ad_cat_sub_sub_div').hide();
     $('#ad_country_sub_sub_sub_div').hide();
    } else {
-
-
+  
     $('#ad_country_sub_sub_div').hide();
     $('#ad_country_sub_div').hide();
     $('#ad_cat_sub_sub_div').hide();
@@ -3713,6 +4273,9 @@ if ($('#emp-job-post').length > 0) {
  });
 
 
+
+
+
  /* user change password */
  $('.cand_pass_pro').hide();
  $('.change_password').click(
@@ -3726,7 +4289,7 @@ if ($('#emp-job-post').length > 0) {
     password_data: $("form#change_password").serialize(),
    }).done(function(response) {
     $('.cp-loader').hide();
-    $('.cand_pass_pro').hide();
+	$('.cand_pass_pro').hide();
     $('.change_password').show();
     if ($.trim(response) == '0') {
      toastr.error($('#old_password_miss').val(), '', {
@@ -3764,12 +4327,7 @@ if ($('#emp-job-post').length > 0) {
   });
 
 
-
-
-
-
- /* user del acount */
-
+/* user del acount */
  $(".del_acount").on("click", function() {
   $.confirm({
    animationBounce: 1.5,
@@ -3813,9 +4371,12 @@ if ($('#emp-job-post').length > 0) {
       });
      }
     },
-    close: function() {
-     $('.cp-loader').hide();
-    }
+    cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
+            }
+        },
    }
   });
  });
@@ -3870,6 +4431,46 @@ if ($('#emp-job-post').length > 0) {
 
  });
 
+
+$('.cand-view-prof').on('click',function(){
+ 
+   var canStatus = $(this).data('cand_status');
+   var canID     = $(this).data('cand_id');
+   var jobID     = $(this).data('job_id');
+   
+    
+   
+  if(canStatus == '0'){
+  
+    $.ajax({
+   type: 'POST',
+   url: nokri_ajax_url,
+   data : {
+       action: "can_set_auto_viewed",
+       cand_status : canStatus,
+       cand_id    : canID,
+       job_id     : jobID,
+   },
+   success: function(res) {
+    
+    if(res == '1'){
+     toastr.success(
+    get_strings.cand_status_change, '', {
+      timeOut: 2500,
+      "closeButton": true,
+      "positionClass": "toast-top-right"
+     });
+    location.reload();    
+    }
+   
+   }
+  });
+  }
+
+});
+
+
+ 
 
 
 
@@ -3944,7 +4545,7 @@ function my_g_map(markers1) {
 
 
  (function(marker, data) {
-
+ 
   google.maps.event.addListener(marker, "click", function(e) {
    infoWindow.setContent(data.description);
    infoWindow.open(map, marker);
@@ -3952,9 +4553,10 @@ function my_g_map(markers1) {
 
 
   google.maps.event.addListener(marker, "dragend", function(e) {
+
    jQuery('.cp-loader').show();
    //document.getElementById("sb_loading").style.display	= "block";
-   var lat, lng, address;
+   var lat, lng, address; 
    geocoder.geocode({
     "latLng": marker.getPosition()
    }, function(results, status) {
@@ -3974,18 +4576,21 @@ function my_g_map(markers1) {
  latlngbounds.extend(marker.position);
  jQuery(document).ready(function($) {
   $("#your_current_location").click(function() {
+     
    $.ajax({
     url: "https://geoip-db.com/jsonp",
     jsonpCallback: "callback",
     dataType: "jsonp",
     success: function(location) {
+        
+     
      var pos = new google.maps.LatLng(location.latitude, location.longitude);
      my_map.setCenter(pos);
      my_map.setZoom(12);
 
      $("#sb_user_address").val(location.city + ", " + location.state + ", " + location.country_name);
      document.getElementById("ad_map_long").value = location.longitude;
-     document.getElementById("ad_map_long").value = location.longitude;
+     document.getElementById("ad_map_lat").value = location.latitude;
 
      var markers2 = [{
       title: "",
@@ -4029,10 +4634,11 @@ function nokri_textarea_initial(call) {
   title: false,
  });
 }
-
+var eduClick = 0;
 function education_fields() {
  "use strict";
-
+ eduClick +=1;
+ 
  var my_Divs = Math.floor((Math.random() * 1000000000) + 1);
  var room = my_Divs + 1;
  var end_date_class = my_Divs + 2;
@@ -4041,9 +4647,51 @@ function education_fields() {
  var date_class = 'date-here-' + room;
  divtest.setAttribute("class", "form-group removeclass_edu" + room);
  var rdiv = 'removeclass_edu' + (room);
+ /* Institute name */
+ var inst     = get_strings.quali_inst;
+ if(inst)
+ {
+	 var inst_html = '<div class="col-md-6 col-sm-6"><div class="form-group"><label>'+get_strings.inst_title+'</label><input type="text"  placeholder="'+ get_strings.inst_plc+'" name="cand_education[\'degree_institute\'][]" class="form-control" '+get_strings.inst_req+'></div></div>';
+ }
+ else  { var inst_html = ''; }
+ /* Start date */
+ var s_date = get_strings.s_date;
+ if(s_date)
+ {
+	 var s_date_html = '<div class="col-md-6 col-xs-12 col-sm-6"><div class="form-group"><label class="">'+get_strings.sdate_title + '</label><input type="text" '+get_strings.sdate_req+' name="cand_education[\'degree_start\'][]" class="'+date_class+' form-control"/></div></div>';
+ }
+ else  { var s_date_html = ''; }
+ /* End date */
+ var e_date = get_strings.e_date;
+ if(e_date)
+ {
+	 var e_date_html = '<div class="col-md-6 col-xs-12 col-sm-6"> <div class="form-group"><label class="">' + get_strings.edate_title + '</label><input type="text" '+get_strings.edate_req+'  name="cand_education[\'degree_end\'][]" class="' + end_date_class + ' form-control"/></div></div>';
+ }
+ else  { var e_date_html = ''; }
+ /* Percentage */
+ var percentage = get_strings.percent;
+ if(percentage)
+ {
+	 var percentage_html = '<div class="col-md-6 col-sm-6"> <div class="form-group"> <label>' + get_strings.perc_title + '</label> <input type="text"  placeholder="' + get_strings.perc_plc + '" name="cand_education[\'degree_percent\'][]" class="form-control" '+get_strings.perc_req+'> </div></div>';
+ }
+ else  { var percentage_html = ''; }
+ /* Grades */
+ var grades = get_strings.grade;
+ if(grades)
+ {
+	 var grades_html = '<div class="col-md-6 col-sm-6"> <div class="form-group"> <label>' + get_strings.grad_title + '</label> <input type="text" placeholder="' + get_strings.grad_plc + '"  name="cand_education[\'degree_grade\'][]" class="form-control" '+get_strings.grad_req+'></div></div>';
+ }
+ else  { var grades_html = ''; }
+ /* Description */
+ var desc = get_strings.desc;
+ if(desc)
+ {
+	 var desc_html = '<div class="col-md-12 col-sm-12 col-xs-12"><div class="form-group"><label>'+ get_strings.desc_title + '</label><textarea rows="6" '+get_strings.desc_req+' class="form-control rich_textarea" name="cand_education[\'degree_detail\'][]" id="ad_description"></textarea></div></div>';
+ }
+ else  { var desc_html = ''; }
+ 
 
-
- divtest.innerHTML = '<div class= "removeclass_edu"><div class= "ad-more-box-single"><div class="col-md-12 col-sm-12"><h4 class="dashboard-heading">' + get_strings.deghead + '</h4></div><div class="col-md-6 col-sm-6"> <div class="form-group"> <label>' + get_strings.degtitle + '<span class="required">*</span></label> <input type="text"  placeholder="' + get_strings.degtitle + '" name="cand_education[\'degree_name\'][]" class="form-control"></div></div><div class="col-md-6 col-sm-6"> <div class="form-group"> <label>' + get_strings.deginsti + '<span class="required">*</span></label> <input type="text"  placeholder="' + get_strings.deginsti + '" name="cand_education[\'degree_institute\'][]" class="form-control"></div></div><div class="col-md-6 col-xs-12 col-sm-6"> <div class="form-group"><label class="">' + get_strings.degstart + '</label><input type="text"  name="cand_education[\'degree_start\'][]" class="' + date_class + ' form-control" /></div></div><div class="col-md-6 col-xs-12 col-sm-6"> <div class="form-group"><label class="">' + get_strings.degend + '</label><input type="text"  name="cand_education[\'degree_end\'][]" class="' + end_date_class + ' form-control"/></div></div><div class="col-md-6 col-sm-6"> <div class="form-group"> <label>' + get_strings.degpercnt + '<span class="required">*</span></label> <input type="text"  placeholder="' + get_strings.degpercntplc + '" name="cand_education[\'degree_percent\'][]" class="form-control"> </div></div><div class="col-md-6 col-sm-6"> <div class="form-group"> <label>' + get_strings.deggrad + '<span class="required">*</span></label> <input type="text" placeholder="' + get_strings.deggradplc + '"  name="cand_education[\'degree_grade\'][]" class="form-control"> </div></div><div class="col-md-12 col-sm-12 col-xs-12"> <div class="form-group"> <label>' + get_strings.degdesc + '</label> <textarea rows="6"  class="form-control rich_textarea" name="cand_education[\'degree_detail\'][]" id="ad_description"></textarea> </div></div><div class="input-group-btn remove-btn"><button class="btn btn-danger" type="button" onclick="remove_education_fields(' + room + ');" data-remove-type="' + room + '"> <span class="ti-minus" aria-hidden="true"></span>' + get_strings.degremov + '</button></div></div><div class="clearfix"></div></div>';
+ divtest.innerHTML = '<div class= "removeclass_edu"><div class= "ad-more-box-single"><div class="col-md-12 col-sm-12"><h4 class="dashboard-heading">' + get_strings.deghead + " " + eduClick + '</h4></div><div class="col-md-6 col-sm-6"><div class="form-group"><label>' + get_strings.degtitle + '<span class="required">*</span></label><input type="text"  placeholder="' + get_strings.deg_plc + '" name="cand_education[\'degree_name\'][]" class="form-control" '+get_strings.deg_req+'></div></div>'+inst_html +''+s_date_html+''+e_date_html+''+percentage_html+''+grades_html+''+desc_html+'<div class="input-group-btn remove-btn"><button class="btn btn-danger" type="button" onclick="remove_education_fields(' + room + ');" data-remove-type="' + room + '"> <span class="ti-minus" aria-hidden="true"></span>' + get_strings.degremov + '</button></div></div><div class="clearfix"></div></div>';
  objTo.appendChild(divtest);
 
  nokri_get_date_picker_start('months', date_class, 'MM yyyy', end_date_class);
@@ -4065,14 +4713,18 @@ function remove_education_fields(rid) {
      jQuery('.removeclass_edu' + rid).remove();
     }
    },
-   close: function() {}
+   cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
+            }
+        },
   }
  });
 }
 
 /*-- Add More Professional Projects --*/
 var room = 1;
-
 function nokri_textarea_initial(call) {
  call = typeof call !== 'undefined' ? call : '';
  $('button[data-remove-type=' + call + '] ').parent().parent().closest('div').find(".rich_textarea").jqte({
@@ -4099,25 +4751,49 @@ function nokri_textarea_initial(call) {
  });
 }
 
-
+var profclick = 0;
 function professional_fields() {
  "use strict";
-
-
+ profclick +=1;
  var my_Divs = Math.floor((Math.random() * 1000000000) + 1);
  var room = my_Divs + 1;
  var end_date_class = my_Divs + 2;
-
  var objTo = document.getElementById('professional_fields');
  var divtest = document.createElement("div");
-
  divtest.setAttribute("class", "form-group removeclass_pro" + room);
  var rdiv = 'removeclass_pro' + room;
-
  var date_class_pro = 'date-here-pro' + room;
+ /* Your Role */
+ var role     = get_strings.prof_role;
+ if(role)
+ {
+	 var role_html = '<div class="col-md-6 col-sm-12"><div class="form-group"><label>' + get_strings.role_title + '</label><input type="text"   placeholder="' + get_strings.role_plc + '" name="cand_profession[\'project_role\'][]" class="form-control" '+get_strings.role_req+'></div></div>';
+ }
+ else  { var role_html = ''; }
+ /* Start date */
+ var s_date = get_strings.strt_show;
+ if(s_date)
+ {
+	 var s_date_html = '<div class="col-md-6 col-xs-12 col-sm-6"><div class="form-group"><label class="">' + get_strings.strt_title + '</label><input type="text" '+get_strings.strt_req+'  name="cand_profession[\'project_start\'][]" class="' + date_class_pro + '  form-control" /></div></div>';
+ }
+ else  { var s_date_html = ''; }
+ /* End date */
+ var e_date = get_strings.edate_show;
+ if(e_date)
+ {
+	 var e_date_html = '<div class="col-md-6 col-xs-12 col-sm-6"><div class="form-group"><label class="">' + get_strings.edate_title + '</label><input type="text"  name="cand_profession[\'project_end\'][]" class="' + end_date_class + '  form-control end-hide"  /><input type="hidden"  value="0" name="cand_profession[\'project_name\'][]"  class="checked-input-hide" /><input type="checkbox" name="checked"  class="icheckbox_minimal control-class-' + room + '">' + get_strings.edate_curr + '</div></div>';
+ }
+ else  { var e_date_html = ''; }
+ /* Description */
+ var desc = get_strings.desc_show;
+ if(desc)
+ {
+	 var desc_html = '<div class="col-md-12 col-sm-12 col-xs-12"><div class="form-group"><label>' + get_strings.desc_title + '</label><textarea rows="6"  class="form-control rich_textarea" name="cand_profession[\'project_desc\'][]" id="ad_description"></textarea></div></div>';
+ }
+ else  { var desc_html = ''; }
+ 
 
-
- divtest.innerHTML = '<div class= "ad-more-box-single"><div class="col-md-12 col-sm-12"><h4 class="dashboard-heading">' + get_strings.projthead + '(' + get_strings.new_btn + ')</h4></div><div class="col-md-6 col-sm-12"><div class="form-group"><label>' + get_strings.projorg + '<span class="required">*</span></label><input type="text"  placeholder="' + get_strings.projorg + '" name="cand_profession[\'project_organization\'][]" class="form-control"></div></div><div class="col-md-6 col-sm-12"><div class="form-group"><label>' + get_strings.projdesign + '<span class="required">*</span></label><input type="text"   placeholder="' + get_strings.projdesign + '" name="cand_profession[\'project_role\'][]" class="form-control"></div></div><div class="col-md-6 col-xs-12 col-sm-6"><div class="form-group"><label class="">' + get_strings.projstrt + '</label><input type="text"   name="cand_profession[\'project_start\'][]" class="' + date_class_pro + '  form-control" /></div></div><div class="col-md-6 col-xs-12 col-sm-6"><div class="form-group"><label class="">' + get_strings.projend + '</label><input type="text"  name="cand_profession[\'project_end\'][]" class="' + end_date_class + '  form-control end-hide"  /><input type="hidden"  value="0" name="cand_profession[\'project_name\'][]"  class="checked-input-hide" /><input type="checkbox" name="checked"  class="icheckbox_minimal control-class-' + room + '">' + get_strings.projtitle + '</div></div><div class="col-md-12 col-sm-12 col-xs-12"><div class="form-group"><label>' + get_strings.projdesc + '</label><textarea rows="6"  class="form-control rich_textarea" name="cand_profession[\'project_desc\'][]" id="ad_description"></textarea></div></div></div></div><div class="input-group-btn remove-btn"><button class="btn btn-danger" type="button" onclick="remove_professional_fields(' + room + ');" data-remove-type="' + room + '"> <span class="ti-minus" aria-hidden="true"></span>' + get_strings.degremov + '</button></div></div></div><div class="clearfix"></div></div></div>';
+divtest.innerHTML = '<div class= "ad-more-box-single"><div class="col-md-12 col-sm-12"><h4 class="dashboard-heading">' + get_strings.prof_head +" "+ profclick + '</h4></div><div class="col-md-6 col-sm-12"><div class="form-group"><label>' + get_strings.org_title + '<span class="required">*</span></label><input type="text"  placeholder="' + get_strings.org_plc + '" name="cand_profession[\'project_organization\'][]" class="form-control" '+get_strings.org_req+'></div></div>'+role_html+''+s_date_html+''+e_date_html+''+desc_html+'</div></div><div class="input-group-btn remove-btn"><button class="btn btn-danger" type="button" onclick="remove_professional_fields(' + room + ');" data-remove-type="' + room + '"> <span class="ti-minus" aria-hidden="true"></span>' + get_strings.prof_remov + '</button></div></div></div><div class="clearfix"></div></div></div>';
 
 
  objTo.appendChild(divtest);
@@ -4145,7 +4821,12 @@ function remove_professional_fields(rid) {
      jQuery('.removeclass_pro' + rid).remove();
     }
    },
-   close: function() {}
+   cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
+            }
+        },
   }
  });
 }
@@ -4180,9 +4861,10 @@ function nokri_textarea_initial(call) {
  });
 }
 
+var cerClick = 0;
 function certification_fields() {
  "use strict";
-
+ cerClick +=1; 
  var my_Divs = Math.floor((Math.random() * 1000000000) + 1);
  var room = my_Divs + 1;
  var end_date_class = my_Divs + 2;
@@ -4190,14 +4872,52 @@ function certification_fields() {
  var divtest = document.createElement("div");
  divtest.setAttribute("class", "form-group removeclass_cert" + room);
  var rdiv = 'removeclass_cert' + room;
-
  var date_class_certi = 'date-here-certi' + room;
-
-
- divtest.innerHTML = '<div class= "ad-more-box-single"><div class="col-md-12 col-sm-12"><h4 class="dashboard-heading">' + get_strings.certhead + '(' + get_strings.new_btn + ')</h4></div><div class="col-md-12 col-sm-12"><div class="form-group"><label>' + get_strings.certtitle + '<span class="required">*</span></label> <input type="text" placeholder="' + get_strings.certtitle + '"  name="cand_certifications[\'certification_name\'][]" class="form-control"> </div></div><div class="col-md-6 col-xs-12 col-sm-6"> <div class="form-group"><label class="">' + get_strings.certstrt + '</label><input type="text"  name="cand_certifications[\'certification_start\'][]" class="' + date_class_certi + ' form-control" /></div></div><div class="col-md-6 col-xs-12 col-sm-6"> <div class="form-group"><label class="">' + get_strings.certend + '</label><input type="text"  name="cand_certifications[\'certification_end\'][]" class="' + end_date_class + ' form-control" /></div></div><div class="col-md-6 col-sm-12"> <div class="form-group"> <label>' + get_strings.certdur + '<span class="required">*</span></label> <input type="text"  placeholder="' + get_strings.certdur + '" name="cand_certifications[\'certification_duration\'][]" class="form-control"> </div></div><div class="col-md-6 col-sm-12"> <div class="form-group"> <label>' + get_strings.certinst + '<span class="required">*</span></label> <input type="text"   placeholder="' + get_strings.certinst + '" name="cand_certifications[\'certification_institute\'][]" class="form-control"> </div></div><div class="col-md-12 col-sm-12 col-xs-12"> <div class="form-group"> <label>' + get_strings.certdesc + '</label> <textarea rows="6" class="form-control rich_textarea"  name="cand_certifications[\'certification_desc\'][]" id="certification_description"></textarea> </div></div><div class="input-group-btn remove-btn"><button class="btn btn-danger" type="button" onclick="remove_certification_fields(' + room + ');" data-remove-type="' + room + '"> <span class="ti-minus" aria-hidden="true"></span>' + get_strings.degremov + '</button></div></div></div><div class="clearfix"></div></div></div>';
-
+ /* Start date */
+ var s_date = get_strings.certi_sdate_show;
+ if(s_date)
+ {
+	 var s_date_html = '<div class="col-md-6 col-xs-12 col-sm-6"> <div class="form-group"><label class="">' + get_strings.certstrt + '</label><input type="text"  name="cand_certifications[\'certification_start\'][]" class="' + date_class_certi + ' form-control" /></div></div>';
+ }
+ else  { var s_date_html = ''; }
+ /* End date */
+ var e_date = get_strings.edate_show;
+ if(e_date)
+ {
+	 var e_date_html = '<div class="col-md-6 col-xs-12 col-sm-6"> <div class="form-group"><label class="">' + get_strings.certend + '</label><input type="text"  name="cand_certifications[\'certification_end\'][]" class="' + end_date_class + ' form-control" /></div></div>';
+ }
+ else  { var e_date_html = ''; }
+ /* End date */
+ var e_date = get_strings.edate_show;
+ if(e_date)
+ {
+	 var e_date_html = '<div class="col-md-6 col-xs-12 col-sm-6"> <div class="form-group"><label class="">' + get_strings.certend + '</label><input type="text"  name="cand_certifications[\'certification_end\'][]" class="' + end_date_class + ' form-control" /></div></div>';
+ }
+ else  { var e_date_html = ''; }
+ /* Duration */
+ var dur = get_strings.certi_dur_show;
+ if(dur)
+ {
+	 var dur_html = '<div class="col-md-6 col-sm-12"><div class="form-group"> <label>'+get_strings.certi_dur_title+'</label> <input type="text"  placeholder="' + get_strings.certi_dur_plc + '" name="cand_certifications[\'certification_duration\'][]" class="form-control" '+get_strings.certi_dur_req+'></div></div>'; 
+ }
+ else  { var dur_html = ''; }
+ /* Institute Name */
+ var inst = get_strings.certi_inst_show;
+ if(inst)
+ {
+	 var inst_html = '<div class="col-md-6 col-sm-12"><div class="form-group"><label>' + get_strings.certi_inst_title+'</label><input type="text"   placeholder="'+get_strings.certi_inst_plc+'" name="cand_certifications[\'certification_institute\'][]" class="form-control" '+get_strings.certi_inst_req+'></div></div>';
+ }
+ else  { var inst_html = ''; }
+ /* DESC */
+ var desc = get_strings.desc_show;
+ if(desc)
+ {
+	 var desc_html = '<div class="col-md-12 col-sm-12 col-xs-12"><div class="form-group"><label>' + get_strings.desc_title + '</label><textarea rows="6" class="form-control rich_textarea" name="cand_certifications[\'certification_desc\'][]" id="certification_description"></textarea></div></div>';
+ }
+ else  { var _html = ''; }
+ 
+divtest.innerHTML = '<div class="ad-more-box-single"><div class="col-md-12 col-sm-12"><h4 class="dashboard-heading">' +   get_strings.cert_head +" "+ cerClick + '</h4></div><div class="col-md-12 col-sm-12"><div class="form-group"><label>' + get_strings.certi_title+'<span class="required">*</span></label><input type="text" placeholder="' + get_strings.certi_plc + '"  name="cand_certifications[\'certification_name\'][]" class="form-control"></div></div>'+s_date_html+''+e_date_html+''+dur_html+''+inst_html+''+desc_html+'<div class="input-group-btn remove-btn"><button class="btn btn-danger" type="button" onclick="remove_certification_fields(' + room + ');" data-remove-type="' + room + '"> <span class="ti-minus" aria-hidden="true"></span>' + get_strings.degremov + '</button></div></div></div><div class="clearfix"></div></div></div>';
  objTo.appendChild(divtest);
-
  //nokri_get_date_picker('months', date_class_certi, 'MM yyyy');
  nokri_get_date_picker_start('months', date_class_certi, 'MM yyyy', end_date_class);
  nokri_textarea_initial(room);
@@ -4219,7 +4939,12 @@ function remove_certification_fields(rid) {
      jQuery('.removeclass_cert' + rid).remove();
     }
    },
-   close: function() {}
+   cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
+            }
+        },
   }
  });
 }
@@ -4237,6 +4962,7 @@ jQuery(document).ready(function() {
   trigger: 'hover',
  });
  nokri_get_date_picker_dob('days', 'datepicker-cand-dob', 'mm/dd/yyyy');
+ nokri_get_date_picker_custom('days', 'datepicker-custom-feilds', 'mm/dd/yyyy');
  nokri_get_date_picker_job_post('days', 'datepicker-job-post', 'mm/dd/yyyy');
 });
 
@@ -4411,6 +5137,29 @@ function nokri_get_date_picker_dob(c_view, apl_class, date_format, end_class) {
 
 }
 
+function nokri_get_date_picker_custom(c_view, apl_class, date_format, end_class) {
+ $('.' + apl_class).datepicker({
+  view: c_view,
+  minView: c_view,
+  dateFormat: date_format,
+  //maxDate: new Date(),
+  language: {
+   days: [get_strings.Sunday, get_strings.Monday, get_strings.Tuesday, get_strings.Wednesday, get_strings.Thursday, get_strings.Friday, get_strings.Saturday],
+   daysShort: [get_strings.Sun, get_strings.Mon, get_strings.Tue, get_strings.Wed, get_strings.Thu, get_strings.Fri, get_strings.Sat],
+   daysMin: [get_strings.Su, get_strings.Mo, get_strings.Tu, get_strings.We, get_strings.Th, get_strings.Fr, get_strings.Sa],
+   months: [get_strings.January, get_strings.February, get_strings.March, get_strings.April, get_strings.May, get_strings.June, get_strings.July, get_strings.August, get_strings.September, get_strings.October, get_strings.November, get_strings.December],
+   monthsShort: [get_strings.Jan, get_strings.Feb, get_strings.Mar, get_strings.Apr, get_strings.May, get_strings.Jun, get_strings.Jul, get_strings.Aug, get_strings.Sep, get_strings.Oct, get_strings.Nov, get_strings.Dec],
+   today: get_strings.Today,
+   clear: get_strings.Clear,
+   timeFormat: 'hh:ii aa',
+   firstDay: 0
+  },
+ });
+
+
+}
+
+
 function nokri_get_date_picker_job_post(c_view, apl_class, date_format) {
 	$('.' + apl_class).datepicker({
 		view: c_view,
@@ -4492,3 +5241,4 @@ $(window).on('load', function() {
 
  }
 });
+

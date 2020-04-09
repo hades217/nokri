@@ -17,44 +17,29 @@ function nokri_getMenuItemsData($item_id, $item, $menu_level = 1, $show_indicato
 		$data['menu_classes'] = get_post_meta($metaID, '_menu_item_is_megamenu_class', true);
 		$data['megamenu_cols'] = get_post_meta($metaID, '_menu_item_is_megamenu', true);
 		$data['megamenu_open_side'] = get_post_meta($metaID, '_menu_item_menu_open_side', true);
-		
 		$data['megamenu_simple_offset'] = get_post_meta($metaID, '_menu_item_menu_simple_offset', true);
 		$data['megamenu_vertical_offset'] = get_post_meta($metaID, '_menu_item_menu_vertical_offset', true);
-		
-		
-				
-
-	
 		$menu_icon = $data['menu_icons'];
-		
 		$attributes  = ! empty( $item->attr_title ) ? ' title="'  . esc_attr( $item->attr_title ) .'"' : '';
 		$attributes .= ! empty( $item->target )     ? ' target="' . esc_attr( $item->target     ) .'"' : '';
 		$attributes .= ! empty( $item->xfn )        ? ' rel="'    . esc_attr( $item->xfn        ) .'"' : '';
 		$attributes .= ! empty( $item->url )        ? ' href="'   . esc_attr( $item->url        ) .'"' : '';		
 		$menu_title = apply_filters( 'the_title', $item->title, $item->ID );
-		
 		$lebel_color = $data['lebel_color'] != "" ? $data['lebel_color'] : '';
 		$lebel_text  = $data['lebel_text'] != "" ? $data['lebel_text'] : '';
-		
 		$lebel_html = '';
 		if( $lebel_text != "" )
 		{
 			$bg_img = "\\s\\t\\y\\l\\e ='background-color: $lebel_color'";
 			$lebel_html = '<span class="label ml-10" '. str_replace('\\',"",$bg_img) .'>'.esc_html($lebel_text).'</span>';	
 		}
-		
-		
 		$menu = '';
 		$item_data['has_parent'] = ($data['is_parent']  > 0 ) ? 'yes'  : 'no';
 		$item_data['cols']  	 = ($data['megamenu_cols'] != "") ? $data['megamenu_cols'] : '';
 		$item_data['megamenu_menu_title'] = $item->title;
-		
 		$item_data['megamenu_open_side'] = ($data['megamenu_open_side'] == 'left-side' ) ? 'left-side'  : '';
-		
 		$item_data['megamenu_simple_offset'] = ((isset($data['megamenu_simple_offset'])) && $data['megamenu_simple_offset'] != '' ) ? $data['megamenu_simple_offset']  : '';
 		$item_data['megamenu_vertical_offset'] = ((isset($data['megamenu_simple_offset'])) && $data['megamenu_vertical_offset'] != '' ) ? $data['megamenu_vertical_offset']  : '';
-		
-		
 		$menu_classes = '';
 		if( $data['menu_classes'] == "mega-menu" )
 		{
@@ -153,6 +138,14 @@ if ( ($theme_location) && ($locations = get_nav_menu_locations()) && isset($loca
 		$menu_items = wp_get_nav_menu_items($menu->term_id);
 		foreach( $menu_items as $item )
 		{
+			if($item->object == 'wpml_ls_menu_item')
+			{
+				continue;
+			}
+		}
+		
+		foreach( $menu_items as $item )
+		{
 			if( $item->menu_item_parent == 0 )
 			{	
 				$level1 = 1;
@@ -234,7 +227,11 @@ else
 {
  $menu_html .= '<li><a href="'.esc_url( home_url('/') ).'">'.esc_html__("Home", "nokri").'</a></li>'; 
 }
-echo($menu_html);
+//echo($menu_html);
+
+echo nokri_wpml_nav_menu_callback($menu_html,$theme_location);
+
+
 }
 }
 
@@ -504,4 +501,42 @@ function nokriMenu_item_additional_fields( $fields ) {
 		
 	return $fields;
 }
+}
+
+function nokri_wpml_nav_menu_callback($menu_html = '', $theme_location) 
+{
+        $nokri_theme = false;
+        if (class_exists('Redux')) {
+            $nokri_theme = Redux::getOption('nokri', 'nokri_display_wpml_in_nav');
+        }
+        if (function_exists('icl_object_id') && $nokri_theme) {
+            if (($theme_location) && ($locations = get_nav_menu_locations()) && isset($locations[$theme_location])) {
+                $menu = get_term($locations[$theme_location], 'nav_menu');
+				if (isset($menu->term_id)) {
+                    $menu_items = wp_get_nav_menu_items($menu->term_id);
+                    $menu_position = 'end';
+                    if (isset($menu_items[0]) && $menu_items[0]->object == 'wpml_ls_menu_item') {
+                        $menu_position = 'start';
+                    }
+                    $wpml_menu_html = '';
+                    ob_start();
+                    $wpml_menu_html .= '<li class="hoverTrigger sb-wpml">';
+                    do_action('wpml_add_language_selector');
+                    $wpml_menu_html .= ob_get_contents();
+                    $wpml_menu_html .= '</li>';
+                    ob_end_clean();
+                    $final_menu = '';
+                    if ($menu_position == 'start') {
+                        $menu_html = $wpml_menu_html . $menu_html;
+                    } else {
+                        $menu_html = $menu_html . $wpml_menu_html;
+                    }
+                    return $menu_html;
+                }
+            }
+        } 
+		else 
+		{
+            return $menu_html;
+        }
 }

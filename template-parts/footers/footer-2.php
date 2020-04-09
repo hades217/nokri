@@ -26,7 +26,7 @@ $apple_store_heading = isset($nokri['apple_store_heading']) ? '<h5>'.$nokri['app
 $apple_store_link = isset($nokri['apple_store_link']) ? $nokri['apple_store_link'] :  '';
 /* is show app section */
 $is_show_app_section = isset($nokri['is_show_app_section']) ? $nokri['is_show_app_section'] :  '';
-$app_section_col = '<div class="col-sm-10 col-md-9 col-lg-9 no-app-section">';
+$app_section_col = '<div class="col-sm-10 col-md-9 col-lg-9 col-xs-12 no-app-section">';
 if($is_show_app_section)
 {
 	$app_section_col = '<div class="col-sm-6 col-md-5 col-lg-5 col-xs-12">';
@@ -50,7 +50,7 @@ if((isset($nokri['footer_full'])) && $nokri['footer_full'] == 1)
 					else {
 					$footerlogo = '<img class="img-responsive footer-logo" src="'.get_template_directory_uri().'/images/logo-white.png" alt="'.esc_attr__("logo", "nokri").'" >';
 					}
-					echo ($footerlogo). nokri_social_footer_sorter(); ?>
+					echo ($footerlogo). nokri_social_footer_sorter('n-social-bar'); ?>
                   </div>
                </div>
                <?php echo $app_section_col; ?>
@@ -106,4 +106,4 @@ if((isset($nokri['footer_full'])) && $nokri['footer_full'] == 1)
          </div>
          <?php }    ?>
       </section>    
-<?php } ?>       
+<?php }

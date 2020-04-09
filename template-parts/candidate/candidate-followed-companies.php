@@ -22,7 +22,6 @@ if(isset($_GET['comp_order']))
                 <input type="text" name="comp_title" value="<?php echo esc_html($company_name); ?>"  class="form-control" placeholder="<?php echo esc_html__('Keyword or Name', 'nokri' ); ?>">
                  <a href="javascript:void(0)" class="a-btn search_company"><i class="ti-search"></i></a>
             </div>
-            
         </div>
         <div class="col-md-6 col-xs-12 col-sm-6">
             <div class="form-group">
@@ -34,6 +33,7 @@ if(isset($_GET['comp_order']))
                 </select>
             </div>
         </div>
+        <?php echo nokri_form_lang_field_callback(true); ?>
         </form>
     </div>
 </div>
@@ -53,7 +53,7 @@ if(isset($_GET['comp_order']))
 <div class="cp-loader"></div>
  <?php
  $get_result      =  nokri_following_company_ids($current_id);
- if(count( (array) $get_result) != 0)
+if(count( (array) $get_result) != 0)
  {
 // total no of User to display
 $limit = isset( $nokri['user_pagination'] )         ?    $nokri['user_pagination']     :   5;

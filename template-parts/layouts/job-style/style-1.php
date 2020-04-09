@@ -1,6 +1,7 @@
 <?php require trailingslashit( get_template_directory () ) . "/template-parts/layouts/job-style/job-informations.php"; ?>
-<section class="n-single-job">
 
+
+<section class="n-single-job">
          <div class="container">
             <div class="row">
                <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
@@ -14,33 +15,34 @@
                   <div class="n-single-title">
                      <h4><?php the_title(); ?></h4>
                      <ul>
-                        <li> <i class="fa fa-map-marker"></i><?php echo nokri_job_country($job_id); ?></li>
+                        <li><i class="fa fa-folder-open"></i> <?php echo $project; ?></li>
                         <?php if(!empty($job_type)) { ?>
                         <li> <i class="fa fa-hand-o-right"></i><?php echo nokri_job_post_single_taxonomies('job_type', $job_type); ?></li><?php } ?>
                         <li> <i class="fa fa-clock-o"></i><?php echo nokri_time_ago(); ?></li>
-                         <?php if(!empty($job_salary)) { ?>
-                        <li><?php echo nokri_job_post_single_taxonomies('job_currency', $job_currency). " ".nokri_job_post_single_taxonomies('job_salary', $job_salary)." ".'/'. " ".nokri_job_post_single_taxonomies('job_salary_type', $job_salary_type); ?></li>
+                        <?php if(isset($nokri['allow_job_countries']) && $nokri['allow_job_countries']!= 'hide'){ ?>
+                        <li> <i class="fa fa-map-marker"></i><?php echo $countries_last; ?></li>
                         <?php } ?>
                      </ul>
                   </div>
                   <?php echo ($advert_up); ?>
                   <div class="n-single-meta">
                      <ul class="n-single-meta-detail">
+                     <?php if(!empty($job_salary)) { ?>
                         <li>
-                           <small><?php echo esc_html__('Category', 'nokri' ); ?></small>
-                           <strong><a href=""><?php echo esc_html($project); ?></a></strong>
+                           <small><?php echo esc_html__('Salary', 'nokri' ); ?></small>
+                           <strong><?php echo nokri_job_post_single_taxonomies('job_currency', $job_currency). " ".nokri_job_post_single_taxonomies('job_salary', $job_salary)." ".'/'. " ".nokri_job_post_single_taxonomies('job_salary_type', $job_salary_type); ?></strong>
                         </li>
-                        <?php if(!empty($job_shift)) { ?>
+                        <?php } if(!empty($job_shift)) { ?>
                         <li>
                            <small><?php echo nokri_feilds_label('shift_txt',esc_html__( 'Shift', 'nokri' )); ?></small>
                            <strong><?php echo nokri_job_post_single_taxonomies('job_shift', $job_shift); ?></strong>
                         </li>
-                        <?php } ?>
+                        <?php } if(!empty($job_qualifications)) {  ?>
                         <li>
-                           <small><?php echo esc_html__('Posted On', 'nokri' ); ?></small>
-                           <strong><?php echo esc_html($post_date); ?></strong>
+                           <small><?php echo nokri_feilds_label('quali_txt',esc_html__( 'Job Qualifications', 'nokri' )); ?></small>
+                           <strong><?php echo nokri_job_post_single_taxonomies('job_qualifications', $job_qualifications); ?></strong>
                         </li>
-                        <?php if(!empty($job_vacancy)) { ?>
+                        <?php } if(!empty($job_vacancy)) { ?>
                         <li>
                            <small><?php echo nokri_feilds_label('vacancy_txt',esc_html__( 'Number of vacancies', 'nokri' )); ?></small>
                            <strong><?php echo esc_html($job_vacancy)." ".($opening_text); ?></strong>
@@ -56,7 +58,6 @@
                            <strong><?php echo nokri_job_post_single_taxonomies('job_level', $job_level); ?></strong>
                         </li>
                         <?php } 
-						
 						/* Dynamic feilds*/
 						if(function_exists('nokriCustomFieldsHTML'))
 						{
@@ -69,16 +70,17 @@
                      <h4><?php echo esc_html__('Job Description', 'nokri' ); ?></h4>
                      <?php   the_content();?>
                   </div>
+                  <?php if($job_alerts) { ?>
                   <div class="jobs-alert-box">
                         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                            <span><?php echo esc_html($job_alerts_title); ?></span>
                            <p><?php echo esc_html($job_alerts_tagline); ?></p>
                         </div>
                         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                            <a href="javascript:void(0)" class="btn n-btn-flat job_alert"><?php echo esc_html($job_alerts_title); ?></a>
+                            <a href="javascript:void(0)" class="btn n-btn-flat job_alert"><?php echo esc_html($job_alerts_btn); ?></a>
                         </div>
                      </div>
-                  
+                  <?php } ?>
                   <div class="n-skills">
                      <h5><i class="fa fa-tags"></i><?php echo nokri_feilds_label('skills_txt',esc_html__( 'Job skills', 'nokri' )); ?></h5>
                      <div class="n-skills-tags">
@@ -114,30 +116,19 @@
                      <div class="apply-buttons">
                      <?php
 					 /* Author Check */
-				  	if ($user_id == $post_author_id || current_user_can('administrator') ) {   ?>
-                     <a href="<?php echo get_the_permalink( $nokri['sb_post_ad_page'] ); ?>?id=<?php echo esc_attr( $job_id );  ?>" class="btn n-btn-flat btn-mid btn-clear"><?php echo esc_html__('Edit Job', 'nokri' ); ?></a>
+				  	if ($user_id == $post_author_id || current_user_can('administrator') ) {   
+					$edit_url    =   esc_url(nokri_set_url_param(get_the_permalink( $nokri['sb_post_ad_page'] ),'id',esc_attr( $job_id )));
+					?>
+                     <a href="<?php echo $edit_url;  ?>" class="btn n-btn-flat btn-mid btn-clear"><?php echo esc_html__('Edit Job', 'nokri' ); ?></a>
                      <?php } else {  ?>
                      <?php if($post_apply_status == 'active') {
-						 
-						 
-						 
-						if($job_apply_with == 'exter') { ?>
-                        <a href="<?php echo esc_url($job_apply_url) ?>" class="btn n-btn-flat btn-mid btn-clear" target="_blank"><?php echo esc_html__('Apply now', 'nokri' ); ?></a>
-                        
-                        <?php } else if ($job_apply_with == 'mail') { ?>
-                        
-                        <a href=mailto:"<?php echo ($job_apply_mail) ?>" class="btn n-btn-flat btn-mid btn-clear"><?php echo esc_html__('Apply now', 'nokri' ); ?></a>
-                        
-                         
-                         <?php } else  { ?>
-                         
-                         
+						 if($job_apply_with == 'exter') { ?>
+                        <a href="JavaScript:Void(0)" class="btn n-btn-flat btn-mid btn-clear external_apply" data-job-id="<?php echo esc_attr( $job_id );?>" data-job-exter="<?php echo esc_url( $job_apply_url );?>"><?php echo esc_html__('Apply now', 'nokri' ); ?></a>
+                         <?php } else if ($job_apply_with == 'mail') { ?>
+                        <a href="#" class="btn n-btn-flat btn-mid btn-clear apply_job" data-job-id="<?php echo esc_attr( $job_id );?>" data-toggle="modal" data-target="#myModal"><?php echo esc_html__('Apply now', 'nokri' ); ?></a>
+                        <?php } else  { ?>
                          <a href="javascript:void(0)" class="btn n-btn-flat btn-mid btn-clear apply_job" data-job-id="<?php echo esc_attr( $job_id );?>" data-author-id="<?php echo esc_attr( $post_author_id );?>" data-toggle="modal" data-target="#myModal" id="applying_job"><?php echo esc_html__('Apply now', 'nokri' ); ?></a>
-                         
-                         
-                        
-                                         
-                        <?php }
+                         <?php }
 						/* Enable/disable linkedin apply */
 						if((isset($nokri['cand_linkedin_apply'])) && $nokri['cand_linkedin_apply']  == 1 )
 							{ 
@@ -255,4 +246,40 @@ if(isset($_GET['src']) && $_GET['src'] == 'lkn')
 	jQuery('#myModal-linkedin_url').modal('show');
 	});
 	</script>";
+} 
+if($single_job_schema) { ?>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "JobPosting",
+  "title": "<?php the_title(); ?>",
+  "description": "<?php echo wp_strip_all_tags(get_the_content()); ?>",
+  "hiringOrganization" : {
+    "@type": "Organization",
+    "name": "<?php echo esc_html($company_name); ?>",
+    "sameAs": "<?php echo esc_url($web); ?>"
+  },
+  "employmentType": "<?php echo nokri_job_post_single_taxonomies('job_type', $job_type); ?>",
+  "datePosted": "<?php echo get_the_date( 'Y-m-d'); ?>",
+  "validThrough": "<?php echo esc_html($job_deadline); ?>",
+  "jobLocation": {
+    "@type": "Place",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "<?php echo $countries_last; ?>"
+    }
+  },
+  "baseSalary": {
+    "@type": "MonetaryAmount",
+    "currency": "<?php echo nokri_job_post_single_taxonomies('job_currency', $job_currency); ?>",
+    "value": {
+      "@type": "QuantitativeValue",
+      "value": "<?php echo nokri_job_post_single_taxonomies('job_salary', $job_salary); ?>",
+      "unitText": "<?php echo nokri_job_post_single_taxonomies('job_salary_type', $job_salary_type); ?>"
+    }
+  },
+  "qualifications": "<?php echo  nokri_job_post_single_taxonomies('job_qualifications',$job_qualifications); ?>",
+  "experienceRequirements": "<?php echo nokri_job_post_single_taxonomies('job_experience', $job_experience); ?>"
 }
+</script>
+<?php }

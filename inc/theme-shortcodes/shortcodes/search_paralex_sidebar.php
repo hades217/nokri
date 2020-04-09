@@ -190,186 +190,179 @@ function search_tabs_sidebar_short_base_func($atts, $content = '')
 		'locat_title' => '',
 	) , $atts));
 	global $nokri;
-	
 	if(isset($want_to_show) && $want_to_show == "yes")
 	{
 		
 	}
-	
-	// For Job Category
-	$rows = vc_param_group_parse_atts( $atts['cats'] );
-		$cats	=	false;
-		$cats_html	=	'';
-		if( count( $rows ) > 0 )
-		{
-			$cats_html .= '';
-			foreach($rows as $row )
+	    // For Job Category
+		if(isset($atts['cats']) && !empty($atts['cats']) != '')
+        {
+			$rows = vc_param_group_parse_atts( $atts['cats'] );
+			$cats	=	false;
+			$cats_html	=	'';
+			if( count( $rows ) > 0 )
 			{
-				if( isset( $row['cat'] )  )
+				$cats_html .= '';
+				foreach($rows as $row )
 				{
-					if($row['cat'] == 'all' )
+					if( isset( $row['cat'] )  )
 					{
-						$cats = true;
-						$cats_html = '';
-						break;
-					}
-					$category = get_term_by('slug', $row['cat'], 'job_category');
-					if( count( $category ) == 0 )
-					continue;
-					
-					if(isset($want_to_show) && $want_to_show == "yes")
-					{
-					
-						$ad_cats_sub	=	nokri_get_cats('job_category' , $category->term_id );
-						if(count($ad_cats_sub) > 0 )
+						if($row['cat'] == 'all' )
 						{
-							$cats_html .= '<option value="'.$category->term_id.'" >'.$category->name.'  ('.$category->count.')' ;
-							foreach( $ad_cats_sub as $ad_cats_subz )
+							$cats = true;
+							$cats_html = '';
+							break;
+						}
+						$category = get_term_by('slug', $row['cat'], 'job_category');
+						if( count( $category ) == 0 )
+						continue;
+						
+						if(isset($want_to_show) && $want_to_show == "yes")
+						{
+						
+							$ad_cats_sub	=	nokri_get_cats('job_category' , $category->term_id );
+							if(count($ad_cats_sub) > 0 )
 							{
-								$cats_html .= '<option value="'.$ad_cats_subz->term_id.'">'.'&nbsp;&nbsp; - &nbsp;' .$ad_cats_subz->name.'  ('.$ad_cats_subz->count.') </option>';
+								$cats_html .= '<option value="'.$category->term_id.'" >'.$category->name.'  ('.$category->count.')' ;
+								foreach( $ad_cats_sub as $ad_cats_subz )
+								{
+									$cats_html .= '<option value="'.$ad_cats_subz->term_id.'">'.'&nbsp;&nbsp; - &nbsp;' .$ad_cats_subz->name.'  ('.$ad_cats_subz->count.') </option>';
+								}
+								$cats_html .='</option>';
 							}
-							$cats_html .='</option>';
+							else
+							{
+								$cats_html .= '<option value="'.$category->term_id.'">'.$category->name. '   ('.$category->count.')</option>';
+							}
 						}
 						else
 						{
 							$cats_html .= '<option value="'.$category->term_id.'">'.$category->name. '   ('.$category->count.')</option>';
 						}
+						
 					}
-					else
-					{
-						$cats_html .= '<option value="'.$category->term_id.'">'.$category->name. '   ('.$category->count.')</option>';
-					}
-					
 				}
-			}
-			
-			if( $cats )
-			{
-				$ad_cats = nokri_get_cats('job_category', 0 );
-				foreach( $ad_cats as $cat )
-				{
 				
-					if(isset($want_to_show) && $want_to_show == "yes")
+				if( $cats )
+				{
+					$ad_cats = nokri_get_cats('job_category', 0 );
+					foreach( $ad_cats as $cat )
 					{
-					//sub cat
-						$ad_sub_cats	=	nokri_get_cats('job_category' , $cat->term_id );
-						if(count($ad_sub_cats) > 0 )
+					
+						if(isset($want_to_show) && $want_to_show == "yes")
 						{
-							$cats_html .= '<option value="'.$cat->term_id.'" >'.$cat->name.'  ('.$cat->count.')' ;
-							foreach( $ad_sub_cats as $sub_cat )
+						//sub cat
+							$ad_sub_cats	=	nokri_get_cats('job_category' , $cat->term_id );
+							if(count($ad_sub_cats) > 0 )
 							{
-								$cats_html .= '<option value="'.$sub_cat->term_id.'">'.'&nbsp;&nbsp; - &nbsp;' .$sub_cat->name.'  ('.$sub_cat->count.') </option>';
+								$cats_html .= '<option value="'.$cat->term_id.'" >'.$cat->name.'  ('.$cat->count.')' ;
+								foreach( $ad_sub_cats as $sub_cat )
+								{
+									$cats_html .= '<option value="'.$sub_cat->term_id.'">'.'&nbsp;&nbsp; - &nbsp;' .$sub_cat->name.'  ('.$sub_cat->count.') </option>';
+								}
+								$cats_html .='</option>';	
 							}
-							$cats_html .='</option>';	
+							else
+							{
+								$cats_html .= '<option value="'.$cat->term_id.'">'.$cat->name.'   ('.$cat->count.')</option>';
+							}
 						}
 						else
 						{
 							$cats_html .= '<option value="'.$cat->term_id.'">'.$cat->name.'   ('.$cat->count.')</option>';
 						}
 					}
-					else
-					{
-						$cats_html .= '<option value="'.$cat->term_id.'">'.$cat->name.'   ('.$cat->count.')</option>';
-					}
+					
 				}
-				
 			}
 		}
-		
-	
 		//For countries
-		$rows_countries = vc_param_group_parse_atts( $atts['countries'] );
-		$year_countries	=	false;
-		$countries_html	=	'';
-		$get_year = '';
-		if( count( $rows_countries ) > 0 )
-		{
-			$countries_html .= '';
-			foreach($rows_countries as $rows_country )
+		if(isset($atts['countries']) && !empty($atts['countries']) != '')
+        {
+			$rows_countries = vc_param_group_parse_atts( $atts['countries'] );
+			$year_countries	=	false;
+			$countries_html	=	'';
+			$get_year = '';
+			if( count( $rows_countries ) > 0 )
 			{
-				if( isset( $rows_country['country'] )  )
+				$countries_html .= '';
+				foreach($rows_countries as $rows_country )
 				{
-					if($rows_country['country'] == 'all' )
+					if( isset( $rows_country['country'] )  )
 					{
-						$year_countries = true;
-						$countries_html = '';
-						break;
+						if($rows_country['country'] == 'all' )
+						{
+							$year_countries = true;
+							$countries_html = '';
+							break;
+						}
+						$get_country = get_term_by('slug', $rows_country['country'], 'ad_location');
+						if( count( $get_country ) == 0 )
+						continue;
+						$countries_html .= '<option value="'.$get_country->term_id.'">'.$get_country->name.'</option>';
 					}
-					$get_country = get_term_by('slug', $rows_country['country'], 'ad_location');
-					if( count( $get_country ) == 0 )
-					continue;
-					$countries_html .= '<option value="'.$get_country->term_id.'">'.$get_country->name.'</option>';
 				}
-			}
-			
-			if( $year_countries )
-			{
 				
-				$all_countries = nokri_get_cats('ad_location', 0 );
-				foreach( $all_countries as $all_year )
+				if( $year_countries )
 				{
-					$countries_html .= '<option value="'.$all_year->term_id.'">'.$all_year->name.'</option>';
+					
+					$all_countries = nokri_get_cats('ad_location', 0 );
+					foreach( $all_countries as $all_year )
+					{
+						$countries_html .= '<option value="'.$all_year->term_id.'">'.$all_year->name.'</option>';
+					}
+					
+					
+					
+					
 				}
-				
-				
-				
-				
 			}
 		}
-	
-
-		$rows_story = vc_param_group_parse_atts( $atts['stories'] );
-		$stories_html = '';
-		if( (array)count( $rows_story ) > 0 )
-		{
-			foreach($rows_story as $row_story ) 
+	    if(isset($atts['stories']) && !empty($atts['stories']) != '')
+        {
+			$rows_story = vc_param_group_parse_atts( $atts['stories'] );
+			$stories_html = '';
+			if( (array)count( $rows_story ) > 0 )
 			{
-		/*Story Title */
-		$astory_title = (isset($row_story['story_title']) && $row_story['story_title'] != "") ? ' <h3 class="count-title">'.$row_story['story_title'].'</h3>' : "";	
-		/*Story Description */
-		$astory_no = (isset($row_story['story_number']) && $row_story['story_number'] != "") ?  '<h5 class="counter-stats">'.$row_story['story_number'].'</h5>' : "";	
-		
-		/*Story Html */		
-		$stories_html .= '<div class="counter-seprator">
-                <div class="counter-box">
-                   '.$astory_no.'
-                   '.$astory_title.'
-                </div>
-             </div>';
-			 }
+				foreach($rows_story as $row_story ) 
+				{
+			/*Story Title */
+			$astory_title = (isset($row_story['story_title']) && $row_story['story_title'] != "") ? ' <h3 class="count-title">'.$row_story['story_title'].'</h3>' : "";	
+			/*Story Description */
+			$astory_no = (isset($row_story['story_number']) && $row_story['story_number'] != "") ?  '<h5 class="counter-stats">'.$row_story['story_number'].'</h5>' : "";	
+			
+			/*Story Html */		
+			$stories_html .= '<div class="counter-seprator">
+					<div class="counter-box">
+					   '.$astory_no.'
+					   '.$astory_title.'
+					</div>
+				 </div>';
+				 }
+			}
 		}
-
-
-	
-
-/*Section Tagline */
-$main_section_tagline = (isset($section_tagline) && $section_tagline != "") ? '<h3 class="hero-title">'.$section_tagline.'</h3>' : "";
-/*Section Title */
-$main_section_title = (isset($section_title) && $section_title != "") ? ' <h2>'.$section_title.'</h2>' : "";
-/*Section Descriptions */
-$main_section_deatils = (isset($section_details) && $section_details != "") ? ' <p>'.$section_details.'</p>' : "";
-
-
-
- /* Background Image */
-$bg_img = '';
-if( $search_section_img != "" )
-{
-$bgImageURL	=	nokri_returnImgSrc( $search_section_img );
-$bg_img = ( $bgImageURL != "" ) ? ' \\s\\t\\y\\l\\e="background:  url('.$bgImageURL.') no-repeat scroll center center / cover;"' : "";
-}
-
-/*sidebar_title */
-$sidebar_title = (isset($sidebar_title) && $sidebar_title != "") ? '<h4>'.$sidebar_title.'</h4>' : "";
-/*keyword_title */
-$keyword_title = (isset($keyword_title) && $keyword_title != "") ? '<label>'.$keyword_title.'</label>' : "";
-/*cats_title */
-$cats_title = (isset($cats_title) && $cats_title != "") ? '<label>'.$cats_title.'<label>' : "";
-/*cats_title */
-$locat_title = (isset($locat_title) && $locat_title != "") ? '<label>'.$locat_title.'<label>' : "";
-
-
-   return   '<section id="intro-hero"  '.str_replace('\\',"",$bg_img).' >
+		/*Section Tagline */
+		$main_section_tagline = (isset($section_tagline) && $section_tagline != "") ? '<h3 class="hero-title">'.$section_tagline.'</h3>' : "";
+		/*Section Title */
+		$main_section_title = (isset($section_title) && $section_title != "") ? ' <h2>'.$section_title.'</h2>' : "";
+		/*Section Descriptions */
+		$main_section_deatils = (isset($section_details) && $section_details != "") ? ' <p>'.$section_details.'</p>' : "";
+		/* Background Image */
+		$bg_img = '';
+		if( $search_section_img != "" )
+		{
+		$bgImageURL	=	nokri_returnImgSrc( $search_section_img );
+		$bg_img = ( $bgImageURL != "" ) ? ' \\s\\t\\y\\l\\e="background:  url('.$bgImageURL.') no-repeat scroll center center / cover;"' : "";
+		}
+		/*sidebar_title */
+		$sidebar_title = (isset($sidebar_title) && $sidebar_title != "") ? '<h4>'.$sidebar_title.'</h4>' : "";
+		/*keyword_title */
+		$keyword_title = (isset($keyword_title) && $keyword_title != "") ? '<label>'.$keyword_title.'</label>' : "";
+		/*cats_title */
+		$cats_title = (isset($cats_title) && $cats_title != "") ? '<label>'.$cats_title.'<label>' : "";
+		/*cats_title */
+		$locat_title = (isset($locat_title) && $locat_title != "") ? '<label>'.$locat_title.'<label>' : "";
+        return   '<section id="intro-hero"  '.str_replace('\\',"",$bg_img).' >
   <div class="container">
     <div class="row">
       <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12">
@@ -384,21 +377,22 @@ $locat_title = (isset($locat_title) && $locat_title != "") ? '<label>'.$locat_ti
       </div>
       <div class="col-lg-4 col-md-5 col-sm-8 col-xs-12 col-md-offset-0 col-sm-offset-2 col-lg-offset-1">
 		<form class="form-join"  method="get" action="'.get_the_permalink($nokri['sb_search_page']).'">
+		'.nokri_form_lang_field_callback(false).'
           '.$sidebar_title.'
           <div class="form-group">
             '.$keyword_title .'
-			 <input type="text" class="form-control" name="job_title" placeholder="'.esc_html__('Search Keyword','nokri').'">
+			 <input type="text" class="form-control" name="job-title" placeholder="'.esc_html__('Search Keyword','nokri').'">
           </div>
           <div class="form-group">
           	'.$cats_title.'
-            <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="'.esc_html__('Select Category','nokri').'" style="width: 100%"   name="cat_id">
+            <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="'.esc_html__('Select Category','nokri').'" style="width: 100%"   name="cat-id">
                <option label="'.esc_html__('Select Category','nokri').'"></option>
                 '.$cats_html.'
             </select>
           </div>
           <div class="form-group">
               '.$locat_title.'
-          	<select class="js-example-basic-single" data-allow-clear="true" data-placeholder="'.esc_html__('Select Location','nokri').'" style="width: 100%" name="job_location">
+          	<select class="js-example-basic-single" data-allow-clear="true" data-placeholder="'.esc_html__('Select Location','nokri').'" style="width: 100%" name="job-location">
                <option value="">'.esc_html__('Select Location','nokri').'</option>
                  '.$countries_html.'
             </select>
@@ -409,7 +403,6 @@ $locat_title = (isset($locat_title) && $locat_title != "") ? '<label>'.$locat_ti
     </div>
   </div>
 </section>';
-
 }
 }
 if (function_exists('nokri_add_code'))

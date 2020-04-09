@@ -107,6 +107,7 @@ $recent_job = array(
 );
 
 global $nokri;
+$recent_job = nokri_wpml_show_all_posts_callback($recent_job);
 $recent_job_query = new WP_Query( $recent_job ); 
 $recent_job_html = '';
 if ( $recent_job_query->have_posts() )
@@ -135,7 +136,6 @@ if ( $recent_job_query->have_posts() )
 				   $project = $c->name;
 				}
 			}
-			
 			/* Getting Profile Photo */
 			$rel_image_link[0]   =   get_template_directory_uri(). '/images/candidate-dp.jpg';
 			if( get_user_meta($post_author_id, '_sb_user_pic', true ) != "" )
@@ -163,7 +163,8 @@ if ( $recent_job_query->have_posts() )
 						{
 							$li_bg_color = 'style=" background-color: '.$bg_color.' !important;"';
 						}
-						$job_badge_text .= '<li '.$li_bg_color.'> <a href="'.get_the_permalink($nokri['sb_search_page']).'?job_class='.$val.'" '.$an_color.'>'.esc_html(ucfirst($job_badge)).'</a></li>';
+						$search_url    = nokri_set_url_param(get_the_permalink($nokri['sb_search_page']), 'job_class',$val);
+						$job_badge_text .= '<li '.$li_bg_color.'> <a href="'.esc_url(nokri_page_lang_url_callback($search_url)).'" '.$an_color.'>'.esc_html(ucfirst($job_badge)).'</a></li>';
 					}  
 					$featured_html = ' <div class="features-star"><i class="fa fa-star"></i></div>';
 					$job_badge_text = '<ul class="featured-badge-list">'.$job_badge_text.'</ul>';
@@ -180,7 +181,7 @@ if ( $recent_job_query->have_posts() )
                                  <div class="n-featured-singel-meta">
                                     <h4><a href="'.get_the_permalink().'">'.get_the_title().'</a></h4>
                                     <div class="n-cat">'.$project.'</div>
-                                    <p><i class="fa fa-map-marker"></i>'.nokri_job_country($job_id).'</p>
+                                    <p><i class="fa fa-map-marker"></i>'.nokri_job_country($job_id,'').'</p>
 									'.$job_badge_text.'
                                  </div>
 								 '.$featured_html.'

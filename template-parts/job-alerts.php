@@ -1,15 +1,7 @@
 <?php
 /* Make cats selected on update Job*/
-$cats_html	=	'';
-$ad_cats	=	nokri_get_cats('job_category' , 0 );
-if ( ! empty( $ad_cats ) && ! is_wp_error( $ad_cats ) )
-{
-	foreach( $ad_cats as $ad_cat )
-	{
-		$cats_html	.=	'<option value="'.$ad_cat->term_id.'" >' . $ad_cat->name .  '</option>';
-	}
-}
-$today =  date("Y/m/d");
+$cat_html	=	nokri_add_taxonomies_on_job_alert('job_category');
+$today      =   date("Y/m/d");
 ?>
 <div class="cp-loader"></div>
 <div class="modal fade resume-action-modal" id="job-alert-subscribtion">
@@ -43,8 +35,8 @@ $today =  date("Y/m/d");
 							<label>
 								<?php echo __( 'Select email frequency', 'nokri' ); ?><span class="color-red">*</span>
 							</label>
-							<select class="select-generat" data-allow-clear="true" data-parsley-required="true" data-parsley-error-message "=Select your resume to apply" name="alert_frequency">
-								<option value=""><?php echo __( 'Select an option', 'nokri' ); ?></option>
+							<select class="select-generat" data-allow-clear="true" data-parsley-required="true" data-parsley-error-message="<?php echo __( 'Please select an option', 'nokri' ); ?>" name="alert_frequency">
+								
                                 <option value="1"><?php echo __( 'Daily', 'nokri' ); ?></option>
                                 <option value="7"><?php echo __( 'Weekly', 'nokri' ); ?></option>
                                 <option value="15"><?php echo __( 'Fortnightly', 'nokri' ); ?></option>
@@ -53,24 +45,75 @@ $today =  date("Y/m/d");
 							</select>
 						</div>
 					</div>
-					<div class="col-md-6 col-sm-6 col-xs-6">
+                    <?php if(nokri_add_taxonomies_on_job_alert('job_type',true)) { ?>
+                    <div class="col-md-6 col-sm-6 col-xs-6">
 						<div class="form-group">
 							<label>
-								<?php echo __( 'Select category', 'nokri' ); ?><span class="color-red">*</span>
+								<?php echo __( 'Job Type', 'nokri' ); ?><span class="color-red">*</span>
 							</label>
-							<select class="select-generat" data-allow-clear="true" data-parsley-required="true" data-parsley-error-message "=Select your resume to apply" name="alert_category">
+							<select class="select-generat" data-allow-clear="true" data-parsley-required="true" name="alert_type" data-parsley-error-message="<?php echo __( 'Please select an option', 'nokri' ); ?>">
 								<option value=""><?php echo __( 'Select an option', 'nokri' ); ?></option>
-                                <?php echo ($cats_html); ?>
+                                <?php echo nokri_add_taxonomies_on_job_alert('job_type',''); ?>
 							</select>
 						</div>
 					</div>
+                    <?php }  if(nokri_add_taxonomies_on_job_alert('job_experience',true)) {  ?>
+                    <div class="col-md-6 col-sm-6 col-xs-6">
+						<div class="form-group">
+							<label>
+								<?php echo __( 'Job Experience', 'nokri' ); ?><span class="color-red">*</span>
+							</label>
+							<select class="select-generat" data-allow-clear="true" data-parsley-required="true" name="alert_experience" data-parsley-error-message="<?php echo __( 'Please select an option', 'nokri' ); ?>">
+								<option value=""><?php echo __( 'Select an option', 'nokri' ); ?></option>
+                                <?php echo nokri_add_taxonomies_on_job_alert('job_experience',''); ?>
+							</select>
+						</div>
+					</div>
+                    <?php }  if(nokri_add_taxonomies_on_job_alert('ad_location',true)) {  ?>
+                     <div class="col-md-6 col-sm-6 col-xs-6">
+						<div class="form-group">
+							<label>
+								<?php echo __( 'Job Location', 'nokri' ); ?><span class="color-red">*</span>
+							</label>
+							<select class="select-generat" data-allow-clear="true" data-parsley-required="true" name="alert_location" data-parsley-error-message="<?php echo __( 'Please select an option', 'nokri' ); ?>">
+								<option value=""><?php echo __( 'Select an option', 'nokri' ); ?></option>
+                                <?php echo nokri_add_taxonomies_on_job_alert('ad_location',''); ?>
+							</select>
+						</div>
+					</div>
+                    <?php } if(nokri_add_taxonomies_on_job_alert('job_category',true)) {?>
+                    <div class="col-md-6 col-sm-6 col-xs-6">
+						<div class="form-group">
+							<label>
+								<?php echo __( 'Job Category', 'nokri' ); ?><span class="color-red">*</span>
+							</label>
+							<select class="select-generat" data-allow-clear="true" data-parsley-required="true"  id="alert_sub_cat" data-parsley-error-message="<?php echo __( 'Please select an option', 'nokri' ); ?>">
+								<option value=""><?php echo __( 'Select an option', 'nokri' ); ?></option>
+                                <?php echo nokri_add_taxonomies_on_job_alert('job_category',''); ?>
+							</select>
+						</div>
+					</div>
+                    <div class="col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group" id="get_child_lev1">
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6 col-xs-6">
+                        <div id="get_child_lev2" class="form-group">
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6 col-xs-6">
+                        <div id="get_child_lev5" class="margin-top-10">
+                        </div>
+                    </div>
+                    <input type="hidden" name="alert_category" id="get_cat_val" value="" />
+                    <?php } ?>
+                    <input type="hidden" name="alert_start" value="<?php echo($today); ?>" />
 					<div class="modal-footer">
 						<button type="submit" name="submit" class="btn n-btn-flat btn-mid btn-block" id="job_alerts">
 							<?php echo esc_html__( 'Submit', 'nokri' ); ?>
 						</button>
 					</div>
 				</div>
-                <input type="hidden" name="alert_start" value="<?php echo($today); ?>" />
 			</form>
 		</div>
 	</div>

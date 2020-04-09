@@ -1,10 +1,6 @@
 <?php
 global $nokri;
-$rtl_class = '';
-if(is_rtl())
-{
-	$rtl_class = "flip";
-}
+$rtl_class = (is_rtl()) ? "flip" : "";
 /* Background image */
 if ( isset( $nokri['section_bg_img'] ) )
 {
@@ -26,11 +22,7 @@ else
 	$dp_key = '_cand_dp'; 
 }
 /* Search Page */
-$search_page_layout = '';
-if((isset($nokri['search_page_layout'])) && $nokri['search_page_layout']  != '' )
-{
- 	$search_page_layout =  ($nokri['search_page_layout']);
-}
+$search_page_layout = ( isset($nokri['search_page_layout']) && $nokri['search_page_layout'] != ""  ) ? $nokri['search_page_layout'] : "";
 /* Getting Candidate Dp */
 if( get_user_meta($current_id, $dp_key, true ) != "" )
 {
@@ -43,41 +35,24 @@ else
 }
 /* Header Logo */
 $headerlogo = '';
-$logo = '';
+$logo       =  get_template_directory_uri() . '/images/logo.png';
 if( isset( $nokri['header_logo']['url'] )  && $nokri['header_logo']['url'] != "")
-	{
-		$logo = ( $nokri['header_logo']['url'] );
-	}
-else
-	{
-		$logo  =  get_template_directory_uri() . '/images/logo.png'; 
-	}
+{
+	$logo = ( $nokri['header_logo']['url'] );
+}
 /* Dashboard Page */
-$dashboard_id = '';
-if((isset($nokri['sb_dashboard_page'])) && $nokri['sb_dashboard_page']  != '' )
-{
- $dashboard_id =  ($nokri['sb_dashboard_page']);
-}
-	
+$dashboard_id = ( isset($nokri['sb_dashboard_page']) && $nokri['sb_dashboard_page'] != ""  ) ? $nokri['sb_dashboard_page'] : "";
 /* Post Job Page */
-$page_id = '';
-if((isset($nokri['sb_post_ad_page'])) && $nokri['sb_post_ad_page']  != '' )
-{
-	$page_id =  ($nokri['sb_post_ad_page']);
-}
+$page_id = ( isset($nokri['sb_post_ad_page']) && $nokri['sb_post_ad_page'] != ""  ) ? $nokri['sb_post_ad_page'] : "";
 /* All Job Page */
-$all_jobs = '';
-if((isset($nokri['sb_all_job_page'])) && $nokri['sb_all_job_page']  != '' )
-{
-$all_jobs =  ($nokri['sb_all_job_page']);
-}
-
-
+$page_id = ( isset($nokri['sb_all_job_page']) && $nokri['sb_all_job_page'] != ""  ) ? $nokri['sb_all_job_page'] : "";
 /* Button text Option */
 $btn_text = '';
+$btn_text_def = esc_html__("Job Post", "nokri");
 if((isset($nokri['nav_bar_post_btn'])) && $nokri['nav_bar_post_btn']  != '' )
 {
  	$btn_text =  ($nokri['nav_bar_post_btn']);
+	$btn_text_def = ($nokri['nav_bar_post_btn']);
 }
 /* Button Icon Option */
 $btn_icon = '';
@@ -91,8 +66,6 @@ if((isset($nokri['nav_bar_post_btn_link'])) && $nokri['nav_bar_post_btn_link']  
 {
 	$job_post =  ($nokri['nav_bar_post_btn_link']);
 }
-
-
 /* Candidate Button text Option */
 $cand_btn_text = '';
 if((isset($nokri['cand_nav_bar_post_btn'])) && $nokri['cand_nav_bar_post_btn']  != '' )
@@ -111,7 +84,6 @@ if((isset($nokri['cand_nav_bar_post_btn_link'])) && $nokri['cand_nav_bar_post_bt
 {
 	$cand_job_post =  ($nokri['cand_nav_bar_post_btn_link']);
 }
-
 /* Job Button Check */
 $job_button  =  $job_link = '';
 if (get_user_meta($current_id, '_sb_reg_type', true) == '1') 
@@ -119,20 +91,18 @@ if (get_user_meta($current_id, '_sb_reg_type', true) == '1')
    $job_button = esc_html($btn_text);
    $job_link   = ($job_post) ;  
    $bnt_class  = esc_attr($btn_icon);
-   
 }
 else 
 {
-   $job_button = esc_html($cand_btn_text);
+   $job_button =  esc_html($cand_btn_text);
    $job_link   =  $cand_job_post;
-   $bnt_class  = esc_attr($cand_btn_icon);
+   $bnt_class  =  esc_attr($cand_btn_icon);
 }
 $is_map = false;
 if(wp_basename(get_page_template()) == 'page-search.php' &&  $search_page_layout == '3')
 {
 	$is_map = true;
 }
-
 /* Dashboard class check */
 if(wp_basename(get_page_template()) == 'page-dashboard.php'|| $is_map  ) 
 {
@@ -190,20 +160,10 @@ if(wp_basename(get_page_template()) == 'page-home.php' || $page_check )
 {
 	$bread_class = '';
 }
-
 /* Signin  Page */
-$signin = '';
-if((isset($nokri['sb_sign_in_page'])) && $nokri['sb_sign_in_page']  != '' )
-{
-	$signin =  ($nokri['sb_sign_in_page']);
-}
+$signin = ( isset($nokri['sb_sign_in_page']) && $nokri['sb_sign_in_page'] != ""  ) ? $nokri['sb_sign_in_page'] : "";
 /* Signup  Page */
-$signup = '';
-if((isset($nokri['sb_sign_up_page'])) && $nokri['sb_sign_up_page']  != '' )
-{
-	$signup =  ($nokri['sb_sign_up_page']);
-}
-
+$signup = ( isset($nokri['sb_sign_up_page']) && $nokri['sb_sign_up_page'] != ""  ) ? $nokri['sb_sign_up_page'] : "";
 /* Dashboard logo  */
 if(basename(get_page_template()) == 'page-dashboard.php')
 {
@@ -214,6 +174,10 @@ if(basename(get_page_template()) == 'page-dashboard.php')
 		$logo = ( $nokri['dashborad_header_logo']['url'] );
 	}
 }
+/* With out login button settings */
+$wo_txt  = isset($nokri['wo_log_btn_txt']) ? $nokri['wo_log_btn_txt']    : '';
+$wo_link = isset($nokri['wo_log_btn_link']) ? $nokri['wo_log_btn_link']  : '';
+$wo_icon = isset($nokri['wo_log_btn_icon']) ? $nokri['wo_log_btn_icon']  : '';
 ?>
 <div class="transparent-header-1">
  <nav id="menu-1" class="mega-menu <?php echo esc_attr($dashboard_class)." ".$bread_class; ?>" <?php if(wp_basename(get_page_template()) != 'page-home.php'  && $page_check == false ) { echo str_replace('\\',"",$bg_url); } ?>>
@@ -229,18 +193,28 @@ if(basename(get_page_template()) == 'page-dashboard.php')
                     {
                        if ( is_user_logged_in()) {  ?>
                        <li class="profile-pic dropdown">
-                                    <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><img src="<?php echo esc_url($image_dp_link[0]); ?>" alt="<?php echo esc_attr__("image", "nokri") ?>" class="img-circle" width="36"><span class="hidden-xs hidden-sm"></span></a>
-                                    <ul class="dropdown-menu">
-                                        <li><a href="<?php echo get_the_permalink($dashboard_id); ?>"><i class="fa fa-user"></i><?php echo esc_html__('Dashboard','nokri'); ?></a></li>
-                                        <li><a href="<?php echo wp_logout_url( home_url() ); ?>"><i class="fa fa-power-off"></i><?php echo esc_html__('Logout','nokri'); ?></a></li>
-                                    </ul>
-                                </li>
+                        <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><img src="<?php echo esc_url($image_dp_link[0]); ?>" alt="<?php echo esc_attr__("image", "nokri") ?>" class="img-circle" width="36"><span class="hidden-xs hidden-sm"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a href="<?php echo get_the_permalink($dashboard_id); ?>"><i class="fa fa-user"></i><?php echo esc_html__('Dashboard','nokri'); ?></a>
+                                    </li>
+                                    <li>
+                                        <a href="<?php echo wp_logout_url( home_url() ); ?>"><i class="fa fa-power-off"></i><?php echo esc_html__('Logout','nokri'); ?></a>
+                                    </li>
+                                </ul>
+                     </li>
+                     <li><a href="<?php echo get_the_permalink($job_link); ?>" class="btn n-btn-flat"><i class="<?php echo esc_attr($bnt_class); ?>"></i><?php echo esc_html($job_button); ?></a></li>
                    <?php }  else { ?>
-                   <li><a href="<?php echo get_the_permalink($signin); ?>" class="n-login-header"><i class="fa fa-sign-in"></i><?php echo esc_html__('Login','nokri'); ?></a></li>
-                   <li><a href="<?php echo get_the_permalink($signup); ?>" class="n-login-header"><i class="fa fa-user-plus"></i><?php echo esc_html__('Register','nokri'); ?></a></li>
-                   <?php } ?>
-                            <li><a href="<?php echo get_the_permalink($job_link); ?>" class="btn n-btn-flat"><i class="<?php echo esc_attr($bnt_class); ?>"></i><?php echo esc_html($job_button); ?></a></li>
-                    <?php } ?>
+                   <li>
+                   		<a href="<?php echo get_the_permalink($signin); ?>" class="n-login-header"><i class="fa fa-sign-in"></i><?php echo esc_html__('Login','nokri'); ?></a>
+                   </li>
+                   <li>
+                   		<a href="<?php echo get_the_permalink($signup); ?>" class="n-login-header"><i class="fa fa-user-plus"></i><?php echo esc_html__('Register','nokri'); ?></a>
+                   </li>
+                   <li>
+                   		<a href="<?php echo get_the_permalink($wo_link); ?>" class="btn n-btn-flat"><i class="<?php echo esc_attr($wo_icon); ?>"></i><?php echo ($wo_txt); ?></a>
+                    </li>
+                   <?php } } ?>
                 </ul>
                 <ul class="menu-links <?php echo esc_attr($rtl_class); ?>">
                    <?php echo nokri_themeMenu('main-nav'); ?>

@@ -543,12 +543,15 @@ ul.footer-menu {
 .serch-filter-overflow-top .search-filter-overflow-top-box .form-group label {
 	margin-bottom:10px;	
 }
-.serch-filter-overflow-top .search-filter-overflow-top-box .form-group i {
+.serch-filter-overflow-top .search-filter-overflow-top-box .form-group i.ti-search {
 	right: 30px;
 	top: 48px;
 	left: auto;
 	font-size: 16px;
 	position: absolute;
+}
+.serch-filter-overflow-top .search-filter-overflow-top-box .form-group i.fa {
+	margin-left:5px;	
 }
 .serch-filter-overflow-top .search-filter-overflow-top-box .form-group .n-btn-flat {
 	margin-top: 29px;

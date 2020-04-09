@@ -82,15 +82,17 @@ extract(shortcode_atts(array(
 		'order_by' => '',  
 	) , $atts));
 	
-	
-$rows = vc_param_group_parse_atts( $atts['employers'] );
-$stories_html = '';
-$current_user_id 	  = get_current_user_id();
-if( (array)count( $rows ) > 0 )
-{
-	foreach($rows as $row ) 
+if(isset($atts['employers']) && $atts['employers'] != '')
+{	
+	$rows = vc_param_group_parse_atts( $atts['employers'] );
+	$stories_html = '';
+	$current_user_id 	  = get_current_user_id();
+	if( (array)count( $rows ) > 0 )
 	{
-		$employers_array[] = (isset($row['employer']) && $row['employer'] != "") ? $row['employer'] : array();
+		foreach($rows as $row ) 
+		{
+			$employers_array[] = (isset($row['employer']) && $row['employer'] != "") ? $row['employer'] : array();
+		}
 	}
 }
 		global $nokri;	
@@ -116,6 +118,7 @@ if( (array)count( $rows ) > 0 )
 		$fb_link = $twitter_link = $google_link = $linkedin_link =  $follow_btn = '';
 		foreach ($authors as $author)
 		{
+			$emp_fb    =  $emp_twitter = $emp_google = $emp_linkedin = '';
 			$user_id   = $author->ID;
 			$user_name = $author->display_name;
 			/* Profile Pic  */

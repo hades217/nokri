@@ -40,7 +40,7 @@ function how_works()
 		"class" => "",
 		"heading" => esc_html__( "Section Image", 'nokri' ),
 		"param_name" => "section_img",
-		 "description" => esc_html__('128x128', 'nokri'),
+		 "description" => esc_html__('1296*316', 'nokri'),
 		),
 		array
 		(
@@ -138,7 +138,7 @@ function how_works()
 		"class" => "",
 		"heading" => esc_html__( "Section Image", 'nokri' ),
 		"param_name" => "section_img2",
-		 "description" => esc_html__('128x128', 'nokri'),
+		 "description" => esc_html__('570x468', 'nokri'),
 		),
 		
 		),
@@ -163,64 +163,58 @@ require trailingslashit( get_template_directory () ) . "inc/theme-shortcodes/sho
 		'section_img2' => '',
 		'link' => '',
 	) , $atts));
-	
-	
-	
-
- /* Background Image */
+/* Background Image */
 $bg_img = '';
 if( $section_img != "" )
 {
 $bgImageURL	=	nokri_returnImgSrc( $section_img );
 $bg_img = ( $bgImageURL != "" ) ? ' \\s\\t\\y\\l\\e="background: url('.$bgImageURL.') no-repeat; -webkit-background-size: contain; -moz-background-size: contain; -o-background-size: contain; background-size: contain; background-position: center center; background-attachment:scroll;"' : "";
 }
-
-$rows = vc_param_group_parse_atts( $atts['steps'] );
-$steps_html = '';
-if( (array)count( $rows ) > 0 )
+if(isset($atts['steps']) && !empty($atts['steps']) != '')
 {
-	foreach($rows as $row ) 
+	$rows = vc_param_group_parse_atts( $atts['steps'] );
+	$steps_html = '';
+	if( (array)count( $rows ) > 0 )
 	{
-/*Step Image */
-$astep_img = '';	
-if(isset($row['step_img']))
-{
-	$img 		=  	wp_get_attachment_image_src($row['step_img'], '');
-	$img_thumb 	= 	$img[0];
-}
-/*Step Icon */
-$astep_icon = '';	
-if(isset($row['step_icon']))
-{
-	$icon_html    =   '<i class="la '.trim($row['step_icon']).' la-4x"></i>';
-}
-
-if(isset($row['step_img']))
-{
-	$astep_img    = ( isset($img_thumb) && $img_thumb != "" ) ? '<img src="'.esc_url($img_thumb).'" class="img-responsive main-img" alt="'.esc_attr__( 'image', 'nokri' ).'" />' : '';
-}
-else
-{
-	$astep_img = $icon_html;
-}
+		foreach($rows as $row ) 
+		{
+	/*Step Image */
+	$astep_img = '';	
+	if(isset($row['step_img']))
+	{
+		$img 		=  	wp_get_attachment_image_src($row['step_img'], '');
+		$img_thumb 	= 	$img[0];
+	}
+	/*Step Icon */
+	$astep_icon = '';	
+	if(isset($row['step_icon']))
+	{
+		$icon_html    =   '<i class="la '.trim($row['step_icon']).' la-4x"></i>';
+	}
 	
-/*Step Title */
-$astep_title = (isset($row['step_title']) && $row['step_title'] != "") ? ' <h4>'.$row['step_title'].'</h4>' : "";	
-/*Step Description */
-$astep_desc = (isset($row['step_description']) && $row['step_description'] != "") ? ' <p>'.$row['step_description'].'</p>' : "";	
-/*Step Html */		
-$steps_html .= '<div class="col-md-3 col-sm-6 col-xs-12">
-				<div class="h-i-w-content-box">
-                    '.$astep_img.'
-					'.$astep_title.'
-					'.$astep_desc.'
-                  </div></div>';
-     }
+	if(isset($row['step_img']))
+	{
+		$astep_img    = ( isset($img_thumb) && $img_thumb != "" ) ? '<img src="'.esc_url($img_thumb).'" class="img-responsive main-img" alt="'.esc_attr__( 'image', 'nokri' ).'" />' : '';
+	}
+	else
+	{
+		$astep_img = $icon_html;
+	}
+		
+	/*Step Title */
+	$astep_title = (isset($row['step_title']) && $row['step_title'] != "") ? ' <h4>'.$row['step_title'].'</h4>' : "";	
+	/*Step Description */
+	$astep_desc = (isset($row['step_description']) && $row['step_description'] != "") ? ' <p>'.$row['step_description'].'</p>' : "";	
+	/*Step Html */		
+	$steps_html .= '<div class="col-md-3 col-sm-6 col-xs-12">
+					<div class="h-i-w-content-box">
+						'.$astep_img.'
+						'.$astep_title.'
+						'.$astep_desc.'
+					  </div></div>';
+		 }
+	}
 }
-
-
-
-
 /*Section title 2 */
 $section_title2 = (isset($section_title2) && $section_title2 != "") ? '<h3>'.$section_title2.'</h3>' : "";
 /*Section details 2 */
@@ -232,7 +226,6 @@ foreach($paras as $para)
 	$paragraph_html .= '<p>'.$para.'</p>';
 }
 /*Link  */
-
 $btn = '';
 if( isset( $link) )
 {
@@ -245,7 +238,6 @@ if(isset($section_img2))
 	$section_imag2 	 =    wp_get_attachment_image_src($section_img2, '');
 	$img_thumb2 	 =   '<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"><img src="'.$section_imag2[0].'" class="img-responsive" alt="'. esc_attr__( 'image', 'nokri' ).'"></div>';
 }
-
    return  ' <section class="how-it-works style-2" >
     <div class="container">
       <div class="row">

@@ -63,82 +63,85 @@ function categories_sliders_short_base_func($atts, $content = '')
 	) , $atts));
 	
 	// For Job Category
-  $rows  		= vc_param_group_parse_atts( $atts['cats'] );
-  $cats 		= false;
-  $cats_html 	= '';
-  if( count((array) $rows ) > 0 )
-  {
-   $cats_html =  '';
-   foreach($rows as $row )
+	if(isset($atts['cats']) && $atts['cats'] != '')
    {
-		if( isset( $row['cat'] )  )
-		{
-			 if($row['cat'] == 'all' )
-			 {
-				  $cats = true;
-				  break;
-			 }
-			 $category = get_term_by('slug', $row['cat'], 'job_category');
-			 if( count((array) $category ) == 0 )
-			 continue;
-			 /*Category Image */
-			 $cat_img = '';	
-			if(isset($row['cat_img']))
-			{
-				 $img 		=  	wp_get_attachment_image_src($row['cat_img'], '');
-				$img_thumb 	= 	$img[0];
-				$cat_img    =   '<span class="images-icon"><img src="'.esc_url($img_thumb).'" alt="'.esc_attr__( 'image', 'nokri' ).'"></span>';
-			}
-			/* calling function for openings*/
-			$custom_count =  nokri_get_opening_count($category->term_id);
-			$count_cat = esc_html__( 'Opening', 'nokri' );
-			if ($category->count > 1)
-			{
-				$count_cat = esc_html__( 'Openings', 'nokri' );
-			}
-				$cats_html .= '<div class="item">
-						<div class="category-style-3-box"> <a href="'.nokri_cat_link_page($category->term_id).'">
-						  <div class="inner-box">
-							<h4>'.$category->name.'</h4>
-							<span> ('.$custom_count.')</span> </div>
-						  </a> </div>
-					  </div>
-						';
-	   }
-	}
-	  if( $cats )
+	  $rows  		= vc_param_group_parse_atts( $atts['cats'] );
+	  $cats 		= false;
+	  $cats_html 	= '';
+	  if( count((array) $rows ) > 0 )
+	  {
+	   $cats_html =  '';
+	   foreach($rows as $row )
 	   {
-			$ad_cats = nokri_get_cats('job_category', 0 );
-			 /*Category Image */
-			 $cat_img = '';	
-			if(isset($row['cat_img']))
+			if( isset( $row['cat'] )  )
 			{
-				 $img 		=  	wp_get_attachment_image_src($row['cat_img'], '');
-				$img_thumb 	= 	$img[0];
-				$cat_img    =   '<img src="'.esc_url($img_thumb).'" alt="'.esc_attr__( 'image', 'nokri' ).'">';
-			}
-			foreach( $ad_cats as $cat )
-			{
+				 if($row['cat'] == 'all' )
+				 {
+					  $cats = true;
+					  break;
+				 }
+				 $category = get_term_by('slug', $row['cat'], 'job_category');
+				 if( count((array) $category ) == 0 )
+				 continue;
+				 /*Category Image */
+				 $cat_img = '';	
+				if(isset($row['cat_img']))
+				{
+					 $img 		=  	wp_get_attachment_image_src($row['cat_img'], '');
+					$img_thumb 	= 	$img[0];
+					$cat_img    =   '<span class="images-icon"><img src="'.esc_url($img_thumb).'" alt="'.esc_attr__( 'image', 'nokri' ).'"></span>';
+				}
 				/* calling function for openings*/
-				$custom_count =  nokri_get_opening_count($cat->term_id);
+				$custom_count =  nokri_get_opening_count($category->term_id,'job_category');
 				$count_cat = esc_html__( 'Opening', 'nokri' );
-				if ($cat->count > 1)
+				if ($category->count > 1)
 				{
 					$count_cat = esc_html__( 'Openings', 'nokri' );
 				}
-				$cats_html .= '
-						<div class="item">
-						<div class="category-style-3-box"> <a href="'.nokri_cat_link_page($cat->term_id).'">
-						  <div class="inner-box">
-							<h4>'.$cat->name.'</h4>
-							<span> ('.$custom_count.')</span> </div>
-						  </a> </div>
-					  </div>
-						
-						';
-			}
-	   }	  
-}
+					$cats_html .= '<div class="item">
+							<div class="category-style-3-box"> <a href="'.nokri_cat_link_page($category->term_id).'">
+							  <div class="inner-box">
+								<h4>'.$category->name.'</h4>
+								<span> ('.$custom_count.')</span> </div>
+							  </a> </div>
+						  </div>
+							';
+		   }
+		}
+		  if( $cats )
+		   {
+				$ad_cats = nokri_get_cats('job_category', 0 );
+				 /*Category Image */
+				 $cat_img = '';	
+				if(isset($row['cat_img']))
+				{
+					 $img 		=  	wp_get_attachment_image_src($row['cat_img'], '');
+					$img_thumb 	= 	$img[0];
+					$cat_img    =   '<img src="'.esc_url($img_thumb).'" alt="'.esc_attr__( 'image', 'nokri' ).'">';
+				}
+				foreach( $ad_cats as $cat )
+				{
+					/* calling function for openings*/
+					$custom_count =  nokri_get_opening_count($cat->term_id,'job_category');
+					$count_cat = esc_html__( 'Opening', 'nokri' );
+					if ($cat->count > 1)
+					{
+						$count_cat = esc_html__( 'Openings', 'nokri' );
+					}
+					$cats_html .= '
+							<div class="item">
+							<div class="category-style-3-box"> <a href="'.nokri_cat_link_page($cat->term_id).'">
+							  <div class="inner-box">
+								<h4>'.$cat->name.'</h4>
+								<span> ('.$custom_count.')</span> </div>
+							  </a> </div>
+						  </div>
+							
+							';
+				}
+		   }	  
+	}
+   }
 /*Section Color */
 $section_clr = (isset($cats_section_clr) && $cats_section_clr != "") ? $cats_section_clr : "";
    return  '<section class="category-float-slider-sectoion '.$section_clr.'">

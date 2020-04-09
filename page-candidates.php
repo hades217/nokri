@@ -82,15 +82,70 @@ if( isset( $_GET['cand_skills'] ) && $_GET['cand_skills'] != ""  )
             'compare' => '='
         );
  }
+ $salary_qry = '';
+ if( isset( $_GET['cand-salary'] ) && $_GET['cand-salary'] != "" )
+ {
+  $salary_qry =   array(
+            'key'     => '_cand_salary_range',
+            'value'   => $_GET['cand-salary'],
+            'compare' => '='
+        );
+ }
+ $salary_type_qry = '';
+ if( isset( $_GET['cand-salary-type'] ) && $_GET['cand-salary-type'] != "" )
+ {
+  $salary_type_qry =   array(
+            'key' => '_cand_salary_type',
+            'value' => $_GET['cand-salary-type'],
+            'compare' => '='
+        );
+ }
+ $salary_type_curren = '';
+ if( isset( $_GET['cand-salary-currency'] ) && $_GET['cand-salary-currency'] != "" )
+ {
+  $salary_type_curren =   array(
+            'key' => '_cand_salary_curren',
+            'value' => $_GET['cand-salary-currency'],
+            'compare' => '='
+        );
+ }
  $location_qry = '';
- if( isset( $_GET['job_location'] ) && $_GET['job_location'] != "" )
+ if( isset( $_GET['job-location'] ) && $_GET['job-location'] != "" )
  {
   $location_qry =   array(
             'key' => '_cand_custom_location',
-            'value' => $_GET['job_location'],
+            'value' => $_GET['job-location'],
             'compare' => 'like'
         );
  }
+ 
+ $headline_qry = '';
+ if( isset( $_GET['cand-headline'] ) && $_GET['cand-headline'] != "" )
+ {
+  $headline_qry =   array(
+            'key' => '_user_headline',
+            'value' => $_GET['cand-headline'],
+            'compare' => 'like'
+        );
+ } 
+ $gender_qry = '';
+ if( isset( $_GET['cand-gender'] ) && $_GET['cand-gender'] != "" )
+ {
+  $gender_qry =   array(
+            'key' => '_cand_gender',
+            'value' => $_GET['cand-gender'],
+            'compare' => '='
+        );
+ }
+ $qualification_qry = '';
+ if( isset( $_GET['cand-qualification'] ) && $_GET['cand-qualification'] != "" )
+ {
+  $qualification_qry =   array(
+            'key'      =>  '_cand_qualification',
+            'value'    =>  $_GET['cand-qualification'],
+            'compare'  =>  '='
+        );
+ } 
 $cands_qry =   array(
 		'key' => '_sb_reg_type',
 		'value' => '0',
@@ -121,17 +176,25 @@ $args = array(
    'orderby'        => $orderby ,
    'number' 	    => $limit,
    'offset'	        => $offset,
-   'role'           => 'subscriber',
-   'paged '         => $page,
+   'role__in'       => array( 'editor', 'administrator','subscriber' ),
+   'paged '         => $page, 
    'meta_query' 	=> array(
         $type_qry,
 		$cands_qry,
 		$level_qry,
 		$skills_qry,
+		$salary_qry,
+		$salary_type_qry,
+		$salary_type_curren,
 		$experience_qry,
-		$location_qry
+		$location_qry,
+		$headline_qry,
+		$gender_qry,
+		$qualification_qry
    )
 );
+
+
 // Create the WP_User_Query object
 $wp_user_query = new WP_User_Query($args);
 // Get the results
@@ -148,6 +211,8 @@ else
 }
 /* Search allowed */
 $is_allowed        =  nokri_is_cand_search_allowed();
+
+
 if(!$is_allowed)
 {
 	echo nokri_redirect( get_the_permalink($package_page) );
@@ -211,7 +276,7 @@ $style = ( isset($nokri['cand_listing_style']) && $nokri['cand_listing_style'] !
                                                 $cand_id  = $user->ID;
                                                 echo nokri_candidates_get_grid_layouts($cand_id,$style);
                                             } 
-                                        }
+                                        } 
                                        ?>
                                    	  </div>
                                    </div>

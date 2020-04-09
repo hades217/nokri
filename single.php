@@ -36,8 +36,13 @@ ob_end_clean();
 			 }
 			 ?>
             <div class="blog-single post-desc entry-content">
-              <div class="post-info"> <a href="javascript:void(0)"><?php echo  get_the_time(get_option( 'date_format' )); ?></a> <a href="javascript:void(0)"><?php echo get_comments_number($pid)." ".__("comment", "nokri"); ?></a> </div>
-              <h3 class="post-title"><?php echo the_title(); ?></h3>
+              <div class="post-info"> 
+              <?php if( isset( $nokri['theme_date'] ) && $nokri['theme_date'] == '1'   ) { ?>
+              <a href="javascript:void(0)"><?php echo  get_the_time(get_option( 'date_format' )); ?></a>
+              <?php } ?> 
+              <a href="javascript:void(0)"><?php echo get_comments_number($pid)." ".__("comment", "nokri"); ?></a> 
+              </div>
+              <h1 class="post-title"><?php echo the_title(); ?></h1>
               <?php the_content();
 			  if(has_tag()) { ?>
               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">

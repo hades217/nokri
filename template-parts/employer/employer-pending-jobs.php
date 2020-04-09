@@ -11,6 +11,7 @@ $current_id = get_current_user_id();
 $job_name    =  (isset($_GET['job_name']) && $_GET['job_name'] != "") ? $_GET['job_name'] : '';
 $paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
 $args = array('author'  => $current_id, 'post_type' => 'job_post' , 'post_status' => 'pending', 's' => $job_name,'paged'  => $paged);
+$args = nokri_wpml_show_all_posts_callback($args);
 ?>
 <div class="main-body">
 <div class="dashboard-job-stats">
@@ -34,6 +35,7 @@ $query = new WP_Query( $args );
 			$query->the_post(); 
 			get_template_part( 'template-parts/layouts/job-style/pending', 'jobs');
 	 }
+	 wp_reset_postdata();
 }
 else
 {

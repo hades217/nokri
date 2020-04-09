@@ -3,56 +3,72 @@
 if (! class_exists ( 'authentication' )) {
 class authentication
 {
-		function nokri_sign_up_form( $string, $terms , $section_user_name = '',$section_user_email='',$section_user_password = '',$section_term = '',$section_user_btn = '',$section_user_phone = '',$key_code =	'' , $section_term_link = '',$section_emp_btn = '',$section_cand_btn = '',$section_already_txt = '',$login_txt = '')
+		function nokri_sign_up_form( $string, $terms , $section_user_name = '',$section_user_email='',$section_user_password = '',$section_term = '',$section_user_btn = '',$section_user_phone = '',$key_code =	'' , $section_term_link = '',$section_emp_btn = '',$section_cand_btn = '',$section_already_txt = '',$login_txt = '',$default_btn)
 		{
-			
-
 			global $nokri;
+			$custom_feild_id = (isset($nokri['custom_registration_feilds'])) ? $nokri['custom_registration_feilds'] : '';
 			$rtl_class = '';
 			if(is_rtl())
 			{
 				$rtl_class = "flip";
 			}
-			
 			/* Only admin post job */
 			$regsiter_buttons = '<input type="hidden" name="sb_reg_type" value="0"/>';
 			if((isset($nokri['job_post_for_admin'])) && $nokri['job_post_for_admin']  != '1' )
 			{
+				$employer = $candidate =  $active_emp = $active_cand = '';
+				if($default_btn == '1')
+				{
+					$employer     = 'checked="checked"';
+					$active_emp   = 'active';
+				}
+				else
+				{
+					$candidate     = 'checked="checked"';
+					$active_cand   = 'active';
+				}
+				
 				$regsiter_buttons = '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 					<div class="btn-group" id="status" data-toggle="buttons">
-					   <label class="btn btn-default btn-md">
-					 <input type="radio" value="1" name="sb_reg_type" >'.$section_emp_btn.'</label>
+					   <label class="btn btn-default btn-md '.$active_emp.'">
+					 <input type="radio" value="1" name="sb_reg_type" '.$employer.'>'.$section_emp_btn.'</label>
 					   </label>
-					   <label class="btn btn-default btn-md active">
-					    <input type="radio" value="0" name="sb_reg_type" checked="checked">'.$section_cand_btn.'</label>
+					   <label class="btn btn-default btn-md '.$active_cand.'">
+					    <input type="radio" value="0" name="sb_reg_type" '.$candidate.'>'.$section_cand_btn.'</label>
 					   </label>
 					</div>
 				 </div>';
 			}
-			
-			
-			
+			/* Custom feilds for registration */
+			$custom_feilds_html = '';
+			if($custom_feild_id)
+			{
+				$custom_feilds_html = nokri_get_custom_feilds('','Registration',$custom_feild_id,'','');
+			}
 		return '<form id="sb-signup-form" method="post" >
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 					<div class="form-group">
-					    <input placeholder="'. esc_html__( 'Your Name','nokri' ).'" class="form-control" type="text" data-parsley-required="true" data-parsley-error-message="'. esc_html__( 'Please enter your name.', 'nokri' ) .'" name="sb_reg_name" >
+					    <input placeholder="'. esc_html($section_user_name).'" class="form-control" type="text" data-parsley-required="true" data-parsley-error-message="'. esc_html__( 'Please enter your name.', 'nokri' ) .'" name="sb_reg_name" >
 					</div>
 				 </div>
 				
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 					<div class="form-group">
-					  <input placeholder="'.  esc_html__( 'Your Email','nokri' ).'" class="form-control" type="email" data-parsley-type="email" data-parsley-required="true" data-parsley-error-message="'. esc_html__( 'Please enter your valid email.', 'nokri' ) .'" data-parsley-trigger="change" name="sb_reg_email">
+					  <input placeholder="'.  esc_html($section_user_email).'" class="form-control" type="email" data-parsley-type="email" data-parsley-required="true" data-parsley-error-message="'. esc_html__( 'Please enter your valid email.', 'nokri' ) .'" data-parsley-trigger="change" name="sb_reg_email">
 					</div>
 				 </div>
 		
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 					<div class="form-group">
-					   <input placeholder="'.  esc_html__( 'Your Password','nokri' ) .'" class="form-control" type="password" data-parsley-required="true" data-parsley-error-message="'. esc_html__( 'Please enter your password.', 'nokri' ) .'" name="sb_reg_password">
+					   <input placeholder="'.  esc_html($section_user_password ) .'" class="form-control" type="password" data-parsley-required="true" data-parsley-error-message="'. esc_html__( 'Please enter your password.', 'nokri' ) .'" name="sb_reg_password">
 					</div>
 				 </div>
-		
+
 				'.$regsiter_buttons.'
-		
+				
+				'.$custom_feilds_html.'
+				
+				
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 					<div class="buttons-area">
 					   <div class="form-group">
@@ -75,9 +91,8 @@ class authentication
 		   <input type="hidden" id="nonce" value="'.$key_code.'" />
 		</form>';
 		}
-		
 		// sign In form
-		function nokri_sign_in_form ( $key_code = '',$already_acount = '',$sign_up = '',$submit_button = '',$forgot_password= '')
+		function nokri_sign_in_form ( $key_code = '',$already_acount = '',$sign_up = '',$submit_button = '',$forgot_password= '' ,$user_email_plc ,$user_password_plc)
 		{
 			global $nokri;
 			$rtl_class = '';
@@ -89,20 +104,20 @@ class authentication
 		return '<form id="sb-login-form-data"  >
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 					<div class="form-group">
-					   <input placeholder="'.  esc_html__( 'Your Email','nokri' ).'" class="form-control" type="email" data-parsley-type="email" data-parsley-required="true" data-parsley-error-message="'. esc_html__( 'Please enter your valid email.', 'nokri' ) .'" data-parsley-trigger="change" name="sb_reg_email" id="sb_reg_email">
+					   <input placeholder="'. esc_html($user_email_plc).'" class="form-control" type="email" data-parsley-type="email" data-parsley-required="true" data-parsley-error-message="'. esc_html__( 'Please enter your valid email.', 'nokri' ) .'" data-parsley-trigger="change" name="sb_reg_email" id="sb_reg_email" autocomplete="off">
 					</div>
 				 </div>
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 					<div class="form-group">
-					   <input placeholder="'.  esc_html__( 'Your Password','nokri' ) .'" class="form-control" type="password" data-parsley-required="true" data-parsley-error-message="'. esc_html__( 'Please enter your password.', 'nokri' ) .'" name="sb_reg_password">
+					   <input placeholder="'. esc_html($user_password_plc) .'" class="form-control" type="password" data-parsley-required="true" data-parsley-error-message="'. esc_html__( 'Please enter your password.', 'nokri' ) .'" name="sb_reg_password" autocomplete="off">
 					</div>
 				 </div>
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 					<div class="form-group">
 					   <a href="#" class="pull-left '.esc_attr($rtl_class).'" data-target="#myModal" data-toggle="modal">'.($forgot_password).'</a>
 					   <button class="btn n-btn-flat btn-mid pull-right '.esc_attr($rtl_class).'" type="submit" id="sb_login_submit">'.($submit_button).'</button>
-		   <button class="btn n-btn-flat btn-mid pull-right '.esc_attr($rtl_class).' no-display" type="button" id="sb_login_msg" disabled>'.  esc_html__( 'Processing...','nokri' ).'</button>
-		   <button class="btn n-btn-flat btn-mid pull-right '.esc_attr($rtl_class).' no-display" type="button" id="sb_login_redirect" disabled>'.  esc_html__( 'Redirecting...','nokri' ).'</button>
+		                           <button class="btn n-btn-flat btn-mid pull-right '.esc_attr($rtl_class).' no-display" type="button" id="sb_login_msg" disabled>'.  esc_html__( 'Processing...','nokri' ).'</button>
+		                           <button class="btn n-btn-flat btn-mid pull-right '.esc_attr($rtl_class).' no-display" type="button" id="sb_login_redirect" disabled>'.  esc_html__( 'Redirecting...','nokri' ).'</button>
 					</div>
 				 </div>
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -113,10 +128,7 @@ class authentication
 		   <input type="hidden" id="nonce" value="'.$key_code.'" />
 		   <input type="hidden" class="get_action" value="login" />
 		</form>';
-		
-		
 		}
-		
 		// Forgot Password Form
 		function nokri_forgot_password_form()
 		{
@@ -178,7 +190,6 @@ if (! function_exists ( 'nokri_login_user' )) {
  
 }
 }
-
 // Ajax handler for Register User
 add_action( 'wp_ajax_sb_register_user', 'nokri_register_user' );
 add_action( 'wp_ajax_nopriv_sb_register_user', 'nokri_register_user' );
@@ -199,9 +210,26 @@ function nokri_register_user()
 				echo '3';
 				die(); 
 			}
+                      
 			$user_name	=	explode( '@', $params['sb_reg_email'] );
 			$u_name   	=	nokri_check_user_name( $user_name[0] );
 			$uid        =	wp_create_user( $u_name, $params['sb_reg_password'], sanitize_email($params['sb_reg_email']) );
+			/* Updating Custom feilds */
+			if( isset($params['_custom_']) && count( $params['_custom_'] ) > 0)
+			{
+				foreach($params['_custom_'] as $key => $data)
+				{
+					if( is_array($data) )
+					{
+						$dataArr    = array();
+						foreach($data as $k ) 
+						$dataArr[]  = $k; 
+						$data       = stripslashes(json_encode($dataArr, JSON_UNESCAPED_UNICODE));
+					}
+					update_user_meta($uid, $key, sanitize_text_field($data) );
+				}
+			}
+			/* Updating Custom feilds ends */
 			wp_update_user( array( 'ID' => $uid, 'display_name' => sanitize_text_field($params['sb_reg_name'] )) );
 			update_user_meta($uid, '_sb_contact', sanitize_text_field($params['sb_reg_contact']));
 			update_user_meta($uid, '_sb_reg_type', sanitize_text_field($params['sb_reg_type']));
@@ -211,7 +239,7 @@ function nokri_register_user()
 			   {
 					nokri_email_on_new_user($uid, '');
 			   }
-			  /* Assign package */
+			  /* Assign package to employer */
 			  $product_id = nokri_assign_free_package();
 			  if( isset( $product_id) && $product_id != '')
 			  {
@@ -221,6 +249,19 @@ function nokri_register_user()
 						if($is_pkg_free == 1)
 						{
 							nokri_free_package( $product_id ,$uid);
+						}
+				   }
+			  }
+			  /* Assign package to candidate */
+			  $product_cand_id = nokri_candidate_assign_free_package();
+			  if( isset( $product_cand_id) && $product_cand_id != '')
+			  {
+				   if( isset( $nokri['cand_assign_pkg'] ) && $nokri['cand_assign_pkg'] == '1' && $params['sb_reg_type'] == '0'  )
+				   {
+						$is_pkg_free  = 	get_post_meta($product_cand_id, 'op_pkg_typ',true );
+						if($is_pkg_free == 1)
+						{
+							nokri_free_package_for_candidate( $product_cand_id ,$uid);
 						}
 				   }
 			  }
@@ -247,14 +288,13 @@ function nokri_register_user()
 				echo esc_html__( 'please verify captcha code', 'nokri' );
 			}
 				}
-		else
-		{
-			echo esc_html__( 'Email already exist, please try other one.', 'nokri' );
-		}
+	else
+	{
+		echo esc_html__( 'Email already exist, please try other one.', 'nokri' );
+	}
 		die();
 	}
 }
-
 if (! function_exists ( 'nokri_auto_login' )) {
 function nokri_auto_login($username, $password, $remember )
 {
@@ -281,9 +321,6 @@ function nokri_auto_login($username, $password, $remember )
 	}
 }
 }
-
-
-
 add_action( 'wp_ajax_sb_social_login', 'nokri_check_social_user' );
 add_action( 'wp_ajax_nopriv_sb_social_login', 'nokri_check_social_user' );
 if ( ! function_exists( 'nokri_check_social_user' ) ) {
@@ -314,7 +351,7 @@ if($is_demo)
    /* if only admin can post */
    if((isset($nokri['job_post_for_admin'])) && $nokri['job_post_for_admin']  == '1' )
 	{
-		update_user_meta($user_id, '_sb_reg_type', 1);
+		//update_user_meta($user_id, '_sb_reg_type', 1);
 	}
    if( $user )
    {
@@ -363,10 +400,6 @@ if($is_demo)
  die();
 }
 }
-
-
-
-
 if (! function_exists ( 'nokri_user_not_logged_in' )) 
 {
 	function nokri_user_not_logged_in()
@@ -399,10 +432,8 @@ function nokri_check_user_name( $username = '' )
 	return $username;
 }
 }
-
 add_action( 'wp_ajax_sb_reset_password', 'nokri_reset_password' );
 add_action( 'wp_ajax_nopriv_sb_reset_password', 'nokri_reset_password' );
-
 // Reset Password
 if ( ! function_exists( 'nokri_reset_password' ) )
 {
@@ -431,13 +462,7 @@ function nokri_reset_password()
 	die();
 }
 }
-
-
-
-
-
 /* After Social Login Acount Check*/
-
 add_action('wp_ajax_after_social_login', 'nokri_after_social_login');
 if ( ! function_exists( 'nokri_after_social_login' ) ) {
 function nokri_after_social_login()
@@ -451,9 +476,6 @@ function nokri_after_social_login()
 	die();
  }
 }
-
-
-
 if( ! function_exists( 'nokri_do_register' ) )
 {
 function nokri_do_register($email= '', $password = '')
@@ -470,16 +492,19 @@ function nokri_do_register($email= '', $password = '')
 	return $uid;
 }
 }
-
 if( ! function_exists( 'nokri_do_register_without_login' ) )
 {
 	function nokri_do_register_without_login($email= '',$user_name = '', $password = '')
 	{
-		$uid =	wp_create_user( $user_name, $password, $email );
-		wp_update_user( array( 'ID' => $uid, 'display_name' => $user_name ) );
-		update_user_meta($uid, '_user_profile_status', 'pub');
-		nokri_auto_login($email, $password, true );
-		return $uid;
+               $emailarray  = explode('@',$email);
+               $emailSuffix = $emailarray[0];
+              
+		$user_name	= sanitize_user($user_name); 
+	         $uid        =	wp_create_user( $emailSuffix, $password, $email );
+		 wp_update_user( array( 'ID' => $uid, 'display_name' => $user_name ) );
+	         update_user_meta($uid, '_user_profile_status', 'pub');
+		 nokri_auto_login($email, $password, true );
+		 return $uid;
 	}
 }
 /************************************/
@@ -487,12 +512,11 @@ if( ! function_exists( 'nokri_do_register_without_login' ) )
 /************************************/
 add_action( 'wp_ajax_emp_profiles', 'nokri_emp_profiles' );
 add_action( 'wp_ajax_nopriv_emp_profiles', 'nokri_emp_profiles' );
-
 function nokri_emp_profiles()
 {
 	global $nokri;
 	/*Setting profile option*/
-	$profile_setting_option = isset($nokri['user_profile_setting_option']) ? $nokri['user_profile_setting_option']  : false;
+	$profile_setting_option = isset($nokri['emp_prof_setting']) ? $nokri['emp_prof_setting']  : false;
 	$taxonomy =  'job_category';
 	$user_id  =   get_current_user_id();
 	/*demo check */
@@ -534,14 +558,8 @@ function nokri_emp_profiles()
 	{
 		wp_update_user( array( 'ID' => $user_id, 'display_name' => sanitize_text_field($params['emp_name'] )) ); 
 	}
-	if ($emp_headline != '')
-	{
-		update_user_meta( $user_id, '_user_headline',sanitize_text_field($emp_headline));
-	}
-	if ($emp_web != '')
-	{
-		update_user_meta( $user_id, '_emp_web', sanitize_text_field($emp_web));
-	}
+	update_user_meta( $user_id, '_user_headline',sanitize_text_field($emp_headline));
+	update_user_meta( $user_id, '_emp_web', sanitize_text_field($emp_web));
 	if ($emp_est != '')
 	{
 		update_user_meta( $user_id, '_emp_est', sanitize_text_field($emp_est));
@@ -550,27 +568,17 @@ function nokri_emp_profiles()
 	{
 		update_user_meta( $user_id, '_emp_search', sanitize_text_field($emp_search));
 	}
-	 if ($emp_phone != '')
-	{
-		update_user_meta( $user_id, '_sb_contact', sanitize_text_field($emp_phone));
-	}
+	update_user_meta( $user_id, '_sb_contact', sanitize_text_field($emp_phone));
 	if ($emp_entity != '')
 	{
 		update_user_meta( $user_id, '_emp_entity', sanitize_text_field($emp_entity));
 	}
-	if ($emp_nos != '')
-	{
 		update_user_meta( $user_id, '_emp_nos', sanitize_text_field($emp_nos));
-	}
 	if ($emp_cat != '')
 	{
 		update_user_meta( $user_id, '_emp_skills', ($emp_cat));
 	}
-	if ($emp_video != '')
-	{
 		update_user_meta( $user_id, '_emp_video', sanitize_text_field($emp_video));
-	}
-	
 	/*If allowed */
 	if($profile_setting_option)
 	{
@@ -580,12 +588,11 @@ function nokri_emp_profiles()
 	{
 		update_user_meta( $user_id, '_user_profile_status', sanitize_text_field('pub'));
 	}
-	update_user_meta( $user_id, '_emp_intro', sanitize_textarea_field($emp_intro));
+	update_user_meta( $user_id, '_emp_intro', wp_kses($emp_intro,nokri_required_tags()));
 	update_user_meta( $user_id, '_emp_fb', sanitize_text_field($emp_fb));
 	update_user_meta( $user_id, '_emp_twitter', sanitize_text_field($emp_twitter));
 	update_user_meta( $user_id, '_emp_linked', sanitize_text_field($emp_linked));
 	update_user_meta( $user_id, '_emp_google', sanitize_text_field($emp_google));
-	
 	if ($emp_map_location != '')
 	{
 		update_user_meta($user_id, '_emp_map_location', sanitize_text_field($emp_map_location) );
@@ -602,7 +609,21 @@ function nokri_emp_profiles()
 	{
 		update_user_meta($user_id, '_emp_postal_address', sanitize_text_field($emp_postal_address) );
 	}
-	
+	/* Updating Custom feilds */
+	if( isset($params['_custom_']) && count( $params['_custom_'] ) > 0)
+	{
+		foreach($params['_custom_'] as $key => $data)
+		{
+			if( is_array($data) )
+			{
+				$dataArr    = array();
+				foreach($data as $k ) 
+				$dataArr[]  = $k; 
+				$data       = stripslashes(json_encode($dataArr, JSON_UNESCAPED_UNICODE));
+			}
+			update_user_meta($user_id, $key, sanitize_text_field($data) );
+		}
+	}
 	/*countries*/
 	$cand_location =	array();
 	if( $params['cand_country'] != "" )        {  $cand_location[]	=	$params['cand_country'];	 }
@@ -610,11 +631,9 @@ function nokri_emp_profiles()
 	if( $params['cand_country_cities'] != "" ) {  $cand_location[]	=	$params['cand_country_cities']; }
 	if( $params['cand_country_towns'] != "" )  {  $cand_location[]	=	$params['cand_country_towns']; }
 	update_user_meta( $user_id, '_emp_custom_location', ($cand_location));
-
 	echo "1";
 	die();
 }
-
 /************************************/
 /* Ajax handler for Proifle Picture   */
 /************************************/ 
@@ -670,8 +689,9 @@ if($is_demo)
     $_FILES = array ("my_file_upload" => $file); 
 	
 // Allow certain file formats
-$imageFileType	=	end( explode('.', $file['name'] ) );
-if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+$imageFileType	= strtolower(end( explode('.', $file['name'] ) ));
+
+if($imageFileType != "jpg"  && $imageFileType != "png" && $imageFileType != "jpeg"
 && $imageFileType != "gif" ) {
     echo '0|' . esc_html__( "Sorry, only JPG, JPEG, PNG & GIF files are allowed.", 'nokri' );
 	die();
@@ -719,10 +739,6 @@ echo '1|' . $image_link[0];
 
 }
 }
-
-
-
-
 /************************************/
 // Ajax handler for add to cart    //
 /************************************/
@@ -734,36 +750,27 @@ function nokri_add_to_cart()
 	global $nokri;
 	$user_id   = get_current_user_id();
 	$user_type = get_user_meta($user_id, '_sb_reg_type', true);
-	
+	$signin_page = (isset($nokri['sb_sign_in_page']) && $nokri['sb_sign_in_page'] != '') ? $nokri['sb_sign_in_page'] : '';
 	if( $user_id == "" )
 	{
-		echo '0|' . __( "You must need to logged in.", 'nokri' );
+		echo '0|' . __( "You must need to logged in", 'nokri') .'|' . get_the_permalink($signin_page);
 		die();	
 	}
-	
-	
-	
 	$product_id	  = 	$_POST['product_id'];
+	$product_id	  =     nokri_get_origional_product_id($product_id);
 	$is_avail     = 	get_user_meta( $user_id, 'avail_free_package', true); 
     $is_pkg_free  = 	get_post_meta($product_id, 'op_pkg_typ',true );
 	$is_pkg_for   = 	get_post_meta($product_id, 'op_pkg_for',true );
-	
-	
 	if( $user_type == '0' && $is_pkg_for == '1' )
 	{
 		echo '5|' . __( "This is employer package", 'nokri' );
 		die();
 	}
-	
-	
-	
-	
 	if ($is_avail == 1 && $_POST['is_free'] == 1)
 	{
 		echo '4|' . __( "You have already availed free package", 'nokri') .'|' . get_the_permalink( $nokri['package_page'] );
 		die();
 	}
-	
 	if ($_POST['is_free'] == 1 &&  $is_pkg_free == 1 )
 	{
 		 nokri_free_package($product_id);
@@ -784,27 +791,24 @@ function nokri_add_to_cart()
 	die();
 }
 }
-
 /************************************************/
 // Ajax handler for add to cart for candidate    //
 /**********************************************/
 add_action( 'wp_ajax_sb_add_cart_cand', 'nokri_add_to_cart_cand' );
-add_action('nokri_add_to_cart_cand', 'nokri_add_to_cart_cand');
+add_action('wp_ajax_nopriv_sb_add_cart_cand', 'nokri_add_to_cart_cand');
 if ( ! function_exists( 'nokri_add_to_cart_cand' ) ) {
 function nokri_add_to_cart_cand()
 {
 	global $nokri;
-	$user_id   = get_current_user_id();
-	$user_type = get_user_meta($user_id, '_sb_reg_type', true);
+	$user_id     = get_current_user_id();
+	$user_type   = get_user_meta($user_id, '_sb_reg_type', true);
+	$signin_page = (isset($nokri['sb_sign_in_page']) && $nokri['sb_sign_in_page'] != '') ? $nokri['sb_sign_in_page'] : '';
 	
 	if( $user_id == "" )
 	{
-		echo '0|' . __( "You must need to logged in.", 'nokri' );
-		die();	
+		echo '0|' . __( "You must need to logged in", 'nokri') .'|' . get_the_permalink($signin_page);
+		die();
 	}
-	
-	
-	
 	/*demo check */
 	$is_demo =  nokri_demo_mode();
 	if($is_demo)
@@ -857,13 +861,9 @@ function nokri_add_to_cart_cand()
 	die();
 }
 }
-
-
-
 /************************************/
 // Ajax handler for Job Posting. //
 /************************************/
-
 add_action('wp_ajax_sb_ad_posting', 'nokri_ad_posting');
 if ( ! function_exists( 'nokri_ad_posting' ) ) {
 function nokri_ad_posting()
@@ -872,15 +872,22 @@ function nokri_ad_posting()
 	/*demo check */
 	$is_demo =  nokri_demo_mode();
 	if($is_demo){echo '2';die();}
+	$is_only_admin = isset($nokri['job_post_for_admin']) ? $nokri['job_post_for_admin']  : false;
+	if ( !is_super_admin() )
+	{
+		if($is_only_admin){echo '3';die();}
+	}
 	$job_params = array();
+        
+        
 	parse_str($_POST['sb_data'], $job_params);
 	// Getting values
-	$job_date 				=    		$job_params['job_date'];
+	$job_date 		        =    		$job_params['job_date'];
 	$job_description 		= 			$job_params['job_description'];
 	$job_category 			= 			$job_params['job_category'];
-	$job_type 				=         	$job_params['job_type'];
-	$job_level 				=        	$job_params['job_level'];
-	$job_shift 				=        	$job_params['job_shift'];
+	$job_type 			=         	$job_params['job_type'];
+	$job_level 			=        	$job_params['job_level'];
+	$job_shift 			=        	$job_params['job_shift'];
 	$job_experience 		=   		$job_params['job_experience'];
 	$job_skills 			=       	$job_params['job_skills'];
 	$job_salary 			=       	$job_params['job_salary']; 
@@ -888,13 +895,14 @@ function nokri_ad_posting()
 	$job_currency 			=     		$job_params['job_currency'];
 	$job_salary_type 		=     		$job_params['job_salary_type'];
 	$job_address 			= 			$job_params['sb_user_address'];
-	$job_lat 				= 			$job_params['ad_map_lat'];
-	$job_long 				= 			$job_params['ad_map_long'];
+	$job_lat 			= 			$job_params['ad_map_lat'];
+	$job_long 			= 			$job_params['ad_map_long'];
 	$job_phone 				= 			$job_params['job_phone'];
 	$job_posts 				= 			$job_params['job_posts'];
 	$job_apply_with 		= 			$job_params['job_apply_with'];
 	$job_apply_url 			= 			$job_params['job_external_url'];
 	$job_video              =           $job_params['job_video'];
+	$job_questions          =           $job_params['job_qstns'];
 	$job_class 				= 			array();
 	$job_class_checked 		= 			$job_params['class_type_value'];
 	if( get_current_user_id() == "" )   { echo "0"; die();}
@@ -929,19 +937,25 @@ function nokri_ad_posting()
 			update_post_meta($pid, '_nokri_ad_status_', 'active' );
 	}
 	nokri_get_notify_on_ad_post($pid);
-	
+       // nokri_job_alerts_function();
+       
 	/* Getting Other Jobs Informations */
 	foreach($job_class_checked as $job_class)
 	{
 		$no_of_jobs          =  get_user_meta(get_current_user_id(), 'package_job_class_'.$job_class, true);
-		if( $no_of_jobs > 0  )
+		
+                if(is_super_admin()){                                
+                    wp_set_post_terms($pid, $job_class_checked, 'job_class');  
+                }
+                else{                               
+                if( $no_of_jobs > 0  )
 			{
 				$no_of_jobs	=	$no_of_jobs - 1;
 				update_user_meta( get_current_user_id(), 'package_job_class_'.$job_class, $no_of_jobs );
 				update_post_meta( $pid, 'package_job_class_'.$job_class, $job_class );
 				wp_set_post_terms($pid, $job_class_checked, 'job_class');  
 			}
-	}
+        }}
 	/*Bad words filteration*/
 	$words		=	explode( ',', $nokri['bad_words_filter'] );
 	$replace	=	$nokri['bad_words_replace'];
@@ -1098,17 +1112,30 @@ function nokri_ad_posting()
    			update_post_meta($pid, $key, sanitize_text_field($data) );
 		}
 	}
-	
-	
-	
-	
-	/* Jobs Status */
-	update_post_meta( $pid, '_job_status', sanitize_text_field('active'));
-	echo get_the_permalink( $pid );
-	 die();
+	/* Questionares */
+	$questions_sanatize = array();
+	if( isset($job_questions) && !empty($job_questions) )
+	{
+		foreach($job_questions as $key)
+		{
+			if(!empty($key))
+			{
+				$questions_sanatize[] = sanitize_text_field($key);
+			}
+		}
+		update_post_meta( $pid, '_job_questions', ($questions_sanatize));
+	}
+		/* Jobs Status */
+		update_post_meta( $pid, '_job_status', sanitize_text_field('active'));
+		if($_POST['is_update'] == "")
+		{
+			/* wpml duplication function */
+			nokri_duplicate_posts_lang_callback($pid);
+		}
+		echo get_the_permalink( $pid );
+		die();
 	}
 }
-
 /* Create Post By Title */
 if ( ! function_exists( 'nokri_check_author' ) ) {
 function nokri_check_author( $ad_id )
@@ -1123,7 +1150,6 @@ function nokri_check_author( $ad_id )
 	}
 }
 }
-
 add_action('wp_ajax_post_ad', 'nokri_post_ad_process');
 if ( ! function_exists( 'nokri_post_ad_process' ) ) {
 function nokri_post_ad_process()
@@ -1176,10 +1202,6 @@ die();
 
 }
 }
-
-
-
-
 // Get States
 add_action('wp_ajax_sb_get_sub_states', 'nokri_get_sub_states');
 add_action( 'wp_ajax_nopriv_sb_get_sub_states_search', 'nokri_get_sub_states_search' );
@@ -1207,8 +1229,6 @@ function nokri_get_sub_states()
 	}
 }
 }
-
-
 /*Employer Action Request*/
 add_action('wp_ajax_job_action', 'nokri_job_action');
 if ( ! function_exists( 'nokri_job_action' ) ) {
@@ -1226,14 +1246,7 @@ function nokri_job_action()
 	die();  
 }
 }
-
-
-
-
-
-
 /*Employer Email Tempalte Action */
-
 add_action('wp_ajax_create_email_action', 'nokri_create_email_templates');
 if ( ! function_exists( 'nokri_create_email_templates' ) ) {
 function nokri_create_email_templates()
@@ -1276,13 +1289,7 @@ function nokri_create_email_templates()
 	die();  
 }
 }
-
-
-
-
-
 /* Employer Deleting Email Template*/
-
 add_action('wp_ajax_del_email_temp', 'nokri_del_email_temp');
 if ( ! function_exists( 'nokri_del_email_temp' ) ) {
 function nokri_del_email_temp()
@@ -1301,12 +1308,7 @@ echo 1;
 die();
  }
 }
-
-
-
-
 /* Employer Select Email Template */
-
 add_action('wp_ajax_template_select_action', 'nokri_template_select');
 if ( ! function_exists( 'nokri_template_select' ) ) {
 function nokri_template_select()
@@ -1341,7 +1343,6 @@ function nokri_template_select()
 		
    }
 }
-
 /* Employer Sending Email*/
 add_action('wp_ajax_sending_email', 'nokri_sending_email');
 if ( ! function_exists( 'nokri_sending_email' ) ) {
@@ -1361,6 +1362,8 @@ function nokri_sending_email()
 	$job_id        =  $send_email_params['job_stat_id'];
 	$cand_status   =  $send_email_params['cand_status_val'];
 	$is_send_mail  =  $send_email_params['is_send_email'];
+        
+      
 	if( $candidate_id != "" )
 	{
 		update_post_meta( $job_id, '_job_applied_status_'.$candidate_id,$cand_status);
@@ -1375,9 +1378,7 @@ function nokri_sending_email()
 	die();
  }
 }
-
 /* Employer Activating/Inactivating His Job*/
-
 add_action('wp_ajax_inactive_job', 'nokri_inactive_job');
 if ( ! function_exists( 'nokri_inactive_job' ) ) {
 function nokri_inactive_job()
@@ -1399,10 +1400,7 @@ function nokri_inactive_job()
 	die();
  }
 }
-
-
 /* Employer Deleting His Job*/
-
 add_action('wp_ajax_del_emp_job', 'nokri_del_my_job');
 if ( ! function_exists( 'nokri_del_my_job' ) ) {
 function nokri_del_my_job()
@@ -1420,8 +1418,6 @@ function nokri_del_my_job()
 	die();
  }
 }
-
-
 /* Employer Deleting His Followers*/
 add_action('wp_ajax_un_following_followers', 'nokri_un_following_followers');
 if ( ! function_exists( 'nokri_un_following_followers' ) ) {
@@ -1453,8 +1449,6 @@ if( $follower_id != "" )
 	die();
 	}
 }
-
-
 /************************************/
 /* Return Followers  ID's*/
 /************************************/
@@ -1477,12 +1471,9 @@ if ( ! function_exists( 'nokri_followers_ids' ) )
 		}
 	}
 }
-
-
 /**********************************/
 /* User updating  password       */
 /**********************************/
-
 add_action('wp_ajax_change_password', 'nokri_change_password');
 if ( ! function_exists( 'nokri_change_password' ) ) {
 function nokri_change_password()
@@ -1526,11 +1517,9 @@ else
 	
 	}
 }
-
 /**********************************/
 /* Del acount      */
 /**********************************/
-
 add_action('wp_ajax_delete_myaccount', 'nokri_delete_my_account');
 if ( ! function_exists( 'nokri_delete_my_account' ) )
 { 
@@ -1578,7 +1567,6 @@ if($is_demo)
   }
  }
 }
-
 /* Contact me */
 add_action( 'wp_ajax_nopriv_contact_me', 'nokri_contact_me' );
 add_action('wp_ajax_contact_me', 'nokri_contact_me');
@@ -1586,19 +1574,21 @@ if ( ! function_exists( 'nokri_contact_me' ) ) {
 function nokri_contact_me()
 {
 	$contact_me_params = array();
+        
+      
 	parse_str($_POST['contact_me_data'], $contact_me_params);
+       
 	$headers            =  array('Content-Type: text/html; charset=UTF-8');  
 	$reciver_id         =  $contact_me_params['receiver_id']; 
 	$sender_name        =  $contact_me_params['contact_name'];
 	$sender_email       =  $contact_me_params['contact_email'];
 	$subject            =  $contact_me_params['contact_subject'];
-	$message            =  $contact_me_params['contact_message'];
+	$message            =  nl2br($contact_me_params['contact_message']);       
 	nokri_contact_me_email( $reciver_id,$sender_email,$sender_name,$subject,$message);
 	echo 1;
 	die();
  }
 }
-
 /**********************************************/
 /* Ajax handler for upload custom feilds attachments  */
 /**********************************************/
@@ -1683,8 +1673,6 @@ function job_attachments() {
 	 echo($attachment_id);
 	 die();
 }}
-
-
 /**********************************************/
 /* Ajax handler for get custom feilds attachments  */
 /**********************************************/
@@ -1739,7 +1727,6 @@ function get_uploaded_job_attachments()
 	die();
 }
 }
-
 /************************************************/
 /* Ajax handler for del custom feilds attachments */
 /***********************************************/
@@ -1775,7 +1762,6 @@ if ( ! function_exists( 'delete_uploaded_job_attachments' ) )
 		die();
 	}
 }
-
 /***********************/
 /* Employer Saving Resume */
 /************************/
@@ -1792,7 +1778,7 @@ if($is_demo)
 	die(); 
 }
 $emp_id 				=   get_current_user_id();
-$cand_id   			    =   $_POST['cand_id'];
+$cand_id   			        =   $_POST['cand_id'];
 /*Login check */
 nokri_check_user_activity();
 /*User type check */ 
@@ -1838,8 +1824,6 @@ if($is_demo)
 	echo '2';
 	die(); 
 }
-
-
 $resume_id	=	trim($_POST['resume_id']);
 if( get_user_meta( $emp_id, '_emp_saved_resume_'.$emp_id, true ) != "" )
  {
@@ -1854,11 +1838,9 @@ if( get_user_meta( $emp_id, '_emp_saved_resume_'.$emp_id, true ) != "" )
 	die();
 	}
 }
-
 /**********************************/
 /* Email job to anyone popup*/
 /**********************************/
-
 add_action( 'wp_ajax_nopriv_email_this_job_popup', 'nokri_email_this_job_popup' );
 add_action('wp_ajax_email_this_job_popup', 'nokri_email_this_job_popup');
 if ( ! function_exists( 'nokri_email_this_job_popup' ) ) 
@@ -1906,8 +1888,6 @@ if ( ! function_exists( 'nokri_email_this_job_popup' ) )
 		die();
 	}
 }
-
-
 /**********************************/
 /* Email job to anyone*/
 /**********************************/
@@ -1917,6 +1897,8 @@ if ( ! function_exists( 'nokri_email_this_job' ) )
 {
 	function nokri_email_this_job()
 	{
+		$submit_job_data          = array();
+        parse_str($_POST['submit_cv_data'], $submit_job_data);
 		/*demo check */
 		$is_demo =  nokri_demo_mode();
 		if($is_demo)
@@ -1924,8 +1906,9 @@ if ( ! function_exists( 'nokri_email_this_job' ) )
 			echo '2';
 			die(); 
 		}
-	   $reciever_email	=	trim($_POST['sb_reciever_email']);
-	   $sent =  nokri_email_job_to_anyone($job_id,$reciever_email);
+	   $reciever_email	=	$submit_job_data['sb_reciever_email'];
+	   $job_id	        =	$submit_job_data['current_job'];
+	   $sent            =   nokri_email_job_to_anyone($job_id,$reciever_email);
 	   if($sent)
 	   {
 		  echo '1';
@@ -1933,14 +1916,10 @@ if ( ! function_exists( 'nokri_email_this_job' ) )
 	   }
 	}
 }
-
-
 /************************************/
 /* Ajax handler for Adding Gallery */
 /************************************/
-
 add_action('wp_ajax_nokri_upload_comp_image', 'nokri_upload_comp_image');
-
 if ( ! function_exists( 'nokri_upload_comp_image' ) ) {
 function nokri_upload_comp_image(){
     global $nokri;
@@ -2018,7 +1997,6 @@ function nokri_upload_comp_image(){
 	die();
     
 }}
-
 /************************************/
 /* Ajax handler for Getting Gallery */
 /************************************/
@@ -2049,7 +2027,6 @@ function nokri_get_uploaded_portfolio_images()
 	die();
 }
 }
-
 /************************************/
 /* Ajax handler for Del Gallery */
 /************************************/
@@ -2107,4 +2084,24 @@ function nokri_del_this_candidate()
     echo "1";
 	die();
 	}
+}
+
+// Goog re-capthca verification
+if (!function_exists('nokri_recaptcha_verify')) {
+
+    function nokri_recaptcha_verify($api_secret, $code, $ip, $is_captcha) {
+        if ($is_captcha == 'no')
+            return true;
+        global $carspot_theme;
+
+        $url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . $api_secret . '&response=' . $code . '&remoteip=' . $ip;
+        $responseData = wp_remote_get($url);
+        $res = json_decode($responseData['body'], true);
+        if ($res["success"] === true) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }

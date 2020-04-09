@@ -15,7 +15,7 @@ function featured_candidates()
 		   'type' => 'custom_markup',
 		   'heading' => __( 'Shortcode Output', 'nokri' ),
 		   'param_name' => 'order_field_key',
-		   'description' => nokri_VCImage('nokri_premium_users.png') . __( 'Ouput of the shortcode will be look like this.', 'nokri' ),
+		   'description' => nokri_VCImage('nokri_premium_candidates.png') . __( 'Ouput of the shortcode will be look like this.', 'nokri' ),
 		  ),
 		 array(
 		"group" => esc_html__("Basic", "nokri"),
@@ -114,7 +114,7 @@ if( isset( $candidate_type ) && $candidate_type == "1"  )
 		    /* Getting Star*/									  
 			if( isset( $candidate_type ) && $candidate_type == "1"  ){ $featured = '<div class="features-star"><i class="fa fa-star"></i></div>';};								  
 			/* Getting Candidates Skills  */
-			$skill_tags     = nokri_get_candidates_skills($user_id);
+			$skill_tags     = nokri_get_candidates_skills($user_id,'');
 			$required_user_html .= '<div class="item">
 								   <div class="n-featured-single">
 									  <div class="n-featured-candidates-single-top">

@@ -27,20 +27,22 @@ function __construct() {
 		global $nokri;
 		 $title	=	'';
 		 $in  = '';
+		 $collapsed = 'collapsed';
 		 if(isset($instance['is_open'] ) && $instance['is_open'] == 'open' )
 		 {
 			 $in = 'in';
+			 $collapsed = '';
 		 }
 		 
-		if( isset( $_GET['job_title'] ) && $_GET['job_title'] != "" )
+		if( isset( $_GET['job-title'] ) && $_GET['job-title'] != "" )
 		{
-			$title	=	$_GET['job_title'];
+			$title	=	$_GET['job-title'];
 			$in     = 'in';
 		}
 		 ?>				
          <div class="panel panel-default">
         <div class="panel-heading active" role="tab">
-            <a role="button" data-toggle="collapse" href="#search-widget">
+            <a role="button" class="<?php echo esc_attr($collapsed); ?>" data-toggle="collapse" href="#search-widget">
               <?php echo ($instance['title'] ); ?>
             </a>
         </div>
@@ -48,13 +50,13 @@ function __construct() {
           <div class="panel-body">
             <form role="search" method="get" action = "<?php echo get_the_permalink($nokri['sb_search_page']); ?>">
                 <div class="form-group">
-                     
-                     <input type="text" class="form-control" value="<?php echo esc_attr( $title ); ?>" name="job_title" placeholder="<?php echo esc_html__('Search Here','nokri') ?>">
+                     <input type="text" class="form-control" value="<?php echo esc_attr( $title ); ?>" name="job-title" placeholder="<?php echo esc_html__('Search Here','nokri') ?>">
                 </div>
                 <div class="form-group form-action">
                  <button type="submit" class="btn"><i class="fa fa-search"></i></button>
                 </div>
-                <?php echo nokri_search_params( 'job_title' ); ?>
+                <?php echo nokri_search_params( 'job-title' ); ?>
+                <?php echo nokri_form_lang_field_callback(true); ?>
             </form>
           </div>
         </div>
@@ -153,17 +155,19 @@ class nokri_search_categories extends WP_Widget {
 			foreach( $ad_cats as $ad_cat )
 			{
 				$selected	=	'';
-				if ( isset( $_GET['cat_id'] ) && $_GET['cat_id'] == $ad_cat->term_id) 
+				if ( isset( $_GET['cat-id'] ) && $_GET['cat-id'] == $ad_cat->term_id) 
 				{
 						$selected = 'selected = "selected"';
 				}
 				$cats_html	.=	'<option value="'.esc_attr($ad_cat->term_id).'" '.$selected.'>' .esc_html( $ad_cat->name ).'</option>';
 			}
 			global $nokri;
-			 $in  = '';
+			 $in  = 'collapsed';
+			 $collapsed = '';
 			 if(isset($instance['is_open'] ) && $instance['is_open'] == 'open' )
 			 {
 				 $in = 'in';
+				 $collapsed = '';
 			 }
 			if( isset( $_GET['job_cat'] ) && $_GET['job_cat'] != "" )
 			{
@@ -172,17 +176,19 @@ class nokri_search_categories extends WP_Widget {
 			?>
 										<div class="panel panel-default">
 										<div class="panel-heading active" role="tab" >
-											<a role="button" data-toggle="collapse" href="#collapse-job_category">
-											 <?php echo "".$instance['title']; ?>
+											<a role="button" class="<?php echo esc_attr($collapsed); ?>" data-toggle="collapse" href="#collapse-job_category">
+											 <?php if ( ! empty( $instance['title'] ) ) {
+			echo ($args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title']);
+		    } ?>
 											</a>
 										</div>
 										<div id="collapse-job_category"  class="panel-collapse collapse <?php echo esc_attr($in); ?>" role="tabpanel" >
-										  <div class="panel-body">
-										  <?php 
-					if( isset( $_GET['cat_id'] ) && $_GET['cat_id'] != "" )
+					<div class="panel-body">
+					<?php 
+					if( isset( $_GET['cat-id'] ) && $_GET['cat-id'] != "" )
 					{
 					?>
-					<div class="cat_head"><span><?php echo nokri_get_taxonomy_parents( $_GET['cat_id'], 'job_category', false); ?></span></div>
+					<div class="cat_head"><span><?php echo nokri_get_taxonomy_parents( $_GET['cat-id'], 'job_category', false); ?></span></div>
 					<?php
 					}
 					?>
@@ -205,8 +211,9 @@ class nokri_search_categories extends WP_Widget {
 			<div class="form-group form-action">
 			</div>
             <input type="button" class="btn n-btn-flat btn-mid" id="category_search" value="<?php echo esc_html__( 'Search', 'nokri' ); ?>">
-		   <input type="hidden" name="cat_id" id="cat_id" value="" />
-		   <?php echo nokri_search_params( 'cat_id' ); ?>
+		   <input type="hidden" name="cat-id" id="cat_id" value="" />
+		   <?php echo nokri_search_params( 'cat-id' ); ?>
+           <?php echo nokri_form_lang_field_callback(true) ?>
 		   </form>
 			 </div>
 				</div>
@@ -302,13 +309,15 @@ class nokri_custom_search_widget extends WP_Widget {
 	 * @param array $instance Saved values from database.
 	 */
 	public function widget( $args, $instance ) {
-		global $nokri;
+		     global $nokri;
 			 $in  = '';
+			 $collapsed = 'collapsed';
 			 if(isset($instance['is_open'] ) && $instance['is_open'] == 'open' )
 			 {
 				 $in = 'in';
+				 $collapsed = '';
 			 }
-			if( isset( $_GET['cat_id'] ) && $_GET['cat_id'] != "" )
+			if( isset( $_GET['cat-id'] ) && $_GET['cat-id'] != "" )
 			{
 				$in     = 'in';
 			}
@@ -316,7 +325,9 @@ class nokri_custom_search_widget extends WP_Widget {
             <div class="panel panel-default">
             <div class="panel-heading active" role="tab" >
                 <a role="button" data-toggle="collapse" href="#collapse-custom_category">
-                 <?php echo "".$instance['title']; ?>
+                  <?php if ( ! empty( $instance['title'] ) ) {
+			echo ($args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title']);
+		    } ?>
                 </a>
             </div>
             <div id="collapse-custom_category"  class="panel-collapse collapse <?php echo esc_attr($in); ?> " role="tabpanel" >
@@ -418,14 +429,16 @@ function __construct() {
 		$search_page_layout = ( isset($nokri['search_page_layout']) && $nokri['search_page_layout'] != ""  ) ? $nokri['search_page_layout'] : "";
 		 $title	=	'';
 		 $in  = '';
+		 $collapsed = 'collapsed';
 		 if(isset($instance['is_open'] ) && $instance['is_open'] == 'open' )
 		 {
 			 $in = 'in';
+			 $collapsed = '';
 		 }
 		 
-		if( isset( $_GET['job_title'] ) && $_GET['job_title'] != "" )
+		if( isset( $_GET['job-title'] ) && $_GET['job-title'] != "" )
 		{
-			$title	=	$_GET['job_title'];
+			$title	=	$_GET['job-title'];
 			$in     = 'in';
 		}
 		if($search_page_layout == '3')
@@ -435,13 +448,15 @@ function __construct() {
 			function getLocation()
 			{
 			if (navigator.geolocation)
-			{
+			{                      
 			navigator.geolocation.getCurrentPosition(showPosition);
+                                         
 			}
 			else{x.innerHTML="Geolocation is not supported by this browser.";}
 			}
 			function showPosition(position)
-			{
+			{         
+                        
 				document.getElementById("radius_lat").value = position.coords.latitude;
 				document.getElementById("radius_long").value = position.coords.longitude;  
 			}
@@ -470,6 +485,7 @@ function __construct() {
                 <div class="form-group form-action">
                 </div>
                 <?php echo nokri_search_params( 'distance','radius_lat','radius_long' ); ?>
+                <?php echo nokri_form_lang_field_callback(true) ?>
             </form>
           </div>
         </div>
@@ -606,9 +622,9 @@ if ( in_array( 'nokri_framework/index.php', apply_filters( 'active_plugins', get
 			{
 				   foreach($customPostTaxonomies as $tax)
 					{
-						if ($tax->name == 'job_category') 
+						if ($tax->name == 'job_category' || $tax->name == 'sb_dynamic_form_templates' || $tax->name == 'ad_location'  ) 
 						{
-						continue;
+							continue;
 						}
 						$selected = ($taxonomy_list == $tax->name) ? 'selected' : '';
 						echo '<option value="'.esc_html($tax->name).'" '.$selected.'>'.esc_html($tax->labels->singular_name).'</option>';    		}
@@ -699,22 +715,24 @@ class nokri_search_location extends WP_Widget {
 		$search_countries	=	nokri_get_cats('ad_location' , 0 );
 		if( count( $search_countries ) > 0 )
 		 {
-		$cats_html	=	'';
+		$cats_html	 =	'';
 		$cats_html	.=	'<option value="0">' .esc_html__( 'Select an option', 'nokri' ).'</option>';
 		foreach( $search_countries as $search_country )
 		{
 			$selected	=	'';
-			if ( isset( $_GET['job_location'] ) && $_GET['job_location'] == $search_country->term_id) 
+			if ( isset( $_GET['job-location'] ) && $_GET['job-location'] == $search_country->term_id) 
 			{
 					$selected = 'selected = "selected"';
 			}
 			$cats_html	.=	'<option value="'.esc_attr($search_country->term_id).'" '.$selected.'>' .esc_html( $search_country->name ).'</option>';
 		}
 		global $nokri;
-		$in  = '';
+		 $in  = '';
+		 $collapsed = 'collapsed';
 		 if(isset($instance['is_open'] ) && $instance['is_open'] == 'open' )
 		 {
 			 $in = 'in';
+			 $collapsed = '';
 		 }
 		if( isset( $_GET['location'] ) && $_GET['location'] != "" )
 		{
@@ -737,17 +755,19 @@ class nokri_search_location extends WP_Widget {
 		 ?>
         <div class="panel panel-default">
             <div class="panel-heading active" role="tab" >
-                <a role="button" data-toggle="collapse" href="#location_search">
-                 <?php echo "".$instance['title']; ?>
+                <a class="<?php echo esc_attr($collapsed); ?>" role="button" data-toggle="collapse" href="#location_search">
+                  <?php if ( ! empty( $instance['title'] ) ) {
+			echo ($args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title']);
+		    } ?>
                 </a>
             </div>
             <div id="location_search"  class="panel-collapse collapse <?php echo esc_attr($in); ?>" role="tabpanel">
               <div class="panel-body">
               <?php 
-				if( isset( $_GET['job_location'] ) && $_GET['job_location'] != "" )
+				if( isset( $_GET['job-location'] ) && $_GET['job-location'] != "" )
 				{
 				?>
-                <div class="cat_head"><span><?php echo nokri_get_taxonomy_parents( $_GET['job_location'], 'ad_location', false); ?></span></div>
+                <div class="cat_head"><span><?php echo nokri_get_taxonomy_parents( $_GET['job-location'], 'ad_location', false); ?></span></div>
                 <?php
 				}
 				?>
@@ -763,9 +783,10 @@ class nokri_search_location extends WP_Widget {
         <div id="select_forth_div_city" class="margin-top-10"></div>
         <div class="form-group form-action">
         </div>
-      <input type="button" class="btn n-btn-flat btn-mid location_search" id="location_search" value="<?php echo esc_html__( 'Search', 'nokri' ); ?>">
-      <input type="hidden" name="job_location" id="location_id" value="" />
-       <?php echo nokri_search_params('job_location' ); ?>
+      <input type="button" class="btn n-btn-flat btn-mid location_search" id="location_search_btn" value="<?php echo esc_html__( 'Search', 'nokri' ); ?>">
+      <input type="hidden" name="job-location" id="location_id" value="" />
+       <?php echo nokri_search_params('job-location' ); ?>
+       <?php echo nokri_form_lang_field_callback(true) ?>
        </form>
          </div>
             </div>
@@ -851,14 +872,12 @@ add_action( 'widgets_init', 'nokri_search_location' );
 /* ========================= */
 /* Candidate Title widget In Search*/
 /* ========================= */
-
-
 class nokri_search_candidate extends WP_Widget {
 /** Register widget with WordPress */
 function __construct() {
 		parent::__construct(
 			'nokri_search_candidate', // Base ID
-			esc_html__( 'Search by candidate  title', 'nokri' ), // Name
+			esc_html__( 'Candidate Title', 'nokri' ), // Name
 			array( 'description' => esc_html__( 'Get candidate by title', 'nokri' ), ) // Args
 						    );
 					   }
@@ -875,9 +894,11 @@ function __construct() {
 		global $nokri;
 		 $title	=	'';
 		 $in  = '';
+		 $collapsed = 'collapsed';
 		 if(isset($instance['is_open'] ) && $instance['is_open'] == 'open' )
 		 {
 			 $in = 'in';
+			 $collapsed = '';
 		 }
 		if( isset( $_GET['cand_title'] ) && $_GET['cand_title'] != "" )
 		{
@@ -887,7 +908,7 @@ function __construct() {
 		 ?>				
          <div class="panel panel-default">
         <div class="panel-heading active" role="tab">
-            <a role="button" data-toggle="collapse" href="#search-widget">
+            <a role="button" class="<?php echo esc_attr($collapsed); ?>" data-toggle="collapse" href="#search-widget">
               <?php echo ($instance['title'] ); ?>
             </a>
         </div>
@@ -900,7 +921,8 @@ function __construct() {
                 <div class="form-group form-action">
                 <button type="submit" class="btn"><i class="fa fa-search"></i></button>
                 </div>
-                  <?php echo nokri_search_params( 'cand_title' ); ?>
+                  <?php echo nokri_search_params( 'cand-title' ); ?>
+                  <?php echo nokri_form_lang_field_callback(true) ?>
             </form>
           </div>
         </div>
@@ -953,12 +975,121 @@ function __construct() {
 	return $instance;
 	}
 	} 
-
 // register Foo_Widget widget
 function nokri_search_candidate() {
 	register_widget( 'nokri_search_candidate' );
 }
 add_action( 'widgets_init', 'nokri_search_candidate' );
+
+/* ========================= */
+/* Candidate Headline widget In Search*/
+/* ========================= */
+class nokri_search_candidate_headline extends WP_Widget {
+/** Register widget with WordPress */
+function __construct() {
+		parent::__construct(
+			'nokri_search_candidate_headline', // Base ID
+			esc_html__( 'Candidate Headline', 'nokri' ), // Name
+			array( 'description' => esc_html__( 'Get candidate by headline', 'nokri' ), ) // Args
+						    );
+					   }
+     /**
+	 * Front-end display of widget.
+	 *
+	 * @see WP_Widget::widget()
+	 *
+	 * @param array $args     Widget arguments.
+	 * @param array $instance Saved values from database.
+	 */
+	public function widget( $args, $instance ) {
+		
+		global $nokri;
+		 $title	=	'';
+		 $in  = '';
+		 $collapsed = 'collapsed';
+		 if(isset($instance['is_open'] ) && $instance['is_open'] == 'open' )
+		 {
+			 $in = 'in';
+			 $collapsed = '';
+		 }
+		if( isset( $_GET['cand-headline'] ) && $_GET['cand-headline'] != "" )
+		{
+			$title	=	$_GET['cand-headline'];
+			$in     = 'in';
+		}
+		 ?>				
+         <div class="panel panel-default">
+        <div class="panel-heading active" role="tab">
+            <a role="button" class="<?php echo esc_attr($collapsed); ?>" data-toggle="collapse" href="#search-headline">
+              <?php echo ($instance['title'] ); ?>
+            </a>
+        </div>
+        <div id="search-headline" class="panel-collapse collapse <?php echo esc_attr($in); ?>" role="tabpanel" >
+          <div class="panel-body">
+            <form role="search" class="custom-search-form" method="get" action = "<?php echo get_the_permalink($nokri['candidates_search_page']); ?>">
+                <div class="form-group">
+                     <input type="text"  class="form-control" value="<?php echo esc_html($title); ?>" name="cand-headline" placeholder="<?php echo esc_html__('e.g Developer...','nokri') ?>" >
+                     <button type="submit" class="btn n-btn-flat btn-mid"><i class="fa fa-search"></i></button>
+                </div>
+                  <?php echo nokri_search_params( 'cand-headline' ); ?>
+                  <?php echo nokri_form_lang_field_callback(true) ?>
+            </form>
+          </div>
+        </div>
+      </div>
+              <?php 
+	}
+	/**
+	 * Back-end widget form.
+	 *
+	 * @see WP_Widget::form()
+	 *
+	 * @param array $instance Previously saved values from database.
+	 */
+	public function form( $instance ) {
+	$title = ! empty( $instance['title'] ) ? $instance['title'] : esc_html__( 'New title', 'nokri' );
+	/* Seting Open Or Not*/
+	$is_open = ! empty( $instance['is_open'] ) ? $instance['is_open'] : esc_html__( 'Select Widget Type', 'nokri' );
+	?>
+	<p>
+	<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_attr_e( 'Title:', 'nokri' ); ?></label> 
+	<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
+	</p>
+    <!--Open/Close  --->
+    <p>
+        <label for="<?php echo esc_attr( $this->get_field_id( 'is_open' ) ); ?>"><?php esc_attr_e( 'Set Widget', 
+'nokri' ); ?>
+		</label> 
+        <select name="<?php echo esc_attr( $this->get_field_name( 'is_open' ) ); ?>" id="<?php echo esc_attr( $this->get_field_id( 'is_open' ) ); ?>" class="widefat">
+        <option value="open" <?php if ( $is_open == 'open') { echo "selected"; } ; ?> ><?php echo esc_html__( 'Open', 'nokri' ); ?></option>
+        <option value="close" <?php if ( $is_open == 'close') { echo "selected"; } ; ?> ><?php echo esc_html__( 'Close', 'nokri' ); ?></option>    				
+		</select>
+        </p>
+	<?php 
+	}
+	/**
+	 * Sanitize widget form values as they are saved.
+	 *
+	 * @see WP_Widget::update()
+	 *
+	 * @param array $new_instance Values just sent to be saved.
+	 * @param array $old_instance Previously saved values from database.
+	 *
+	 * @return array Updated safe values to be saved.
+	 */
+	public function update( $new_instance, $old_instance ) {
+	$instance = array();
+	$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
+	/* Save open/close*/
+	$instance['is_open'] = ( ! empty( $new_instance['is_open'] ) ) ? strip_tags( $new_instance['is_open'] ) : ''; 
+	return $instance;
+	}
+	} 
+// register Foo_Widget widget
+function nokri_search_candidate_headline() {
+	register_widget( 'nokri_search_candidate_headline' );
+}
+add_action( 'widgets_init', 'nokri_search_candidate_headline' );
 
 /* ========================= */
 /*  Candidates Type widget   */
@@ -973,7 +1104,7 @@ class nokri_search_candidate_type extends WP_Widget {
 	function __construct() {
 		parent::__construct(
 			'nokri_search_candidate_type', // Base ID
-			esc_html__( 'Search by candidate type', 'nokri' ), // Name
+			esc_html__( 'Candidate Type', 'nokri' ), // Name
 			array( 'description' => esc_html__( 'Show All candidate type', 'nokri' ), ) // Args
 		);
 	}
@@ -1021,10 +1152,12 @@ class nokri_search_candidate_type extends WP_Widget {
 			$count++;
 		}
 		global $nokri;
-		$in  = '';
+		$in  = 'collapsed';
+		$collapsed = '';
 		 if(isset($instance['is_open'] ) && $instance['is_open'] == 'open' )
 		 {
 			 $in = 'in';
+			 $collapsed = '';
 		 }
 		if( isset( $_GET['cand_type'] ) && $_GET['cand_type'] != "" )
 		{
@@ -1033,8 +1166,10 @@ class nokri_search_candidate_type extends WP_Widget {
 		?>
         <div class="panel panel-default">
         <div class="panel-heading active" role="tab" >
-            <a role="button" data-toggle="collapse" href="#cand_job_type">
-            <?php echo "".$instance['title']; ?>
+            <a role="button" class="<?php echo esc_attr($collapsed); ?>" data-toggle="collapse" href="#cand_job_type">
+             <?php if ( ! empty( $instance['title'] ) ) {
+			echo ($args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title']);
+		    } ?>
             </a>
         </div>
         <div id="cand_job_type"  class="panel-collapse collapse <?php echo esc_attr($in);?>" role="tabpanel">
@@ -1045,8 +1180,8 @@ class nokri_search_candidate_type extends WP_Widget {
            </ul>
           </div>
           <?php echo nokri_search_params( 'cand_type' ); ?>
+          <?php echo nokri_form_lang_field_callback(true) ?>
           </form>
-          
         </div>
       </div>     
 		<?php 
@@ -1126,9 +1261,180 @@ function nokri_search_candidate_type() {
 }
 add_action( 'widgets_init', 'nokri_search_candidate_type' );
 
+
+/* candiate skills **/
+class nokri_search_candidate_skills extends WP_Widget {
+
+	/**
+	 * Register widget with WordPress.
+	 */
+	function __construct() {
+		parent::__construct(
+			'nokri_search_candidate_skills', // Base ID
+			esc_html__( 'Search by candidate skills', 'nokri' ), // Name
+			array( 'description' => esc_html__( 'Show candidate by skills', 'nokri' ), ) // Args
+		);
+	}
+	/**
+	 * Front-end display of widget.
+	 *
+	 * @see WP_Widget::widget()
+	 *
+	 * @param array $args     Widget arguments.
+	 * @param array $instance Saved values from database.
+	 */
+	public function widget( $args, $instance ) {
+		/* Number Of Records */
+		$no_of_records = ! empty( $instance['no_of_records'] ) ? $instance['no_of_records'] : esc_html__( 'Select Number', 'nokri' );
+       /*  Select Country,  City, State */
+		$search_types	=	nokri_get_cats('job_skills' , 0 );
+		if( count((array) $search_types ) > 0 )
+		 {
+		$skill_html	=	'';
+		$count	=	1;
+		$cls	=	'';
+		$showed	=	false;
+		$cur_cls	=	'sb_skills';
+		$is_run 	=	true;
+		foreach( $search_types as $search_type )
+		{
+			$selected	=	'';
+			if ( isset( $_GET['cand_skills'] ) && $_GET['cand_skills'] == $search_type->term_id) 
+			{
+					$selected = 'checked = "checked"';
+			}
+			
+			if( $count > $no_of_records && $is_run )
+			{
+				$cls	=	'hide_skills hide_li';
+				$showed = true;
+				$is_run	=	false;
+			}
+			if( $showed )
+			{
+				$showed	=	false;
+				$skill_html	.=	'<li class="show-more hide_now_'.esc_attr( $cur_cls ).'"><small><a href="javascript:void(0);" class="show_records" data-attr-id="hide_skills" data-attr-hide="'.esc_attr( $cur_cls ).'">'.__('Show more','nokri').'</a></small></li>';	
+			}
+			
+			$skill_html	.=	'<li class="'.esc_attr( $cls ).'"><input class="input-icheck input-icheck-search cand_skills_form" '.esc_attr($selected).' value="'.esc_attr($search_type->term_id).'" type="radio"  name="cand_skills"> <label>' .esc_html( $search_type->name ).'</label></li>';
+			$count++;
+		}
+		global $nokri;
+		$in  = 'collapsed';
+		$collapsed = '';
+		 if(isset($instance['is_open'] ) && $instance['is_open'] == 'open' )
+		 {
+			 $in = 'in';
+			 $collapsed = '';
+		 }
+		if( isset( $_GET['cand_skills'] ) && $_GET['cand_skills'] != "" )
+		{
+			$in     = 'in';
+		}
+		?>
+        <div class="panel panel-default">
+        <div class="panel-heading active" role="tab" >
+            <a role="button" class="<?php echo esc_attr($collapsed); ?>" data-toggle="collapse" href="#cand_job_skills">
+            <?php echo "".$instance['title']; ?>
+            </a>
+        </div>
+        <div id="cand_job_skills"  class="panel-collapse collapse <?php echo esc_attr($in);?>" role="tabpanel">
+        <form method="get" id="cand_skills_form"  action="<?php echo get_the_permalink( $nokri['candidates_search_page'] ); ?>">
+          <div class="panel-body">
+            <ul class="list">
+              <?php echo "".($skill_html);?>
+           </ul>
+          </div>
+          <?php echo nokri_search_params( 'cand_skills' ); ?>
+          </form>
+          
+        </div>
+      </div>     
+		<?php 
+		 }
+}
+	/**
+	 * Back-end widget form.
+	 *
+	 * @see WP_Widget::form()
+	 *
+	 * @param array $instance Previously saved values from database.
+	 */
+	public function form( $instance ) {
+		$title = ! empty( $instance['title'] ) ? $instance['title'] : esc_html__( 'New title', 'nokri' );
+		/* Seting Open Or Not*/
+		$is_open = ! empty( $instance['is_open'] ) ? $instance['is_open'] : esc_html__( 'Select Widget Type', 'nokri' );
+		/* Number Of Records */
+		$no_of_records = ! empty( $instance['no_of_records'] ) ? $instance['no_of_records'] : esc_html__( 'Select Number', 'nokri' );
+		?>
+		<p>
+		<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_attr_e( 'Title:', 
+
+'nokri' ); ?></label> 
+		<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo 
+
+esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
+		</p>
+        <!--Open/close  --->
+        <p>
+        <label for="<?php echo esc_attr( $this->get_field_id( 'is_open' ) ); ?>"><?php esc_attr_e( 'Set Widget', 
+'nokri' ); ?>
+		</label> 
+        <select name="<?php echo esc_attr( $this->get_field_name( 'is_open' ) ); ?>" id="<?php echo esc_attr( $this->get_field_id( 'is_open' ) ); ?>" class="widefat">
+        <option value="open" <?php if ( $is_open == 'open') { echo "selected"; } ; ?> ><?php echo esc_html__( 'Open', 'nokri' ); ?></option>
+        <option value="close" <?php if ( $is_open == 'close') { echo "selected"; } ; ?> ><?php echo esc_html__( 'Close', 'nokri' ); ?></option>    				
+		</select>
+        </p>
+        <!--Number of records --->
+        <p>
+		<label for="<?php echo esc_attr( $this->get_field_id( 'no_of_records' ) ); ?>"><?php esc_attr_e( 'By Default Number of Records:', 
+
+'nokri' ); ?></label> 
+		<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'no_of_records' ) ); ?>" name="<?php echo 
+
+esc_attr( $this->get_field_name( 'no_of_records' ) ); ?>" type="number" value="<?php echo esc_attr( $no_of_records ); ?>">
+		</p>
+		<?php 
+	}
+
+	/**
+	 * Sanitize widget form values as they are saved.
+	 *
+	 * @see WP_Widget::update()
+	 *
+	 * @param array $new_instance Values just sent to be saved.
+	 * @param array $old_instance Previously saved values from database.
+	 *
+	 * @return array Updated safe values to be saved.
+	 */
+	public function update( $new_instance, $old_instance ) {
+		$instance = array();
+		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
+		/* Save open/close*/
+		$instance['is_open'] = ( ! empty( $new_instance['is_open'] ) ) ? strip_tags( $new_instance['is_open'] ) : '';
+		/* Save Number Of Records*/
+		$instance['no_of_records'] = ( ! empty( $new_instance['no_of_records'] ) ) ? strip_tags( $new_instance['no_of_records'] ) : '';
+		return $instance;
+	}
+
+} 
+// register nokri Widget widget
+function nokri_search_candidate_skills() {
+    register_widget( 'nokri_search_candidate_skills' );
+}
+add_action( 'widgets_init', 'nokri_search_candidate_skills' );
+
+
+
+
+
 /* ========================= */
 /*  Candidates Level widget   */
 /* ========================= */
+
+
+
+
 
 
 class nokri_search_candidate_level extends WP_Widget {
@@ -1139,7 +1445,7 @@ class nokri_search_candidate_level extends WP_Widget {
 	function __construct() {
 		parent::__construct(
 			'nokri_search_candidate_level', // Base ID
-			esc_html__( 'Search by candidate level', 'nokri' ), // Name
+			esc_html__( 'Candidate Level', 'nokri' ), // Name
 			array( 'description' => esc_html__( 'Show candidates by level', 'nokri' ), ) // Args
 		);
 	}
@@ -1188,10 +1494,12 @@ class nokri_search_candidate_level extends WP_Widget {
 			$count++;
 		}
 		global $nokri;
-		$in  = '';
+		$in  = 'collapsed';
+		$collapsed = '';
 		 if(isset($instance['is_open'] ) && $instance['is_open'] == 'open' )
 		 {
 			 $in = 'in';
+			 $collapsed = '';
 		 }
 		if( isset( $_GET['cand_level'] ) && $_GET['cand_level'] != "" )
 		{
@@ -1200,8 +1508,10 @@ class nokri_search_candidate_level extends WP_Widget {
 		?>
         <div class="panel panel-default">
         <div class="panel-heading active" role="tab" >
-            <a role="button" data-toggle="collapse" href="#cand_job_level">
-            <?php echo "".$instance['title']; ?>
+            <a role="button" class="<?php echo esc_attr($collapsed); ?>" data-toggle="collapse" href="#cand_job_level">
+             <?php if ( ! empty( $instance['title'] ) ) {
+			echo ($args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title']);
+		    } ?>
             </a>
         </div>
         <div id="cand_job_level" class="panel-collapse collapse <?php echo esc_attr($in);?>" role="tabpanel">
@@ -1212,6 +1522,7 @@ class nokri_search_candidate_level extends WP_Widget {
            </ul>
           </div>
            <?php echo nokri_search_params( 'cand_level' ); ?>
+           <?php echo nokri_form_lang_field_callback(true) ?>
           </form>
          
         </div>
@@ -1303,7 +1614,7 @@ class nokri_search_candidate_experience extends WP_Widget {
 	function __construct() {
 		parent::__construct(
 			'nokri_search_candidate_experience', // Base ID
-			esc_html__( 'Search by candidate experience', 'nokri' ), // Name
+			esc_html__( 'Candidate Experience', 'nokri' ), // Name
 			array( 'description' => esc_html__( 'Show candidates by experience', 'nokri' ), ) // Args
 		);
 	}
@@ -1352,10 +1663,12 @@ class nokri_search_candidate_experience extends WP_Widget {
 			$count++;
 		}
 		global $nokri;
-		$in  = '';
+		$in  = 'collapsed';
+		$collapsed = '';
 		 if(isset($instance['is_open'] ) && $instance['is_open'] == 'open' )
 		 {
 			 $in = 'in';
+			 $collapsed = '';
 		 }
 		if( isset( $_GET['cand_experience'] ) && $_GET['cand_experience'] != "" )
 		{
@@ -1364,8 +1677,10 @@ class nokri_search_candidate_experience extends WP_Widget {
 		?>
         <div class="panel panel-default">
         <div class="panel-heading active" role="tab" >
-            <a role="button" data-toggle="collapse" href="#cand_job_experience">
-            <?php echo "".$instance['title']; ?>
+            <a role="button" class="<?php echo esc_attr($collapsed); ?>" data-toggle="collapse" href="#cand_job_experience">
+             <?php if ( ! empty( $instance['title'] ) ) {
+			echo ($args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title']);
+		    } ?>
             </a>
         </div>
         <div id="cand_job_experience" class="panel-collapse collapse <?php echo esc_attr($in);?>" role="tabpanel">
@@ -1376,6 +1691,7 @@ class nokri_search_candidate_experience extends WP_Widget {
            </ul>
           </div>
            <?php echo nokri_search_params( 'cand_experience' ); ?>
+           <?php echo nokri_form_lang_field_callback(true) ?>
           </form>
          
         </div>
@@ -1426,7 +1742,6 @@ esc_attr( $this->get_field_name( 'no_of_records' ) ); ?>" type="number" value="<
 		</p>
 		<?php 
 	}
-
 	/**
 	 * Sanitize widget form values as they are saved.
 	 *
@@ -1455,20 +1770,350 @@ function nokri_search_candidate_experience() {
 add_action( 'widgets_init', 'nokri_search_candidate_experience' );
 
 /* ========================= */
-/*  Candidates skill widget  */
+/*  Candidates Qualification widget   */
 /* ========================= */
+class nokri_search_candidate_qualification extends WP_Widget {
+	/**
+	 * Register widget with WordPress.
+	 */
+	function __construct() {
+		parent::__construct(
+			'nokri_search_candidate_qualification', // Base ID
+			esc_html__( 'Candidate Qualifications', 'nokri' ), // Name
+			array( 'description' => esc_html__( 'Show candidates by qualification', 'nokri' ), ) // Args
+		);
+	}
+	/**
+	 * Front-end display of widget.
+	 *
+	 * @see WP_Widget::widget()
+	 *
+	 * @param array $args     Widget arguments.
+	 * @param array $instance Saved values from database.
+	 */
+	     public function widget( $args, $instance ) {
+		/* Number Of Records */
+		$no_of_records = ! empty( $instance['no_of_records'] ) ? $instance['no_of_records'] : esc_html__( 'Select Number', 'nokri' );
+       /*  Select Country,  City, State */
+		$search_types	=	nokri_get_cats('job_qualifications' , 0 );
+		if( count((array) $search_types ) > 0 )
+		 {
+		$type_html	=	 '';
+		$count	    =	1;
+		$showed     =   false;
+		$cls	    =	'';
+		$cur_cls	=	'sb_qualifications';
+		$is_run 	=	true;
+		foreach( $search_types as $search_type )
+		{
+			$selected	=	'';
+			if ( isset( $_GET['cand-qualification'] ) && $_GET['cand-qualification'] == $search_type->term_id) 
+			{
+					 $selected = 'checked = "checked"';
+			}
+			if( $count > $no_of_records && $is_run )
+			{
+				$cls	=	'hide_qualification hide_li';
+				$showed =   true;
+				$is_run	=	false;
+			}
+			if( $showed )
+			{
+				$showed	=	false;
+				$type_html	.=	'<li class="show-more show-more hide_now_'.esc_attr( $cur_cls ).'"><small><a href="javascript:void(0);" class="show_records" data-attr-id="hide_qualification" data-attr-hide="'.esc_attr( $cur_cls ).'">'.__('Show more','nokri').'</a></small></li>';	
+			}
+
+			
+			$type_html	.=	'<li class="'.esc_attr( $cls ).'"><input class="input-icheck input-icheck-search cand_experience_form" '.esc_attr($selected).' value="'.esc_attr($search_type->term_id).'" type="radio"  name="cand-qualification"> <label>' .esc_html( $search_type->name ).'</label></li>';
+			$count++;
+		}
+		global $nokri;
+		$in        = '';
+		$collapsed = 'collapsed';
+		 if(isset($instance['is_open'] ) && $instance['is_open'] == 'open' )
+		 {
+			 $in        = 'in';
+			 $collapsed = '';
+		 }
+		if( isset( $_GET['cand-qualification'] ) && $_GET['cand-qualification'] != "" )
+		{
+			$in     = 'in';
+		}
+		?>
+        <div class="panel panel-default">
+        <div class="panel-heading active" role="tab" >
+            <a role="button" class="<?php echo esc_attr($collapsed); ?>" data-toggle="collapse" href="#cand_job_qualification">
+             <?php if ( ! empty( $instance['title'] ) ) {
+			echo ($args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title']);
+		    } ?>
+            </a>
+        </div>
+        <div id="cand_job_qualification" class="panel-collapse collapse <?php echo esc_attr($in);?>" role="tabpanel">
+        <form method="get" id="cand_quali_form" class="search_candidates_form" action="<?php echo get_the_permalink( $nokri['candidates_search_page'] ); ?>">
+          <div class="panel-body">
+            <ul class="list">
+              <?php echo "".($type_html);?>
+           </ul>
+          </div>
+           <?php echo nokri_search_params( 'cand-qualification' ); ?>
+           <?php echo nokri_form_lang_field_callback(true) ?>
+          </form>
+        </div>
+      </div>     
+		<?php 
+		 }
+}
+	/**
+	 * Back-end widget form.
+	 *
+	 * @see WP_Widget::form()
+	 *
+	 * @param array $instance Previously saved values from database.
+	 */
+	public function form( $instance ) {
+		$title = ! empty( $instance['title'] ) ? $instance['title'] : esc_html__( 'New title', 'nokri' );
+		/* Seting Open Or Not*/
+		$is_open = ! empty( $instance['is_open'] ) ? $instance['is_open'] : esc_html__( 'Select Widget Type', 'nokri' );
+		/* Number Of Records */
+		$no_of_records = ! empty( $instance['no_of_records'] ) ? $instance['no_of_records'] : esc_html__( 'Select Number', 'nokri' );
+		?>
+		<p>
+		<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_attr_e( 'Title:', 
+
+'nokri' ); ?></label> 
+		<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo 
+
+esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
+		</p>
+        <!--Open/close  --->
+        <p>
+        <label for="<?php echo esc_attr( $this->get_field_id( 'is_open' ) ); ?>"><?php esc_attr_e( 'Set Widget', 
+'nokri' ); ?>
+		</label> 
+        <select name="<?php echo esc_attr( $this->get_field_name( 'is_open' ) ); ?>" id="<?php echo esc_attr( $this->get_field_id( 'is_open' ) ); ?>" class="widefat">
+        <option value="open" <?php if ( $is_open == 'open') { echo "selected"; } ; ?> ><?php echo esc_html__( 'Open', 'nokri' ); ?></option>
+        <option value="close" <?php if ( $is_open == 'close') { echo "selected"; } ; ?> ><?php echo esc_html__( 'Close', 'nokri' ); ?></option>    				
+		</select>
+        </p>
+        <!-- Number of records  --->
+        <p>
+		<label for="<?php echo esc_attr( $this->get_field_id( 'no_of_records' ) ); ?>"><?php esc_attr_e( 'By Default Number of Records:', 
+
+'nokri' ); ?></label> 
+		<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'no_of_records' ) ); ?>" name="<?php echo 
+
+esc_attr( $this->get_field_name( 'no_of_records' ) ); ?>" type="number" value="<?php echo esc_attr( $no_of_records ); ?>">
+		</p>
+		<?php 
+	}
+	/**
+	 * Sanitize widget form values as they are saved.
+	 *
+	 * @see WP_Widget::update()
+	 *
+	 * @param array $new_instance Values just sent to be saved.
+	 * @param array $old_instance Previously saved values from database.
+	 *
+	 * @return array Updated safe values to be saved.
+	 */
+	public function update( $new_instance, $old_instance ) {
+		$instance = array();
+		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
+		/* Save open/close*/
+		$instance['is_open'] = ( ! empty( $new_instance['is_open'] ) ) ? strip_tags( $new_instance['is_open'] ) : '';
+		/* Save Number Of Records*/
+		$instance['no_of_records'] = ( ! empty( $new_instance['no_of_records'] ) ) ? strip_tags( $new_instance['no_of_records'] ) : '';
+		return $instance;
+	}
+
+} 
+// register nokri Widget widget
+function nokri_search_candidate_qualification() {
+    register_widget( 'nokri_search_candidate_qualification' );
+}
+add_action( 'widgets_init', 'nokri_search_candidate_qualification' );
 
 
-class nokri_search_candidate_skills extends WP_Widget {
+/* ========================= */
+/*  Candidates Gender widget   */
+/* ========================= */
+class nokri_search_candidate_gender extends WP_Widget {
 
 	/**
 	 * Register widget with WordPress.
 	 */
 	function __construct() {
 		parent::__construct(
-			'nokri_search_candidate_skills', // Base ID
-			esc_html__( 'Search by candidate skills', 'nokri' ), // Name
-			array( 'description' => esc_html__( 'Show candidate by skills', 'nokri' ), ) // Args
+			'nokri_search_candidate_gender', // Base ID
+			esc_html__( 'Candidate Gender', 'nokri' ), // Name
+			array( 'description' => esc_html__( 'Show candidates by gender', 'nokri' ), ) // Args
+		);
+	}
+	/**
+	 * Front-end display of widget.
+	 *
+	 * @see WP_Widget::widget()
+	 *
+	 * @param array $args     Widget arguments.
+	 * @param array $instance Saved values from database.
+	 */
+	     public function widget( $args, $instance ) {
+		/* Number Of Records */
+		$no_of_records = ! empty( $instance['no_of_records'] ) ? $instance['no_of_records'] : esc_html__( 'Select Number', 'nokri' );
+       /* Gender values array */
+		$search_types	=	array('male' => esc_html__('Male','nokri'),'female' => esc_html__('Female','nokri'),'other' => esc_html__('Other','nokri'));
+		if( count((array) $search_types ) > 0 )
+		 {
+		$type_html	=	 '';
+		$count	    =	1;
+		$showed     =   false;
+		$cls	    =	'';
+		$cur_cls	=	'sb_gender';
+		$is_run 	=	true;
+		foreach( $search_types as $key => $value )
+		{
+			$selected	=	'';
+			if ( isset( $_GET['cand-gender'] ) && $_GET['cand-gender'] == $key) 
+			{
+					 $selected = 'checked = "checked"';
+			}
+			if( $count > $no_of_records && $is_run )
+			{
+				$cls	=	'hide_gender hide_li';
+				$showed =    true;
+				$is_run	=	false;
+			}
+			if( $showed )
+			{
+				$showed	=	false;
+				$type_html	.=	'<li class="show-more show-more hide_now_'.esc_attr( $cur_cls ).'"><small><a href="javascript:void(0);" class="show_records" data-attr-id="hide_experience" data-attr-hide="'.esc_attr( $cur_cls ).'">'.__('Show more','nokri').'</a></small></li>';	
+			}
+
+			
+			$type_html	.=	'<li class="'.esc_attr( $cls ).'"><input class="input-icheck input-icheck-search cand_experience_form" '.esc_attr($selected).' value="'.esc_attr($key).'" type="radio"  name="cand-gender"> <label>' .esc_html( $value ).'</label></li>';
+			$count++;
+		}
+		global $nokri;
+		$in        = '';
+		$collapsed = 'collapsed';
+		 if(isset($instance['is_open'] ) && $instance['is_open'] == 'open' )
+		 {
+			 $in        = 'in';
+			 $collapsed = '';
+		 }
+		if( isset( $_GET['cand-gender'] ) && $_GET['cand-gender'] != "" )
+		{
+			$in     = 'in';
+		}
+		?>
+        <div class="panel panel-default">
+        <div class="panel-heading active" role="tab" >
+            <a role="button" class="<?php echo esc_attr($collapsed); ?>" data-toggle="collapse" href="#cand_gender">
+            <?php if ( ! empty( $instance['title'] ) ) {
+			echo ($args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title']);
+		    } ?>
+            </a>
+        </div>
+        <div id="cand_gender" class="panel-collapse collapse <?php echo esc_attr($in);?>" role="tabpanel">
+        <form method="get" id="cand_experience_form" class="search_candidates_form" action="<?php echo get_the_permalink( $nokri['candidates_search_page'] ); ?>">
+          <div class="panel-body">
+            <ul class="list">
+              <?php echo "".($type_html);?>
+           </ul>
+          </div>
+           <?php echo nokri_search_params( 'cand-gender' ); ?>
+           <?php echo nokri_form_lang_field_callback(true) ?>
+          </form>
+        </div>
+      </div>     
+		<?php 
+		 }
+}
+	/**
+	 * Back-end widget form.
+	 *
+	 * @see WP_Widget::form()
+	 *
+	 * @param array $instance Previously saved values from database.
+	 */
+	    public function form( $instance ) {
+		$title = ! empty( $instance['title'] ) ? $instance['title'] : esc_html__( 'New title', 'nokri' );
+		/* Seting Open Or Not*/
+		$is_open = ! empty( $instance['is_open'] ) ? $instance['is_open'] : esc_html__( 'Select Widget Type', 'nokri' );
+		/* Number Of Records */
+		$no_of_records = ! empty( $instance['no_of_records'] ) ? $instance['no_of_records'] : esc_html__( 'Select Number', 'nokri' );
+		?>
+		<p>
+		<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_attr_e( 'Title:', 
+
+'nokri' ); ?></label> 
+		<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo 
+
+esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
+		</p>
+        <!--Open/close  --->
+        <p>
+        <label for="<?php echo esc_attr( $this->get_field_id( 'is_open' ) ); ?>"><?php esc_attr_e( 'Set Widget', 
+'nokri' ); ?>
+		</label> 
+        <select name="<?php echo esc_attr( $this->get_field_name( 'is_open' ) ); ?>" id="<?php echo esc_attr( $this->get_field_id( 'is_open' ) ); ?>" class="widefat">
+        <option value="open" <?php if ( $is_open == 'open') { echo "selected"; } ; ?> ><?php echo esc_html__( 'Open', 'nokri' ); ?></option>
+        <option value="close" <?php if ( $is_open == 'close') { echo "selected"; } ; ?> ><?php echo esc_html__( 'Close', 'nokri' ); ?></option>    				
+		</select>
+        </p>
+        <!-- Number of records  --->
+        <p>
+		<label for="<?php echo esc_attr( $this->get_field_id( 'no_of_records' ) ); ?>"><?php esc_attr_e( 'By Default Number of Records:', 
+
+'nokri' ); ?></label> 
+		<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'no_of_records' ) ); ?>" name="<?php echo 
+
+esc_attr( $this->get_field_name( 'no_of_records' ) ); ?>" type="number" value="<?php echo esc_attr( $no_of_records ); ?>">
+		</p>
+		<?php 
+	}
+	/**
+	 * Sanitize widget form values as they are saved.
+	 *
+	 * @see WP_Widget::update()
+	 *
+	 * @param array $new_instance Values just sent to be saved.
+	 * @param array $old_instance Previously saved values from database.
+	 *
+	 * @return array Updated safe values to be saved.
+	 */
+	public function update( $new_instance, $old_instance ) {
+		$instance = array();
+		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
+		/* Save open/close*/
+		$instance['is_open'] = ( ! empty( $new_instance['is_open'] ) ) ? strip_tags( $new_instance['is_open'] ) : '';
+		/* Save Number Of Records*/
+		$instance['no_of_records'] = ( ! empty( $new_instance['no_of_records'] ) ) ? strip_tags( $new_instance['no_of_records'] ) : '';
+		return $instance;
+	}
+
+} 
+// register nokri Widget widget
+function nokri_search_candidate_gender() {
+    register_widget( 'nokri_search_candidate_gender' );
+}
+add_action( 'widgets_init', 'nokri_search_candidate_gender' );
+
+
+
+
+/* ========================= */
+/*  Candidates Salary Widget  */
+/* ========================= */
+class nokri_search_candidate_salary1 extends WP_Widget {
+	/**
+	 * Register widget with WordPress.
+	 */
+	function __construct() {
+		parent::__construct(
+			'nokri_search_candidate_salary1', // Base ID
+			esc_html__( 'Candidate Salary Range', 'nokri' ), // Name
+			array( 'description' => esc_html__( 'Show candidate by salary', 'nokri' ), ) // Args
 		);
 	}
 	/**
@@ -1483,65 +2128,70 @@ class nokri_search_candidate_skills extends WP_Widget {
 		/* Number Of Records */
 		$no_of_records = ! empty( $instance['no_of_records'] ) ? $instance['no_of_records'] : esc_html__( 'Select Number', 'nokri' );
        /*  Select Country,  City, State */
-		$search_types	=	nokri_get_cats('job_skills' , 0 );
+	   $salary_html = '';
+		$search_types	=	nokri_get_cats('job_salary' , 0 );
 		if( count((array) $search_types ) > 0 )
 		 {
-		$skill_html	=	'';
+		$salary_html	=	'';
 		$count	=	1;
 		$cls	=	'';
 		$showed	=	false;
-		$cur_cls	=	'sb_skills';
+		$cur_cls	=	'sb_salary';
 		$is_run 	=	true;
 		foreach( $search_types as $search_type )
 		{
 			$selected	=	'';
-			if ( isset( $_GET['cand_skills'] ) && $_GET['cand_skills'] == $search_type->term_id) 
+			if ( isset( $_GET['cand-salary'] ) && $_GET['cand-salary'] == $search_type->term_id) 
 			{
 					$selected = 'checked = "checked"';
 			}
 			
 			if( $count > $no_of_records && $is_run )
 			{
-				$cls	=	'hide_skills hide_li';
+				$cls	=	'hide_salary hide_li';
 				$showed = true;
 				$is_run	=	false;
 			}
 			if( $showed )
 			{
 				$showed	=	false;
-				$skill_html	.=	'<li class="show-more hide_now_'.esc_attr( $cur_cls ).'"><small><a href="javascript:void(0);" class="show_records" data-attr-id="hide_skills" data-attr-hide="'.esc_attr( $cur_cls ).'">'.__('Show more','nokri').'</a></small></li>';	
+				$salary_html	.=	'<li class="show-more hide_now_'.esc_attr( $cur_cls ).'"><small><a href="javascript:void(0);" class="show_records" data-attr-id="hide_salary" data-attr-hide="'.esc_attr( $cur_cls ).'">'.__('Show more','nokri').'</a></small></li>';	
 			}
 			
-			$skill_html	.=	'<li class="'.esc_attr( $cls ).'"><input class="input-icheck input-icheck-search cand_skills_form" '.esc_attr($selected).' value="'.esc_attr($search_type->term_id).'" type="radio"  name="cand_skills"> <label>' .esc_html( $search_type->name ).'</label></li>';
+			$salary_html	.=	'<li class="'.esc_attr( $cls ).'"><input class="input-icheck input-icheck-search cand_salary_form" '.esc_attr($selected).' value="'.esc_attr($search_type->term_id).'" type="radio"  name="cand-salary"> <label>' .esc_html( $search_type->name ).'</label></li>';
 			$count++;
 		}
 		global $nokri;
-		$in  = '';
+		$in        = '';
+		$collapsed = 'collapsed';
 		 if(isset($instance['is_open'] ) && $instance['is_open'] == 'open' )
 		 {
-			 $in = 'in';
+			 $in        = 'in';
+			 $collapsed = '';
 		 }
-		if( isset( $_GET['cand_skills'] ) && $_GET['cand_skills'] != "" )
+		if( isset( $_GET['cand-salary'] ) && $_GET['cand-salary'] != "" )
 		{
 			$in     = 'in';
 		}
 		?>
         <div class="panel panel-default">
         <div class="panel-heading active" role="tab" >
-            <a role="button" data-toggle="collapse" href="#cand_job_skills">
-            <?php echo "".$instance['title']; ?>
+            <a role="button" class="<?php echo esc_attr($collapsed); ?>" data-toggle="collapse" href="#cand_job_salary">
+             <?php if ( ! empty( $instance['title'] ) ) {
+			echo ($args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title']);
+		    } ?>
             </a>
         </div>
-        <div id="cand_job_skills"  class="panel-collapse collapse <?php echo esc_attr($in);?>" role="tabpanel">
-        <form method="get" id="cand_skills_form"  action="<?php echo get_the_permalink( $nokri['candidates_search_page'] ); ?>">
+        <div id="cand_job_salary"  class="panel-collapse collapse <?php echo esc_attr($in);?>" role="tabpanel">
+        <form method="get" id="cand_job_salary"  action="<?php echo get_the_permalink( $nokri['candidates_search_page'] ); ?>">
           <div class="panel-body">
             <ul class="list">
-              <?php echo "".($skill_html);?>
+              <?php echo "".($salary_html);?>
            </ul>
           </div>
-          <?php echo nokri_search_params( 'cand_skills' ); ?>
+          <?php echo nokri_search_params( 'cand-salary' ); ?>
+          <?php echo nokri_form_lang_field_callback(true) ?>
           </form>
-          
         </div>
       </div>     
 		<?php 
@@ -1613,10 +2263,346 @@ esc_attr( $this->get_field_name( 'no_of_records' ) ); ?>" type="number" value="<
 
 } 
 // register nokri Widget widget
-function nokri_search_candidate_skills() {
-    register_widget( 'nokri_search_candidate_skills' );
+function nokri_search_candidate_salary1() {
+    register_widget( 'nokri_search_candidate_salary1' );
 }
-add_action( 'widgets_init', 'nokri_search_candidate_skills' );
+add_action( 'widgets_init', 'nokri_search_candidate_salary1' );
+
+/* ========================= */
+/*  Candidates Salary Type Widget  */
+/* ========================= */
+class nokri_search_candidate_salary_type extends WP_Widget {
+	/**
+	 * Register widget with WordPress.
+	 */
+	function __construct() {
+		parent::__construct(
+			'nokri_search_candidate_salary_type', // Base ID
+			esc_html__( 'Candidate Salary Type', 'nokri' ), // Name
+			array( 'description' => esc_html__( 'Show candidate by salary', 'nokri' ), ) // Args
+		);
+	}
+	/**
+	 * Front-end display of widget.
+	 *
+	 * @see WP_Widget::widget()
+	 *
+	 * @param array $args     Widget arguments.
+	 * @param array $instance Saved values from database.
+	 */
+	public function widget( $args, $instance ) {
+		/* Number Of Records */
+		$no_of_records = ! empty( $instance['no_of_records'] ) ? $instance['no_of_records'] : esc_html__( 'Select Number', 'nokri' );
+       /*  Select Country,  City, State */
+	   $salary_html = '';
+	   $salary_type_html	=	'';
+		$search_types	=	nokri_get_cats('job_salary_type' , 0 );
+		if( count((array) $search_types ) > 0 )
+		 {
+		$salary_type_html	=	'';
+		$count	=	1;
+		$cls	=	'';
+		$showed	=	false;
+		$cur_cls	=	'sb_salary_type';
+		$is_run 	=	true;
+		foreach( $search_types as $search_type )
+		{
+			$selected	=	'';
+			if ( isset( $_GET['cand-salary-type'] ) && $_GET['cand-salary-type'] == $search_type->term_id) 
+			{
+					$selected = 'checked = "checked"';
+			}
+			
+			if( $count > $no_of_records && $is_run )
+			{
+				$cls	=	'hide_salary_type hide_li';
+				$showed = true;
+				$is_run	=	false;
+			}
+			if( $showed )
+			{
+				$showed	=	false;
+				$salary_html	.=	'<li class="show-more hide_now_'.esc_attr( $cur_cls ).'"><small><a href="javascript:void(0);" class="show_records" data-attr-id="hide_salary_type" data-attr-hide="'.esc_attr( $cur_cls ).'">'.__('Show more','nokri').'</a></small></li>';	
+			}
+			
+			$salary_html	.=	'<li class="'.esc_attr( $cls ).'"><input class="input-icheck input-icheck-search cand_salary_form" '.esc_attr($selected).' value="'.esc_attr($search_type->term_id).'" type="radio"  name="cand-salary-type"> <label>' .esc_html( $search_type->name ).'</label></li>';
+			$count++;
+		}
+		global $nokri;
+		$in        = '';
+		$collapsed = 'collapsed';
+		 if(isset($instance['is_open'] ) && $instance['is_open'] == 'open' )
+		 {
+			 $in        = 'in';
+			 $collapsed = '';
+		 }
+		if( isset( $_GET['cand-salary'] ) && $_GET['cand-salary'] != "" )
+		{
+			$in     = 'in';
+		}
+		?>
+        <div class="panel panel-default">
+        <div class="panel-heading active" role="tab" >
+            <a role="button" class="<?php echo esc_attr($collapsed); ?>" data-toggle="collapse" href="#cand_job_salary_type">
+             <?php if ( ! empty( $instance['title'] ) ) {
+			echo ($args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title']);
+		    } ?>
+            </a>
+        </div>
+        <div id="cand_job_salary_type"  class="panel-collapse collapse <?php echo esc_attr($in);?>" role="tabpanel">
+        <form method="get" id="cand_job_salary_type"  action="<?php echo get_the_permalink( $nokri['candidates_search_page'] ); ?>">
+          <div class="panel-body">
+            <ul class="list">
+              <?php echo "".($salary_html);?>
+           </ul>
+          </div>
+          <?php echo nokri_search_params( 'cand-salary-type' ); ?>
+          <?php echo nokri_form_lang_field_callback(true) ?>
+          </form>
+        </div>
+      </div>     
+		<?php 
+		 }
+}
+	/**
+	 * Back-end widget form.
+	 *
+	 * @see WP_Widget::form()
+	 *
+	 * @param array $instance Previously saved values from database.
+	 */
+	public function form( $instance ) {
+		$title = ! empty( $instance['title'] ) ? $instance['title'] : esc_html__( 'New title', 'nokri' );
+		/* Seting Open Or Not*/
+		$is_open = ! empty( $instance['is_open'] ) ? $instance['is_open'] : esc_html__( 'Select Widget Type', 'nokri' );
+		/* Number Of Records */
+		$no_of_records = ! empty( $instance['no_of_records'] ) ? $instance['no_of_records'] : esc_html__( 'Select Number', 'nokri' );
+		?>
+		<p>
+		<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_attr_e( 'Title:', 
+
+'nokri' ); ?></label> 
+		<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo 
+
+esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
+		</p>
+        <!--Open/close  --->
+        <p>
+        <label for="<?php echo esc_attr( $this->get_field_id( 'is_open' ) ); ?>"><?php esc_attr_e( 'Set Widget', 
+'nokri' ); ?>
+		</label> 
+        <select name="<?php echo esc_attr( $this->get_field_name( 'is_open' ) ); ?>" id="<?php echo esc_attr( $this->get_field_id( 'is_open' ) ); ?>" class="widefat">
+        <option value="open" <?php if ( $is_open == 'open') { echo "selected"; } ; ?> ><?php echo esc_html__( 'Open', 'nokri' ); ?></option>
+        <option value="close" <?php if ( $is_open == 'close') { echo "selected"; } ; ?> ><?php echo esc_html__( 'Close', 'nokri' ); ?></option>    				
+		</select>
+        </p>
+        <!--Number of records --->
+        <p>
+		<label for="<?php echo esc_attr( $this->get_field_id( 'no_of_records' ) ); ?>"><?php esc_attr_e( 'By Default Number of Records:', 
+
+'nokri' ); ?></label> 
+		<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'no_of_records' ) ); ?>" name="<?php echo 
+
+esc_attr( $this->get_field_name( 'no_of_records' ) ); ?>" type="number" value="<?php echo esc_attr( $no_of_records ); ?>">
+		</p>
+		<?php 
+	}
+
+	/**
+	 * Sanitize widget form values as they are saved.
+	 *
+	 * @see WP_Widget::update()
+	 *
+	 * @param array $new_instance Values just sent to be saved.
+	 * @param array $old_instance Previously saved values from database.
+	 *
+	 * @return array Updated safe values to be saved.
+	 */
+	public function update( $new_instance, $old_instance ) {
+		$instance = array();
+		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
+		/* Save open/close*/
+		$instance['is_open'] = ( ! empty( $new_instance['is_open'] ) ) ? strip_tags( $new_instance['is_open'] ) : '';
+		/* Save Number Of Records*/
+		$instance['no_of_records'] = ( ! empty( $new_instance['no_of_records'] ) ) ? strip_tags( $new_instance['no_of_records'] ) : '';
+		return $instance;
+	}
+
+} 
+// register nokri Widget widget
+function nokri_search_candidate_salary_type() {
+    register_widget( 'nokri_search_candidate_salary_type' );
+}
+add_action( 'widgets_init', 'nokri_search_candidate_salary_type' );
+
+/* ========================= */
+/*  Candidates Salary Currency Widget  */
+/* ========================= */
+class nokri_search_candidate_salary_currency extends WP_Widget {
+	/**
+	 * Register widget with WordPress.
+	 */
+	function __construct() {
+		parent::__construct(
+			'nokri_search_candidate_salary_currency', // Base ID
+			esc_html__( 'Candidate Salary Currency', 'nokri' ), // Name
+			array( 'description' => esc_html__( 'Show candidate by salary currency', 'nokri' ), ) // Args
+		);
+	}
+	/**
+	 * Front-end display of widget.
+	 *
+	 * @see WP_Widget::widget()
+	 *
+	 * @param array $args     Widget arguments.
+	 * @param array $instance Saved values from database.
+	 */
+	public function widget( $args, $instance ) {
+		/* Number Of Records */
+		$no_of_records = ! empty( $instance['no_of_records'] ) ? $instance['no_of_records'] : esc_html__( 'Select Number', 'nokri' );
+       /*  Currency Values*/
+	    $salary_html = '';
+		$search_types	=	nokri_get_cats('job_currency' , 0 );
+		if( count((array) $search_types ) > 0 )
+		 {
+		$salary_type_html	=	'';
+		$count	=	1;
+		$cls	=	'';
+		$showed	=	false;
+		$cur_cls	=	'sb_salary_currency';
+		$is_run 	=	true;
+		foreach( $search_types as $search_type )
+		{
+			$selected	=	'';
+			if ( isset( $_GET['cand-salary-currency'] ) && $_GET['cand-salary-currency'] == $search_type->term_id) 
+			{
+					$selected = 'checked = "checked"';
+			}
+			
+			if( $count > $no_of_records && $is_run )
+			{
+				$cls	=	'hide_salary_currency hide_li';
+				$showed =   true;
+				$is_run	=	false;
+			}
+			if( $showed )
+			{
+				$showed	         =	false;
+				$salary_html	.=	'<li class="show-more hide_now_'.esc_attr( $cur_cls ).'"><small><a href="javascript:void(0);" class="show_records" data-attr-id="hide_salary_currency" data-attr-hide="'.esc_attr( $cur_cls ).'">'.__('Show more','nokri').'</a></small></li>';	
+			}
+			
+			$salary_html	.=	'<li class="'.esc_attr( $cls ).'"><input class="input-icheck input-icheck-search cand_salary_form" '.esc_attr($selected).' value="'.esc_attr($search_type->term_id).'" type="radio"  name="cand-salary-currency"> <label>' .esc_html( $search_type->name ).'</label></li>';
+			$count++;
+		}
+		global $nokri;
+		$in        = '';
+		$collapsed = 'collapsed';
+		 if(isset($instance['is_open'] ) && $instance['is_open'] == 'open' )
+		 {
+			 $in        = 'in';
+			 $collapsed = '';
+		 }
+		if( isset( $_GET['cand-salary-currency'] ) && $_GET['cand-salary-currency'] != "" )
+		{
+			$in     = 'in';
+		}
+		?>
+        <div class="panel panel-default">
+        <div class="panel-heading active" role="tab" >
+            <a role="button" class="<?php echo esc_attr($collapsed); ?>" data-toggle="collapse" href="#cand_job_salary_currency">
+             <?php if ( ! empty( $instance['title'] ) ) {
+			echo ($args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title']);
+		    } ?>
+            </a>
+        </div>
+        <div id="cand_job_salary_currency"  class="panel-collapse collapse <?php echo esc_attr($in);?>" role="tabpanel">
+        <form method="get" id="cand_salary_form"  action="<?php echo get_the_permalink( $nokri['candidates_search_page'] ); ?>">
+          <div class="panel-body">
+            <ul class="list">
+              <?php echo "".($salary_html);?>
+           </ul>
+          </div>
+          <?php echo nokri_search_params( 'cand-salary-currency' ); ?>
+          <?php echo nokri_form_lang_field_callback(true) ?>
+          </form>
+        </div>
+      </div>     
+		<?php 
+		 }
+}
+	/**
+	 * Back-end widget form.
+	 *
+	 * @see WP_Widget::form()
+	 *
+	 * @param array $instance Previously saved values from database.
+	 */
+	public function form( $instance ) {
+		$title = ! empty( $instance['title'] ) ? $instance['title'] : esc_html__( 'New title', 'nokri' );
+		/* Seting Open Or Not*/
+		$is_open = ! empty( $instance['is_open'] ) ? $instance['is_open'] : esc_html__( 'Select Widget Type', 'nokri' );
+		/* Number Of Records */
+		$no_of_records = ! empty( $instance['no_of_records'] ) ? $instance['no_of_records'] : esc_html__( 'Select Number', 'nokri' );
+		?>
+		<p>
+		<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_attr_e( 'Title:', 
+
+'nokri' ); ?></label> 
+		<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo 
+
+esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
+		</p>
+        <!--Open/close  --->
+        <p>
+        <label for="<?php echo esc_attr( $this->get_field_id( 'is_open' ) ); ?>"><?php esc_attr_e( 'Set Widget', 
+'nokri' ); ?>
+		</label> 
+        <select name="<?php echo esc_attr( $this->get_field_name( 'is_open' ) ); ?>" id="<?php echo esc_attr( $this->get_field_id( 'is_open' ) ); ?>" class="widefat">
+        <option value="open" <?php if ( $is_open == 'open') { echo "selected"; } ; ?> ><?php echo esc_html__( 'Open', 'nokri' ); ?></option>
+        <option value="close" <?php if ( $is_open == 'close') { echo "selected"; } ; ?> ><?php echo esc_html__( 'Close', 'nokri' ); ?></option>    				
+		</select>
+        </p>
+        <!--Number of records --->
+        <p>
+		<label for="<?php echo esc_attr( $this->get_field_id( 'no_of_records' ) ); ?>"><?php esc_attr_e( 'By Default Number of Records:', 
+
+'nokri' ); ?></label> 
+		<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'no_of_records' ) ); ?>" name="<?php echo 
+
+esc_attr( $this->get_field_name( 'no_of_records' ) ); ?>" type="number" value="<?php echo esc_attr( $no_of_records ); ?>">
+		</p>
+		<?php 
+	}
+
+	/**
+	 * Sanitize widget form values as they are saved.
+	 *
+	 * @see WP_Widget::update()
+	 *
+	 * @param array $new_instance Values just sent to be saved.
+	 * @param array $old_instance Previously saved values from database.
+	 *
+	 * @return array Updated safe values to be saved.
+	 */
+	public function update( $new_instance, $old_instance ) {
+		$instance = array();
+		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
+		/* Save open/close*/
+		$instance['is_open'] = ( ! empty( $new_instance['is_open'] ) ) ? strip_tags( $new_instance['is_open'] ) : '';
+		/* Save Number Of Records*/
+		$instance['no_of_records'] = ( ! empty( $new_instance['no_of_records'] ) ) ? strip_tags( $new_instance['no_of_records'] ) : '';
+		return $instance;
+	}
+
+} 
+// register nokri Widget widget
+function nokri_search_candidate_salary_currency() {
+    register_widget( 'nokri_search_candidate_salary_currency' );
+}
+add_action( 'widgets_init', 'nokri_search_candidate_salary_currency' );
+
+
+
 
 /* ========================= */
 /*  Employer skill widget  */
@@ -1631,7 +2617,7 @@ class nokri_search_employer_skills extends WP_Widget {
 	function __construct() {
 		parent::__construct(
 			'nokri_search_employer_skills', // Base ID
-			esc_html__( 'Search by employer specialization', 'nokri' ), // Name
+			esc_html__( 'Employer Specialization', 'nokri' ), // Name
 			array( 'description' => esc_html__( 'Show employer by specialization', 'nokri' ), ) // Args
 		);
 	}
@@ -1681,9 +2667,11 @@ class nokri_search_employer_skills extends WP_Widget {
 		}
 		global $nokri;
 		$in  = '';
+		$collapsed = 'collapsed';
 		 if(isset($instance['is_open'] ) && $instance['is_open'] == 'open' )
 		 {
 			 $in = 'in';
+			 $collapsed = '';
 		 }
 		if( isset( $_GET['emp_skills'] ) && $_GET['emp_skills'] != "" )
 		{
@@ -1693,7 +2681,9 @@ class nokri_search_employer_skills extends WP_Widget {
         <div class="panel panel-default">
         <div class="panel-heading active" role="tab" >
             <a role="button" data-toggle="collapse" href="#emp_job_skills">
-            <?php echo "".$instance['title']; ?>
+             <?php if ( ! empty( $instance['title'] ) ) {
+			echo ($args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title']);
+		    } ?>
             </a>
         </div>
         <div id="emp_job_skills"  class="panel-collapse collapse <?php echo esc_attr($in);?>" role="tabpanel">
@@ -1704,8 +2694,8 @@ class nokri_search_employer_skills extends WP_Widget {
            </ul>
           </div>
           <?php echo nokri_search_params( 'emp_skills' ); ?>
+          <?php echo nokri_form_lang_field_callback(true) ?>
           </form>
-          
         </div>
       </div>     
 		<?php 
@@ -1810,7 +2800,6 @@ function __construct() {
 			echo ($args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title']);
 		}
 		 ?>
-			
           <div class="search-blog">
          <form role="search" method="get" id="search-form" action="<?php echo home_url( '/' ); ?>">
            <div class="input-group stylish-input-group">
@@ -1819,6 +2808,7 @@ function __construct() {
               <button type="submit" id="search-submit"> <span class="fa fa-search"></span> </button>
               </span> 
            </div>
+           <?php echo nokri_form_lang_field_callback(true) ?>
             </form> 
         </div>   
          
@@ -1986,7 +2976,7 @@ class nokri_search_employer extends WP_Widget {
 function __construct() {
 		parent::__construct(
 			'nokri_search_employer', // Base ID
-			esc_html__( 'Search by employer  title', 'nokri' ), // Name
+			esc_html__( 'Employer Title', 'nokri' ), // Name
 			array( 'description' => esc_html__( 'Get employer by title', 'nokri' ), ) // Args
 						    );
 					   }
@@ -2003,9 +2993,11 @@ function __construct() {
 		global $nokri;
 		 $title	=	'';
 		 $in  = '';
+		 $collapsed = 'collapsed';
 		 if(isset($instance['is_open'] ) && $instance['is_open'] == 'open' )
 		 {
 			 $in = 'in';
+			 $collapsed = '';
 		 }
 		if( isset( $_GET['emp_title'] ) && $_GET['emp_title'] != "" )
 		{
@@ -2029,6 +3021,7 @@ function __construct() {
                 <button type="submit" class="btn"><i class="fa fa-search"></i></button>
                 </div>
                   <?php echo nokri_search_params( 'emp_title' ); ?>
+                  <?php echo nokri_form_lang_field_callback(true) ?>
             </form>
           </div>
         </div>
@@ -2111,9 +3104,11 @@ function __construct() {
 	public function widget( $args, $instance ) {
 		
 		$in  = '';
+		$collapsed = 'collapsed';
 		 if(isset($instance['is_open'] ) && $instance['is_open'] == 'open' )
 		 {
 			 $in = 'in';
+			 $collapsed = '';
 		 }
 		global $nokri;
 		 ?>				
@@ -2341,14 +3336,16 @@ function __construct() {
 		global $nokri;
 		 $title	=	'';
 		 $in  = '';
+		 $collapsed = 'collapsed';
 		 if(isset($instance['is_open'] ) && $instance['is_open'] == 'open' )
 		 {
 			 $in = 'in';
+			 $collapsed = '';
 		 }
 		 
-		if( isset( $_GET['job_title'] ) && $_GET['job_title'] != "" )
+		if( isset( $_GET['job-title'] ) && $_GET['job-title'] != "" )
 		{
-			$title	=	$_GET['job_title'];
+			$title	=	$_GET['job-title'];
 			$in     = 'in';
 		}
 		 ?>				
@@ -2359,16 +3356,17 @@ function __construct() {
             </a>
         </div>
         <div id="job_keyword" class="panel-collapse collapse <?php echo esc_attr($in); ?>" role="tabpanel" >
-          <div class="panel-body">
+          <div class="panel-body">                 
             <form role="search" method="get" action = "<?php echo get_the_permalink($nokri['sb_search_page']); ?>" class="custom-search-form">
                 <div class="form-group">
-                     <input type="text" id="autocomplete-dynamic" autocomplete="off" class="form-control" name="job_title" value="<?php echo esc_attr( $title ); ?>" placeholder="<?php echo esc_html__('Enter keyword or title','nokri') ?>">
+                     <input type="text" id="autocomplete-dynamic" autocomplete="off" class="form-control" name="job-title" value="<?php echo esc_attr( $title ); ?>" placeholder="<?php echo esc_html__('Enter keyword or title','nokri') ?>">
                      <button type="submit" class="btn n-btn-flat btn-mid"><i class="fa fa-search"></i></button>
                 </div>
                 <div class="form-group form-action">
                 </div>
-                <?php echo nokri_search_params( 'job_title'); ?>
-            </form>
+                <?php echo nokri_search_params( 'job-title'); ?>
+                <?php echo nokri_form_lang_field_callback(true) ?>
+            </form>               
           </div>
         </div>
       </div>

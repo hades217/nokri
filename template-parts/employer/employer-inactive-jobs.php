@@ -48,6 +48,7 @@ $query = new WP_Query( $args );
 			$query->the_post(); 
 			get_template_part( 'template-parts/layouts/job-style/style', '3');
 	  }
+	  wp_reset_postdata();
   }
 else
 {

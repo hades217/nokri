@@ -32,6 +32,8 @@ $user_query = new WP_User_Query(
  'order'    =>  $c_order,
   )  );
 $cand_followers = $user_query->get_results();
+
+
 $pages_number = ceil($user_query->get_total()/$limit);
 $company_id = $li  =  $follower_id =  '';
 ?>
@@ -92,11 +94,7 @@ foreach ( $cand_followers as $follower )
 	 if(get_user_meta($follower_id, '_user_headline', true ) != '')
 	 {
 		 $headline_html = '<p>'.get_user_meta($follower_id, '_user_headline', true ).'</p>';
-	 }
-	 
-	 
-
-	 
+	 }	 
  $li .= ' <div class="posted-job-list resume-on-jobs" id="company-box-'.esc_attr($follower_id).'">
 		<ul class="list-inline">
 			<li class="resume-id">'.esc_attr($count).'</li>

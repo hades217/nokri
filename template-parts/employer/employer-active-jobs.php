@@ -25,14 +25,13 @@ $job_name   =  $job_order = $meta_key = $job_filter = '';
 $query_title = '';
 if($job_name != '')
 {
-	 $query_title = "'s'  => $job_name";
+	 $query_title =  $job_name;
 }
 $paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
 $args = array(
 	'post_type'   => 'job_post',
 	'orderby'     => 'date',
 	'order'       => $job_order,
-	's'           => $job_name,
 	'author' 	  => $current_id,
 	'paged'       => $paged,
 	'post_status' => array('publish'), 
@@ -46,6 +45,11 @@ $args = array(
         )
     )
 );
+if($job_name != '')
+{
+	$args['s'] = $job_name;
+}
+$args = nokri_wpml_show_all_posts_callback($args);
 ?>
 <div class="dashboard-job-filters">
     <div class="row">
@@ -79,6 +83,7 @@ $args = array(
                 </select>
             </div>
         </div>
+        <?php echo nokri_form_lang_field_callback(true); ?>
         </form>
     </div>
 </div>
@@ -104,6 +109,7 @@ $query = new WP_Query( $args );
 			$query->the_post(); 
 			get_template_part( 'template-parts/layouts/job-style/style', '3');
 	 }
+	 wp_reset_postdata(); 
 }
 else
 {

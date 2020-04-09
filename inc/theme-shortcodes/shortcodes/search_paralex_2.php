@@ -134,58 +134,53 @@ function search_paralex_2_short_base_func($atts, $content = '')
 		'cats_title' => '',
 		'cats_link' => '',
 	) , $atts));
-	global $nokri;
-	
-	
-	
-		//For countries
-		$rows_countries = vc_param_group_parse_atts( $atts['countries'] );
-		$year_countries	=	false;
-		$countries_html	=	'';
-		$get_year = '';
-		if( count( $rows_countries ) > 0 )
+	    global $nokri;
+	    //For countries
+		if(isset($atts['countries']) && !empty($atts['countries']) != '')
 		{
-			$countries_html .= '';
-			foreach($rows_countries as $rows_country )
+			$rows_countries = vc_param_group_parse_atts( $atts['countries'] );
+			$year_countries	=	false;
+			$countries_html	=	'';
+			$get_year = '';
+			if( count( $rows_countries ) > 0 )
 			{
-				if( isset( $rows_country['country'] )  )
+				$countries_html .= '';
+				foreach($rows_countries as $rows_country )
 				{
-					if($rows_country['country'] == 'all' )
+					if( isset( $rows_country['country'] )  )
 					{
-						$year_countries = true;
-						$countries_html = '';
-
-						break;
+						if($rows_country['country'] == 'all' )
+						{
+							$year_countries = true;
+							$countries_html = '';
+	
+							break;
+						}
+						$get_country = get_term_by('slug', $rows_country['country'], 'ad_location');
+						if( count( $get_country ) == 0 )
+						continue;
+						$countries_html .= '<option value="'.$get_country->term_id.'">'.$get_country->name.'</option>';
 					}
-					$get_country = get_term_by('slug', $rows_country['country'], 'ad_location');
-					if( count( $get_country ) == 0 )
-					continue;
-					$countries_html .= '<option value="'.$get_country->term_id.'">'.$get_country->name.'</option>';
 				}
-			}
-			
-			if( $year_countries )
-			{
 				
-				$all_countries = nokri_get_cats('ad_location', 0 );
-				foreach( $all_countries as $all_year )
+				if( $year_countries )
 				{
-					$countries_html .= '<option value="'.$all_year->term_id.'">'.$all_year->name.'</option>';
+					
+					$all_countries = nokri_get_cats('ad_location', 0 );
+					foreach( $all_countries as $all_year )
+					{
+						$countries_html .= '<option value="'.$all_year->term_id.'">'.$all_year->name.'</option>';
+					}
+					
+					
+					
+					
 				}
-				
-				
-				
-				
 			}
 		}
-	
-
-
-	
-	// For hot categories
+	    // For hot categories
 		$hot_cats_html = ''; 
-		
-		if(!empty($atts['hot_cats']))
+		if(isset($atts['hot_cats']) && !empty($atts['hot_cats']))
 		{
 		  $rows_hot_cats   = vc_param_group_parse_atts( $atts['hot_cats'] );
 			$year_countries	=	false;
@@ -209,77 +204,70 @@ function search_paralex_2_short_base_func($atts, $content = '')
 						$get_hot_cat = get_term_by('slug', $rows_hot_cat['hot_cat'], 'job_category');
 						if( count( (array)$get_hot_cat ) == 0 )
 						continue;
-						$hot_cats_html .= '<a href="'.get_the_permalink($nokri['sb_search_page']).'?cat_id='.$get_hot_cat->term_id.'">'.$get_hot_cat->name.'</a>';
+						$hot_cats_html .= '<a href="'.nokri_cat_link_page($get_hot_cat->term_id).'">'.$get_hot_cat->name.'</a>';
 					}
 				}
 			}
 		}
-		
-		
 		//For countries
-		$rows_countries = vc_param_group_parse_atts( $atts['countries'] );
-		$year_countries	=	false;
-		$countries_html	=	'';
-		$get_year = '';
-		if( count( $rows_countries ) > 0 )
+		if(isset($atts['countries']) && !empty($atts['countries']) != '')
 		{
-			$countries_html .= '';
-			foreach($rows_countries as $rows_country )
+			$rows_countries = vc_param_group_parse_atts( $atts['countries'] );
+			$year_countries	=	false;
+			$countries_html	=	'';
+			$get_year = '';
+			if( count( $rows_countries ) > 0 )
 			{
-				if( isset( $rows_country['country'] )  )
+				$countries_html .= '';
+				foreach($rows_countries as $rows_country )
 				{
-					if($rows_country['country'] == 'all' )
+					if( isset( $rows_country['country'] )  )
 					{
-						$year_countries = true;
-						$countries_html = '';
-						break;
+						if($rows_country['country'] == 'all' )
+						{
+							$year_countries = true;
+							$countries_html = '';
+							break;
+						}
+						$get_country = get_term_by('slug', $rows_country['country'], 'ad_location');
+						if( count( $get_country ) == 0 )
+						continue;
+						$countries_html .= '<option value="'.$get_country->term_id.'">'.$get_country->name.'</option>';
 					}
-					$get_country = get_term_by('slug', $rows_country['country'], 'ad_location');
-					if( count( $get_country ) == 0 )
-					continue;
-					$countries_html .= '<option value="'.$get_country->term_id.'">'.$get_country->name.'</option>';
 				}
-			}
-			
-			if( $year_countries )
-			{
 				
-				$all_countries = nokri_get_cats('ad_location', 0 );
-				foreach( $all_countries as $all_year )
+				if( $year_countries )
 				{
-					$countries_html .= '<option value="'.$all_year->term_id.'">'.$all_year->name.'</option>';
+					
+					$all_countries = nokri_get_cats('ad_location', 0 );
+					foreach( $all_countries as $all_year )
+					{
+						$countries_html .= '<option value="'.$all_year->term_id.'">'.$all_year->name.'</option>';
+					}
+					
+					
+					
+					
 				}
-				
-				
-				
-				
 			}
 		}
-		
-
-/*Section Title */
-$main_section_title = (isset($section_title) && $section_title != "") ? ' <h1>'.$section_title.'</h1>' : "";
-/*Section Tagline */
-$main_section_tagline = (isset($section_tagline) && $section_tagline != "") ? ' <p>'.$section_tagline.'</p>' : "";
-/*hot Title */
-$hot_section_title = (isset($hot_title) && $hot_title != "") ? '<span class="n-most-cat-title">'.$hot_title.'</span>' : "";
-
-/*keyowrd Title */
-$keyword_title = (isset($keyword_title) && $keyword_title != "") ? '<label><i class="ti-briefcase"></i>'." ".$keyword_title.'</label>' : "";
-
-/*country Title */
-$country_title = (isset($country_title) && $country_title != "") ? '<label><i class="ti-location-pin"></i>'." ".$country_title.'</label>' : "";
-
-
- /* Background Image */
-$bg_img = '';
-if( $search_section_img != "" )
-{
-$bgImageURL	=	nokri_returnImgSrc( $search_section_img );
-$bg_img = ( $bgImageURL != "" ) ? ' \\s\\t\\y\\l\\e="background:  url('.$bgImageURL.') 0 0 no-repeat; -webkit-background-size: cover; -moz-background-size: cover; -o-background-size: cover; background-size: cover; background-position: center center; background-attachment:scroll;"' : "";
-}
-
-
+		/*Section Title */
+		$main_section_title = (isset($section_title) && $section_title != "") ? ' <h1>'.$section_title.'</h1>' : "";
+		/*Section Tagline */
+		$main_section_tagline = (isset($section_tagline) && $section_tagline != "") ? ' <p>'.$section_tagline.'</p>' : "";
+		/*hot Title */
+		$hot_section_title = (isset($hot_title) && $hot_title != "") ? '<span class="n-most-cat-title">'.$hot_title.'</span>' : "";
+		/*keyowrd Title */
+		$keyword_title = (isset($keyword_title) && $keyword_title != "") ? '<label><i class="ti-briefcase"></i>'." ".$keyword_title.'</label>' : "";
+		/*country Title */
+		$country_title = (isset($country_title) && $country_title != "") ? '<label><i class="ti-location-pin"></i>'." ".$country_title.'</label>' : "";
+		 /* Background Image */
+		$bg_img = '';
+		if( $search_section_img != "" )
+		{
+		$bgImageURL	=	nokri_returnImgSrc( $search_section_img );
+		$bg_img = ( $bgImageURL != "" ) ? ' \\s\\t\\y\\l\\e="background:  url('.$bgImageURL.') 0 0 no-repeat; -webkit-background-size: cover; -moz-background-size: cover; -o-background-size: cover; background-size: cover; background-position: center center; background-attachment:scroll;"' : "";
+		}
    return   '<section class="n-hero-section-two"  '.str_replace('\\',"",$bg_img).'>
          <div class="container">
             <div class="row">
@@ -292,16 +280,17 @@ $bg_img = ( $bgImageURL != "" ) ? ' \\s\\t\\y\\l\\e="background:  url('.$bgImage
                      <div class="n-hero-two-form-cat">
                         <div class="n-saech-two-form">
                            <form  method="get" action="'.get_the_permalink($nokri['sb_search_page']).'">
+						   '.nokri_form_lang_field_callback(false).'
                               <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                  <div class="form-group">
                                     '.$keyword_title.'
-									 <input type="text" class="form-control" name="job_title" placeholder="'.esc_html__('Search Keyword','nokri').'">
+									 <input type="text" class="form-control" name="job-title" placeholder="'.esc_html__('Search Keyword','nokri').'">
                                  </div>
                               </div>
                               <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
                                  <div class="form-group">
                                      '.$country_title.'
-                                    <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="'.esc_html__('Select Location','nokri').'" style="width: 100%" name="job_location">
+                                    <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="'.esc_html__('Select Location','nokri').'" style="width: 100%" name="job-location">
                                          <option value="">'.$country_title.'</option>
                                            '.$countries_html.'
                                         </select>

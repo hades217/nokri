@@ -3,6 +3,16 @@
 get_header();
 global $nokri;
 $user_id         =  get_current_user_id();
+/* Signin  Page */
+$signin = '';
+if((isset($nokri['sb_sign_in_page'])) && $nokri['sb_sign_in_page']  != '' )
+{
+	$signin =  ($nokri['sb_sign_in_page']);
+}
+if(!is_user_logged_in())
+{
+	echo nokri_redirect( get_the_permalink($signin) );
+}
 $rtl_class = $expire_pkg = '';
 if(is_rtl())
  {
@@ -36,18 +46,19 @@ if( !isset( $_GET['id'] ) )
 		$expiry_date_string 	=  strtotime($expiry_date);
 		$today_string 			=  strtotime($today);
 		$expire_jobs 			=  false;
-		if($regular_jobs == 0 || $today_string > $expiry_date_string)
+		  
+		
+		
+		if($regular_jobs == 0 || $today_string > $expiry_date_string )
 		{
 			$expire_jobs = true;
 			nokri_simple_jobs($expire_jobs );
-			echo nokri_redirect( get_the_permalink($package_page) );
+		   echo nokri_redirect( get_the_permalink($package_page) );
 		}
 	}
 }
 
-$job_id = $job_ext_url = $job_apply_with = $job_ext_mail =  $job_deadline = $job_type = $job_level = $job_shift = $job_experience = $job_skills =  $job_salary = $job_qualifications = $job_currency = $ad_mapLocation = $ad_map_lat =  $ad_map_long = $level = $cats = $sub_cats_html = $sub_sub_cats_html =  $sub_sub_sub_cats_html = $cats_html =  $tags = $job_phone =  $description = $job_posts = $title = $levelz =  $job_salary_type =   $country_states =   $country_cities =   $country_towns = '';
-global $nokri;
-
+$job_id = $job_ext_url = $job_apply_with = $job_ext_mail =  $job_deadline = $job_type = $job_level = $job_shift = $job_experience = $job_skills =  $job_salary = $job_qualifications = $job_currency = $ad_mapLocation = $ad_map_lat =  $ad_map_long = $level = $cats = $sub_cats_html = $sub_sub_cats_html =  $sub_sub_sub_cats_html = $cats_html =  $tags = $job_phone =  $description = $job_posts = $title = $levelz =  $job_salary_type =   $country_states =   $country_cities =   $country_towns =  $questions = '';
 if((isset($nokri['sb_default_lat'])) && $nokri['sb_default_lat']  != '' )
 {
 	$ad_map_lat =  ($nokri['sb_default_lat']);
@@ -82,24 +93,23 @@ if( get_post_field( 'post_author', $job_id ) != get_current_user_id() && !is_sup
 
 $job_type        		   =      wp_get_post_terms($job_id, 'job_type', array("fields" => "ids"));
 $job_type	     		   =	  isset( $job_type[0] ) ? $job_type[0] : '';
-$job_qualifications        =      wp_get_post_terms($job_id, 'job_qualifications', array("fields" => "ids"));
-$job_qualifications	       =	  isset( $job_qualifications[0] ) ? $job_qualifications[0] : '';
+$job_qualifications                =      wp_get_post_terms($job_id, 'job_qualifications', array("fields" => "ids"));
+$job_qualifications	           =	  isset( $job_qualifications[0] ) ? $job_qualifications[0] : '';
 $job_level        		   =      wp_get_post_terms($job_id, 'job_level', array("fields" => "ids"));
-$job_level	               =	  isset( $job_level[0] ) ? $job_level[0] : '';
+$job_level	                   =	  isset( $job_level[0] ) ? $job_level[0] : '';
 $job_salary       		   = 	  wp_get_post_terms($job_id, 'job_salary', array("fields" => "ids"));
 $job_salary	      		   =	  isset( $job_salary[0] ) ? $job_salary[0] : '';
-$job_salary_type           =      wp_get_post_terms($job_id, 'job_salary_type', array("fields" => "ids"));
-$job_salary_type	       =	  isset( $job_salary_type[0] ) ? $job_salary_type[0] : '';
+$job_salary_type                   =      wp_get_post_terms($job_id, 'job_salary_type', array("fields" => "ids"));
+$job_salary_type	           =	  isset( $job_salary_type[0] ) ? $job_salary_type[0] : '';
 $job_experience   		   =      wp_get_post_terms($job_id, 'job_experience', array("fields" => "ids"));
 $job_experience	  		   =	  isset( $job_experience[0] ) ? $job_experience[0] : '';
-$job_currency              =      wp_get_post_terms($job_id, 'job_currency', array("fields" => "ids"));
-$job_currency	           =	  isset( $job_currency[0] ) ? $job_currency[0] : '';
-$job_shift                 =      wp_get_post_terms($job_id, 'job_shift', array("fields" => "ids"));
-$job_shift	               =	  isset( $job_shift[0] ) ? $job_shift[0] : '';
-$job_skills                =       wp_get_post_terms($job_id, 'job_skills', array("fields" => "ids"));
-
-
-$job_deadline	=      get_post_meta($job_id, '_job_date', true);
+$job_currency                      =      wp_get_post_terms($job_id, 'job_currency', array("fields" => "ids"));
+$job_currency	                   =	  isset( $job_currency[0] ) ? $job_currency[0] : '';
+$job_shift                         =      wp_get_post_terms($job_id, 'job_shift', array("fields" => "ids"));
+$job_shift	                   =	  isset( $job_shift[0] ) ? $job_shift[0] : '';
+$job_skills                        =       wp_get_post_terms($job_id, 'job_skills', array("fields" => "ids"));
+$get_attachment                 	=      get_post_meta($job_id, '_job_attachment', true);
+$job_deadline        	=      get_post_meta($job_id, '_job_date', true);
 $ad_mapLocation	=      get_post_meta($job_id, '_job_address', true);
 $ad_map_lat		=      get_post_meta($job_id, '_job_lat', true);
 $ad_map_long	=      get_post_meta($job_id, '_job_long', true);
@@ -108,7 +118,7 @@ $job_posts		=	   get_post_meta($job_id, '_job_posts', true);
 $job_apply_with	=	   get_post_meta($job_id, '_job_apply_with', true);
 $job_ext_url	=	   get_post_meta($job_id, '_job_apply_url', true);
 $job_ext_mail	=	   get_post_meta($job_id, '_job_apply_mail', true);
-
+$job_questions  =      get_post_meta( $job_id, '_job_questions',true);
 $cats	    	=	   nokri_get_jobs_cats ( $job_id );
 $level	    	=	  count((array) $cats);
 /* Make cats selected on update Job*/
@@ -262,7 +272,7 @@ else
 	
 	//Countries
 $ad_country	=	nokri_get_cats('ad_location' , 0 );
-$country_html	=	'';
+$country_html	=	'<option disabled selected>'.esc_html__('Select Country','nokri').'</option>';
 foreach( $ad_country as $ad_count )
 {
 	$country_html	.=	'<option value="'.$ad_count->term_id.'">' . $ad_count->name .  '</option>';
@@ -335,6 +345,12 @@ $job_apply_with_option = isset($nokri['job_apply_with']) ? $nokri['job_apply_wit
 $job_post_form = isset($nokri['job_post_form']) ? $nokri['job_post_form']  : '0';
 /*Job attachment*/
 $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_attachment']  : '0';
+/*Job questionare*/
+$job_questionare = isset($nokri['allow_questinares']) ? $nokri['allow_questinares']  : false;
+/*Job questionare*/
+$is_attachment = isset($get_attachment) && $get_attachment != '' ? '1'  : '0';
+/* required message */
+$req_mess = esc_html__( 'This value is required', 'nokri' );
 ?>
 <section class="n-pages-breadcrumb" <?php echo ($bg_url); ?>>
  <div class="container">
@@ -355,6 +371,7 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
           <div class="row">
              <form class="n-jobpost" method="post" enctype="multipart/form-data" id="emp-job-post">
                  <input id="is_update" name="is_update" value="<?php echo ($job_id); ?>" type="hidden">
+                 <input id="is_attachment" name="job_attachment" value="<?php echo ($is_attachment); ?>" type="hidden">
                  <input type="hidden" id="country_level" name="country_level" value="<?php echo esc_attr($levelz); ?>" />
                  <input type="hidden" id="is_level" name="is_level" value="<?php echo esc_attr($level); ?>" />
                 <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
@@ -368,7 +385,7 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
                       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                          <div class="form-group">
                          	<label><?php echo esc_html__( 'Job Title*', 'nokri' ); ?></label>
-                             <input type="text" placeholder="<?php echo esc_html__( 'Job Title', 'nokri' ); ?>" value="<?php echo esc_html($title); ?>" id="ad_title" data-parsley-required="true" name="job_title" class="form-control">
+                             <input type="text" placeholder="<?php echo esc_html__( 'Job Title', 'nokri' ); ?>" value="<?php echo esc_html($title); ?>" id="ad_title" data-parsley-required="true" name="job_title" class="form-control" data-parsley-error-message="<?php echo ($req_mess); ?>">
                          </div>
                       </div>
                       <!--End categories levels -->
@@ -427,7 +444,7 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
                       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                          <div class="form-group">
                           <label><?php echo esc_html__( 'Application deadline', 'nokri' ); ?></label>
-                            <input type="text" value="<?php echo esc_html($job_deadline); ?>" class="form-control datepicker-job-post"   data-parsley-required="true" <?php if($expire_pkg) { echo "disabled"; } ?> name="job_date" placeholder="<?php echo esc_html__( 'Application deadline*', 'nokri' ); ?>">
+                            <input type="text" value="<?php echo esc_html($job_deadline); ?>" class="form-control datepicker-job-post"   data-parsley-required="true" <?php if($expire_pkg) { echo "disabled"; } ?> name="job_date" placeholder="<?php echo esc_html__( 'Application deadline*', 'nokri' ); ?>"  data-parsley-error-message="<?php echo ($req_mess); ?>" autocomplete="off">
                          </div>
                       </div>
                       <?php 
@@ -502,7 +519,7 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
                       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                          <div class="form-group">
                          <label><?php echo nokri_feilds_label('type_txt',esc_html__( 'Job type', 'nokri' )); ?></label>
-                            <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo nokri_feilds_label('type_txt',esc_html__( 'Job type', 'nokri' )); ?>" name="job_type" <?php echo nokri_feilds_operat('allow_job_type', 'required'); ?>>
+                            <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo nokri_feilds_label('type_txt',esc_html__( 'Job type', 'nokri' )); ?>" name="job_type" <?php echo nokri_feilds_operat('allow_job_type', 'required'); ?> data-parsley-error-message="<?php echo ($req_mess); ?>">
                                <option value=""><?php echo esc_html__( 'Select Option', 'nokri' ); ?>
                               <?php echo nokri_job_post_taxonomies('job_type',$job_type); ?>
                             </select>
@@ -513,7 +530,7 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
                       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                          <div class="form-group">
                          <label><?php echo nokri_feilds_label('salary_type_txt',esc_html__( 'Salary type', 'nokri' )); ?></label>
-                            <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo nokri_feilds_label('salary_type_txt',esc_html__( 'Salary type', 'nokri' )); ?>" name="job_salary_type" <?php echo nokri_feilds_operat('allow_job_salary_type', 'required'); ?>>
+                            <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo nokri_feilds_label('salary_type_txt',esc_html__( 'Salary type', 'nokri' )); ?>" name="job_salary_type" <?php echo nokri_feilds_operat('allow_job_salary_type', 'required'); ?> data-parsley-error-message="<?php echo ($req_mess); ?>">
                                <option value=""><?php echo esc_html__( 'Select Option', 'nokri' ); ?>
                                <?php  echo nokri_job_post_taxonomies('job_salary_type', $job_salary_type); ?>
                             </select>
@@ -525,7 +542,7 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
                          <div class="form-group">
                          <label><?php echo nokri_feilds_label('job_currency_txt',esc_html__( 'Salary currency', 'nokri' )); ?>
                          </label>
-                            <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo nokri_feilds_label('job_currency_txt',esc_html__( 'Salary currency', 'nokri' )); ?>" name="job_currency" <?php echo nokri_feilds_operat('allow_job_currency', 'required'); ?>>
+                            <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo nokri_feilds_label('job_currency_txt',esc_html__( 'Salary currency', 'nokri' )); ?>" name="job_currency" <?php echo nokri_feilds_operat('allow_job_currency', 'required'); ?> data-parsley-error-message="<?php echo ($req_mess); ?>">
                                <option value=""><?php echo esc_html__( 'Select Option', 'nokri' ); ?></option>
                                 <?php echo nokri_job_post_taxonomies('job_currency', $job_currency); ?>
                             </select>
@@ -536,7 +553,7 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
                       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                          <div class="form-group">
                           <label><?php echo nokri_feilds_label('job_salary_txt',esc_html__( 'Salary range', 'nokri' )); ?></label>
-                            <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo nokri_feilds_label('job_salary_txt',esc_html__( 'Salary range', 'nokri' )); ?>" name="job_salary" <?php echo nokri_feilds_operat('allow_job_salary', 'required'); ?>>
+                            <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo nokri_feilds_label('job_salary_txt',esc_html__( 'Salary range', 'nokri' )); ?>" name="job_salary" <?php echo nokri_feilds_operat('allow_job_salary', 'required'); ?> data-parsley-error-message="<?php echo ($req_mess); ?>">
                                 <option value=""><?php echo esc_html__( 'Select Option', 'nokri' ); ?></option>
                                 <?php echo nokri_job_post_taxonomies('job_salary', $job_salary); ?>
                             </select>
@@ -547,7 +564,7 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
                       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                          <div class="form-group">
                          <label><?php echo nokri_feilds_label('experience_txt',esc_html__( 'Job experience', 'nokri' )); ?></label>
-                            <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo nokri_feilds_label('experience_txt',esc_html__( 'Job experience', 'nokri' )); ?>" name="job_experience" <?php echo nokri_feilds_operat('allow_job_experience', 'required'); ?>>
+                            <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo nokri_feilds_label('experience_txt',esc_html__( 'Job experience', 'nokri' )); ?>" name="job_experience" <?php echo nokri_feilds_operat('allow_job_experience', 'required'); ?> data-parsley-error-message="<?php echo ($req_mess); ?>">
                                 <option value=""><?php echo esc_html__( 'Select Option', 'nokri' ); ?></option>
                                 <?php echo nokri_job_post_taxonomies('job_experience',$job_experience); ?>
                             </select>
@@ -558,7 +575,7 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
                       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                          <div class="form-group">
                          <label><?php echo nokri_feilds_label('shift_txt',esc_html__( 'Job shift', 'nokri' )); ?></label>
-                            <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo nokri_feilds_label('shift_txt',esc_html__( 'Job shift', 'nokri' )); ?>" name="job_shift" <?php echo nokri_feilds_operat('allow_job_shift', 'required'); ?>>
+                            <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo nokri_feilds_label('shift_txt',esc_html__( 'Job shift', 'nokri' )); ?>" name="job_shift" <?php echo nokri_feilds_operat('allow_job_shift', 'required'); ?> data-parsley-error-message="<?php echo ($req_mess); ?>">
                                 <option value=""><?php echo esc_html__( 'Select Option', 'nokri' ); ?></option>
                                 <?php echo nokri_job_post_taxonomies('job_shift', $job_shift); ?>
                             </select>
@@ -569,7 +586,7 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
                       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                          <div class="form-group">
                          <label><?php echo nokri_feilds_label('level_txt',esc_html__( 'Job level', 'nokri' )); ?></label>
-                            <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo nokri_feilds_label('level_txt',esc_html__( 'Job level', 'nokri' )); ?>" name="job_level" <?php echo nokri_feilds_operat('allow_job_level', 'required'); ?>>
+                            <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo nokri_feilds_label('level_txt',esc_html__( 'Job level', 'nokri' )); ?>" name="job_level" <?php echo nokri_feilds_operat('allow_job_level', 'required'); ?> data-parsley-error-message="<?php echo ($req_mess); ?>">
                                 <option value=""><?php echo esc_html__( 'Select Option', 'nokri' ); ?></option>
                                 <?php echo nokri_job_post_taxonomies('job_level', $job_level); ?>
                             </select>
@@ -580,7 +597,7 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
                       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                          <div class="form-group">
                          <label><?php echo nokri_feilds_label('vacancy_txt',esc_html__( 'Number of vacancies', 'nokri' )); ?></label>
-                            <input type="text" class="form-control" placeholder="<?php echo nokri_feilds_label('vacancy_txt',esc_html__( 'Number of vacancies', 'nokri' )); ?>" name="job_posts" value="<?php echo esc_attr($job_posts); ?>" <?php echo nokri_feilds_operat('allow_job_vacancy', 'required'); ?>>
+                            <input type="text" class="form-control" placeholder="<?php echo nokri_feilds_label('vacancy_txt',esc_html__( 'Number of vacancies', 'nokri' )); ?>" name="job_posts" value="<?php echo esc_attr($job_posts); ?>" <?php echo nokri_feilds_operat('allow_job_vacancy', 'required'); ?> data-parsley-error-message="<?php echo ($req_mess); ?>">
                          </div>
                       </div>
                       <?php } ?>
@@ -590,11 +607,11 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
                       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                          <div class="form-group">
                          <label><?php echo esc_html__( 'Apply With Link', 'nokri' ); ?></label>
-                            <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo esc_html__( 'Select an option', 'nokri' ); ?>" name="job_apply_with" data-parsley-required="true" id="ad_external">
+                            <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo esc_html__( 'Select an option', 'nokri' ); ?>" name="job_apply_with" data-parsley-required="true" id="ad_external" data-parsley-error-message="<?php echo ($req_mess); ?>">
                             <?php 
 							if (!empty($nokri['job_external_source']))
 							  {
-								  $exter =  $inter =  $mail = false;
+								$exter =  $inter =  $mail = false;
 								foreach ($nokri['job_external_source'] as $key => $value) 
 								{
 									if($value == 'exter')
@@ -605,7 +622,6 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
 									$mail = true; 
 								}
 							  }
-					  
 							  ?> 
                               <option value="0"><?php echo esc_html__( 'Select Option', 'nokri' ); ?></option>
                               <?php if($exter) { ?>
@@ -638,7 +654,7 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
                       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                          <div class="form-group">
                          <label><?php echo nokri_feilds_label('skills_txt',esc_html__( 'Job skills', 'nokri' )); ?></label>
-                            <select class="js-example-basic-single" multiple data-allow-clear="true" data-placeholder="<?php echo nokri_feilds_label('skills_txt',esc_html__( 'Job skills', 'nokri' )); ?>" name="job_skills[]" <?php echo nokri_feilds_operat('allow_job_skills', 'required'); ?>>
+                            <select class="js-example-basic-single" multiple data-allow-clear="true" data-placeholder="<?php echo nokri_feilds_label('skills_txt',esc_html__( 'Job skills', 'nokri' )); ?>" name="job_skills[]" <?php echo nokri_feilds_operat('allow_job_skills', 'required'); ?> data-parsley-error-message="<?php echo ($req_mess); ?>">
                                <option value=""><?php echo esc_html__( 'Select Options', 'nokri' ); ?></option>
                                <?php echo nokri_job_selected_skills('job_skills','_job_skills',$job_skills); ?>
                             </select>
@@ -649,7 +665,7 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
                       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                          <div class="form-group">
                          <label><?php echo nokri_feilds_label('tags_txt',esc_html__( 'Job tags', 'nokri' )); ?></label>
-                            <input type="text" id="tags_tag_job" name="job_tags"  value="<?php echo ($tags); ?>" class="form-control" data-role="tagsinput"  <?php echo nokri_feilds_operat('allow_job_tags', 'required'); ?>/>
+                            <input type="text" id="tags_tag_job" name="job_tags"  value="<?php echo ($tags); ?>" class="form-control" data-role="tagsinput"  <?php echo nokri_feilds_operat('allow_job_tags', 'required'); ?> data-parsley-error-message="<?php echo ($req_mess); ?>"/>
                          </div>
                       </div>
                       <?php } } if($job_attachment && $job_post_form == '0' ) { ?>
@@ -659,7 +675,77 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
                           <div id="dropzone_custom" class="dropzone"></div> 
                       </div>
                       </div> 
-                      <?php } ?>
+                      <?php } if($job_questionare) {
+						 $state = $exist = ""; 
+					    if( isset($job_questions) && !empty($job_questions) )
+						{
+							$state = "checked";
+							$exist = 1;
+						}
+					  ?>
+                      <input type="hidden" id="job_qstns_enable" value="1">
+                      <input type="hidden" id="job_qstns_exist" value="<?php echo esc_attr($exist); ?>">
+                      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                      <div class="n-question-box">                      
+                      <div class="company-search-toggle">
+                      		<div class="row">
+                                <div class="col-md-9 col-xs-12 col-sm-9">
+                                    <h3><?php echo esc_html__( 'Add Questionnaire', 'nokri' ); ?></h3>
+                                </div>
+                                <div class="col-md-3 col-xs-12 col-sm-3">
+                                   <div class="pull-right ">
+                      					<input id="job_qstns_toggle"  data-on="<?php echo esc_html__( 'YES', 'nokri' ); ?>" data-off="<?php echo esc_html__( 'NO', 'nokri' ); ?>" data-size="mini" <?php echo esc_attr($state); ?>  data-toggle="toggle" type="checkbox">
+                      			   </div>
+                      			</div>
+                      		</div>
+                      </div>
+                      <div class="questions content job_qstns mt30">
+                      <?php 
+						if( isset($job_questions) && !empty($job_questions) )
+						{
+							foreach($job_questions as $questions)
+							{ ?>
+						   <div class="row group">
+							<div class="col-lg-10 col-md-10 col-sm-12 col-xs-12">
+								<div class="form-group">
+									<label>
+										<?php echo nokri_feilds_label('question_label',esc_html__( 'Job Question', 'nokri' )); ?>
+									</label>
+									<input type="text" class="form-control jobs_questions" placeholder="<?php echo nokri_feilds_label('question_plc',esc_html__( 'Job Question', 'nokri' )); ?>" name="job_qstns[]" value="<?php echo esc_html($questions); ?>">
+								</div>
+							</div>
+							<div class="col-md-2 col-sm-2 col-xs-12">
+								<div class="form-group">
+									<button type="button" class="btn btn-danger btnRemove">
+										<?php echo nokri_feilds_label( 'question_rem_btn',esc_html__( 'Remove', 'nokri' )); ?>
+									</button>
+								</div>
+							</div>
+						   </div>
+						   <?php } } else { ?>
+                          <div class="row group">
+							<div class="col-lg-10 col-md-10 col-sm-12 col-xs-12">
+								<div class="form-group">
+									<label>
+										<?php echo nokri_feilds_label('question_label',esc_html__( 'Job Question', 'nokri' )); ?>
+									</label>
+									<input type="text" class="form-control" placeholder="<?php echo nokri_feilds_label('question_plc',esc_html__( 'Job Question', 'nokri' )); ?>" name="job_qstns[]" value="<?php echo esc_html($questions); ?>">
+								</div>
+							</div>
+							<div class="col-md-2 col-sm-2 col-xs-12">
+								<div class="form-group">
+									<button type="button" class="btn btn-danger btnRemove">
+										<?php echo nokri_feilds_label( 'question_rem_btn',esc_html__( 'Remove', 'nokri' )); ?>
+									</button>
+								</div>
+							</div>
+						   </div>
+                           <?php } ?>
+                                <button type="button" id="question_btn" class="btn btn-success">
+                                    <?php echo nokri_feilds_label( 'question_ad_btn',esc_html__( 'Add More', 'nokri' )); ?>
+                                </button>
+                    </div></div></div>
+                      <?php  } ?>
                    </div>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
@@ -670,8 +756,8 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
                    <!--job country -->
                    <div class="form-group">
                     <label><?php echo esc_html($job_country_level_1 ); ?></label>
-                      <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo esc_attr($job_country_level_1 ); ?>" id="ad_country" name="ad_country" <?php echo nokri_feilds_operat('allow_job_countries', 'required'); ?>>
-                         <option value="0"><?php echo esc_html__( 'Select an option', 'nokri' ); ?></option>
+                      <select class="js-example-basic-single" data-allow-clear="true" data-placeholder="<?php echo esc_attr($job_country_level_1 ); ?>" id="ad_country" name="ad_country" <?php echo nokri_feilds_operat('allow_job_countries', 'required'); ?> data-parsley-error-message="<?php echo ($req_mess); ?>">
+                        
                           <?php echo "".($country_html);?>
                       </select>
                       <input type="hidden" name="ad_country_id" id="ad_country_id" value="" />
@@ -708,9 +794,9 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
                       </div>
                    </div>
                    <div class="form-group">
-                   	<label><?php echo esc_html__( 'Select address', 'nokri' ); ?></label>
+                   	<label><?php echo nokri_feilds_label( 'adres_txt',esc_html__( 'Select address', 'nokri' )); ?></label>
                    	  <input type="hidden" id="is_post_job" value="1" />	
-                      <input type="text" class="form-control" data-parsley-required="true" name="sb_user_address" id="sb_user_address" value="<?php echo esc_attr($ad_mapLocation); ?>" placeholder="<?php echo esc_html__('Enter map address', 'nokri' ); ?>">
+                      <input type="text" class="form-control" name="sb_user_address" id="sb_user_address" value="<?php echo esc_attr($ad_mapLocation); ?>" placeholder="<?php echo esc_html__('Enter map address', 'nokri' ); ?>" <?php echo nokri_feilds_operat('allow_job_adress', 'required'); ?> data-parsley-error-message="<?php echo ($req_mess); ?>">
                    <?php if($mapType == 'google_map') { ?>
                       <a href="javascript:void(0);" id="your_current_location" title="<?php echo esc_html__('You Current Location', 'nokri' ); ?>"><i class="fa fa-crosshairs"></i></a>
                       <?php } ?>
@@ -723,27 +809,35 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
                       
                    </div>
                    <div class="form-group">
-                      <input class="form-control" data-parsley-required="true" type="text" name="ad_map_lat" id="ad_map_lat" value="<?php echo esc_attr($ad_map_lat); ?>">
+                      <input class="form-control" data-parsley-required="true"  name="ad_map_lat" id="ad_map_lat" value="<?php echo esc_attr($ad_map_lat); ?>">
                    </div>
                    <?php } ?>
                    <?php 
                     /* Employer Purchase Any Package*/	
-                    if (get_user_meta( $user_id, '_sb_expire_ads', true ) != '') 
+                    $job_bost = nokri_validate_employer_premium_jobs();
+                    if ($job_bost)  
                     { ?>
                     <div class="post-job-section job job-topups">
                         <div class="col-md-12 col-sm-12 col-xs-12">
-                            <h4 class="post-job-heading"><?php echo esc_html__( 'Boost your job with addons', 'nokri' ); ?></h4>
+                            <h4 class="post-job-heading">
+								<?php echo nokri_feilds_label( 'addon_text',esc_html__( 'Boost your job with addons', 'nokri' )); ?>
+                            </h4>
                         </div>
                         <div class="col-md-12 col-sm-12 col-xs-12">
                             <ul>
                             <?php
-                            $job_classes = get_terms( array( 'taxonomy' => 'job_class', 'hide_empty' => false, ) );
+                            $job_classes = get_terms( array( 'taxonomy' => 'job_class', 'hide_empty' => false,'parent' => 0) );
                             foreach( $job_classes as $job_class )
                             {
                                 $term_id 				= $job_class->term_id;
-                               $job_class_user_meta 	= get_user_meta($user_crnt_id, 'package_job_class_'.$term_id, true);
+                                $job_class_user_meta 	= get_user_meta($user_crnt_id, 'package_job_class_'.$term_id, true);
                                 $emp_class_check     	= get_term_meta($job_class->term_id, 'emp_class_check', true);
-                                if( $job_class_user_meta  > 0 && $emp_class_check  != 1)
+								/* Skipping Free Job Class */
+								if( $emp_class_check  == 1  )
+								{
+									continue;
+								}
+                                if( $job_class_user_meta  > 0 && $emp_class_check  != 1 || current_user_can('administrator'))
                                     { ?>
                                 <li>
                                     <div class="job-topups-box">
@@ -753,14 +847,14 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
                                     <div class="job-topups-checkbox">
                                      <?php 
                                      $job_class_checked = wp_get_post_terms($job_id, 'job_class', array("fields" => "names"));
-                                if (in_array($job_class->name, $job_class_checked))
-                                  {
-                                    echo '<h5>'.esc_html__( 'Already', 'nokri' )." ".$job_class->name.'</h5>';
-                                  }
-                                else
-                                  {
-                                     echo '<input type="checkbox" name="class_type_value[]" value="'.$term_id.'" class="input-icheck-others">';
-                                  }
+									if (in_array($job_class->name, $job_class_checked))
+									  {
+										echo '<h5>'.esc_html__( 'Already', 'nokri' )." ".$job_class->name.'</h5>';
+									  }
+									else
+									  {
+										 echo '<input type="checkbox" name="class_type_value[]" value="'.$term_id.'" class="input-icheck-others">';
+									  }
                                      ?>
                                     </div>
                                 </li>
@@ -782,7 +876,7 @@ $job_attachment = isset($nokri['default_job_attachment']) ? $nokri['default_job_
  </div>
 </section>
 <?php 
-if($mapType == 'leafletjs_map')
+if($mapType == 'leafletjs_map' && $is_lat_long)
 {
 	echo $lat_lon_script = '<script type="text/javascript">
 	var mymap = L.map(\'dvMap\').setView(['.$ad_map_lat.', '.$ad_map_long.'], 13);
@@ -818,7 +912,7 @@ if($mapType == 'leafletjs_map')
 		});
 	</script>';
 }
-if($mapType == 'google_map')
+if($mapType == 'google_map' && $is_lat_long)
 {
 	nokri_load_search_countries(1); 		
 }

@@ -15,9 +15,8 @@ $sr_no = '1';
 foreach( $resumes as $key => $val )
 {
 	
-	$edit_link  = get_the_permalink()."?tab-data=email-templates&edit-id=".$key;
-	$delet_link = get_the_permalink()."?tab-data=email-templates-list&del_id=".$key;
-	
+	$edit_link  =   esc_url(nokri_set_url_params_multi(get_the_permalink(),'tab-data','email-templates','edit-id',$key));	
+	$delet_link =   get_the_permalink()."?tab-data=email-templates-list&del_id=".$key;
 	$resume_table .=  '<div class="posted-job-list" id="email_temp_del-'.$key.'">
 						<ul class="list-inline">
 							<li class="email-template-id">'.esc_attr($sr_no).'</li>
@@ -31,7 +30,6 @@ foreach( $resumes as $key => $val )
 									<li class="tool-tip del_email_template" data-tempId="'.esc_attr($key).'"  title="'.esc_html__( 'Delete', 'nokri' ).'"><a href="#" class="label label-danger"> <i class="ti-trash"></i></a></li>
 								</ul>
 							</li>
-							
 						</ul>
 					</div>';
 	 $sr_no++;
@@ -45,7 +43,6 @@ foreach( $resumes as $key => $val )
                     <li class="posted-job-title"><?php echo esc_html__( ' Email Template Name', 'nokri' ); ?></li>
                     <li class="posted-job-expiration"> <?php echo esc_html__( 'Created on', 'nokri' ); ?></li>
                     <li class="posted-job-action"> <?php echo esc_html__( 'Action', 'nokri' ); ?></li>
-                    
                 </ul>
             </div>
              <?php echo "".$resume_table; ?>

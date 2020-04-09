@@ -52,11 +52,11 @@ if($cand_skills != '')
 		}
 
 	}
-$intro = get_user_meta($user_crnt_id, '_cand_intro', true);
-$cand_video	    = get_user_meta($user_crnt_id, '_cand_video', true);
+$intro       = get_user_meta($user_crnt_id, '_cand_intro', true);
+$cand_video	 = get_user_meta($user_crnt_id, '_cand_video', true);
 /* Low profile txt*/
 $profile_percent = get_user_meta($user_crnt_id, '_cand_profile_percent', true);
-$user_low_profile_txt = ( isset($nokri['user_low_profile_txt']) && $nokri['user_low_profile_txt'] != ""  ) ? $nokri['user_low_profile_txt'] : ""; 	
+$user_low_profile_txt = ( isset($nokri['user_low_profile_txt']) && $nokri['user_low_profile_txt'] != ""  ) ? $nokri['user_low_profile_txt'] : ""; 
 ?>
 <div class="main-body n-candidate-detail">
 <div class="dashboard-stats">
@@ -205,6 +205,26 @@ $certi_detail	= (isset($certification['certification_desc']))  ? '<div class="in
 				   <iframe width="830" height="380" src="https://www.youtube.com/embed/<?php echo "".($cand_video); ?>" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 				</div>
 			 </div>
-             <?php } ?>
+             <?php } 
+          if(!empty($cand_intro_video))     
+       { 
+								$rx = '~
+							  ^(?:https?://)?                           # Optional protocol
+							   (?:www[.])?                              # Optional sub-domain
+							   (?:youtube[.]com/watch[?]v=|youtu[.]be/) # Mandatory domain name (w/ query string in .com)
+							   ([^&]{11})                               # Video id of 11 characters as capture group 1
+								~x';
+								$valid = preg_match($rx, $cand_intro_video, $matches);
+								$cand_intro_video = $matches[1];
+						?>
+                        <div class="resume-3-box">
+                        	<h4><?php echo nokri_feilds_label('cand_vid_lab',esc_html__( 'Resume Video', 'nokri' )); ?></h4>
+                            <div class="portfolio-video">
+                                <iframe width="750" height="380" src="https://www.youtube.com/embed/<?php echo "".($cand_intro_video); ?>" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                            </div>
+                        </div>
+                        <?php } 
+             
+             ?>
           </div>
        </div>

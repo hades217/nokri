@@ -1,8 +1,8 @@
 <?php
-if(isset($_GET['cat_id']) && $_GET['cat_id'] != "" && is_numeric($_GET['cat_id']))
+if(isset($_GET['cat-id']) && $_GET['cat-id'] != "" && is_numeric($_GET['cat-id']))
 {
 
-$term_id = $_GET['cat_id'];
+$term_id = $_GET['cat-id'];
 $result = nokri_dynamic_templateID($term_id);
 $templateID = get_term_meta( $result , '_sb_dynamic_form_fields' , true);	
 if(isset($templateID) && $templateID != "")

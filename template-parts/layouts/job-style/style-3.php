@@ -13,7 +13,6 @@ $job_currency	           =	  isset( $job_currency[0] ) ? $job_currency[0] : '';
 $company_name  			   =      get_user_meta($user_id, '_emp_name', true);
 $job_expiry                =      get_post_meta($job_id, '_job_date', true);
 $job_status                =      get_post_meta($job_id, '_job_status', true);
-
 if($job_status == 'inactive')
 {
 	$job_status            =      esc_html__('inactive', 'nokri' );
@@ -54,6 +53,12 @@ if( count( $single_job_badges ) > 0)
 			$job_badge_text .= '<a href="#">'.esc_html(ucfirst($job_badge)).'</a>';
 		}
 }
+/* Dashboard Page */
+$dashboard_id = '';
+if((isset($nokri['sb_dashboard_page'])) && $nokri['sb_dashboard_page']  != '' )
+{
+ 	$dashboard_id =  ($nokri['sb_dashboard_page']);
+}
 ?>
 <div class="cp-loader"></div>
 <div class="posted-job-list" id="all-jobs-list-box2-<?php echo esc_attr($job_id); ?>">
@@ -70,9 +75,15 @@ if( count( $single_job_badges ) > 0)
         <li class="posted-job-expiration"><?php echo date_i18n(get_option('date_format'), strtotime($job_expiry)); ?></li>
         <li class="posted-job-action"> 
             <ul class="list-inline">
-                <li class="tool-tip" title="<?php echo esc_html__( 'View Applications', 'nokri' ); ?>"> <a href="?tab-data=resumes-list&id=<?php echo esc_attr( $job_id ); ?>" class="label label-success"> <i class="ti-files"></i></a></li>
-                 <?php if ($job_status == 'active') { ?>
-                <li class="tool-tip" title="Edit Job"> <a href="<?php echo get_the_permalink( $nokri['sb_post_ad_page'] ); ?>?id=<?php echo esc_attr( $job_id );  ?>" class="label label-info"> <i class="ti-pencil-alt"></i></a></li>
+                    <?php
+					 $myurl     = 	get_the_permalink($dashboard_id);
+					 $final_url =   esc_url(nokri_set_url_params_multi($myurl,'tab-data','resumes-list','id',$job_id));					 					?>
+                <li class="tool-tip" title="<?php echo esc_html__( 'View Applications', 'nokri' ); ?>"> <a href="<?php echo $final_url; ?>" class="label label-success"> <i class="ti-files"></i></a></li>
+				 <?php if ($job_status == 'active') { 
+				 $link      = nokri_set_url_param(get_the_permalink($nokri['sb_post_ad_page']), 'id', esc_attr( $job_id ));
+				 $final_url = esc_url(nokri_page_lang_url_callback($link));
+				 ?>
+                <li class="tool-tip" title="<?php echo esc_html__( 'Edit Job', 'nokri' ); ?>"> <a href="<?php echo $final_url;  ?>" class="label label-info"> <i class="ti-pencil-alt"></i></a></li>
                  <?php } ?>
                 <li class="tool-tip" title="<?php echo esc_html__( 'Delete Job', 'nokri' ); ?>"><a data-value="<?php echo esc_attr($job_id);?>" class="label label-danger del_my_job"> <i class="ti-trash"></i></a></li>
                 <?php if ($job_status == 'active' && $take_action == true) { ?>

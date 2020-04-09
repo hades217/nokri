@@ -1,45 +1,28 @@
 <?php 
 /*  Employer Active jobs */ 
 global $nokri;
-/* Post Job Page */
-$page_job_post = '';
-if((isset($nokri['sb_post_ad_page'])) && $nokri['sb_post_ad_page']  != '' )
-{
-	$page_job_post =  ($nokri['sb_post_ad_page']);
-} 
 $current_id = get_current_user_id();
-
-$job_name = '';
-$job_order = '';
-$meta_key = '';
+/* Post Job Page */
+$page_job_post    =  (isset($nokri['sb_post_ad_page']) && $nokri['sb_post_ad_page'] != "") ? $nokri['sb_post_ad_page'] : ''; 
 $job_filter = '';
-
-	$job_name    =  (isset($_GET['job_name']) && $_GET['job_name'] != "") ? $_GET['job_name'] : '';
-	$job_order   =  (isset($_GET['job_order']) && $_GET['job_order'] != "") ? $_GET['job_order'] : 'date'; 
-	$job_class   =  (isset($_GET['job_class']) && $_GET['job_class'] != "" ) ? $_GET['job_class'] : '';
-	$meta_key    =  ( $job_class != "" ) ? 'package_job_class_'.$job_class : '';
-	if ($job_class != '')
-	{
-		$job_filter = array(
-            'key' => $meta_key,
-            'value' => $job_class,
-            'compare' => '='
-        );
-	
-	}
-$query_title = '';
-if($job_name != '')
-
+$job_name    =  (isset($_GET['job_name']) && $_GET['job_name'] != "") ? $_GET['job_name'] : '';
+$job_order   =  (isset($_GET['job_order']) && $_GET['job_order'] != "") ? $_GET['job_order'] : 'date'; 
+$job_class   =  (isset($_GET['job_class']) && $_GET['job_class'] != "" ) ? $_GET['job_class'] : '';
+$meta_key    =  ( $job_class != "" ) ? 'package_job_class_'.$job_class : '';
+if ($job_class != '')
 {
-	 $query_title = "'s'  => $job_name";
-}
+	$job_filter = array(
+		'key' => $meta_key,
+		'value' => $job_class,
+		'compare' => '='
+	);
 
+}
 $paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
 $args = array(
 	'post_type'   => 'job_post',
 	'orderby'     => 'date',
 	'order'       => $job_order,
-	's'           => $job_name,
 	'author' 	  => $current_id,
 	'paged'       => $paged,
 	'post_status' => array('publish'), 
@@ -52,8 +35,12 @@ $args = array(
             'compare' => '='
         )
     )
-  
 );
+if($job_name != '')
+{
+	$args['s'] =  $job_name;
+}
+$args = nokri_wpml_show_all_posts_callback($args);
 ?>
 <div class="dashboard-job-filters">
     <div class="row">
@@ -87,6 +74,7 @@ $args = array(
                 </select>
             </div>
         </div>
+        <?php echo nokri_form_lang_field_callback(true); ?>
         </form>
     </div>
 </div>
@@ -94,14 +82,17 @@ $args = array(
 <div class="dashboard-job-stats">
 <h4><?php echo esc_html__( 'Active jobs ', 'nokri' ); ?></h4>
 <div class="dashboard-posted-jobs">
-    <div class="posted-job-list header-title">
-        <ul class="list-inline">
-            <li class="posted-job-title"><?php echo esc_html__( 'Job Title', 'nokri' ); ?> </li>
-            <li class="posted-job-status"><?php echo esc_html__( 'Status', 'nokri' ); ?> </li>
-            <li class="posted-job-expiration"> <?php echo esc_html__( 'Expired On', 'nokri' ); ?></li>
-            <li class="posted-job-action"><?php echo esc_html__( 'Resumes', 'nokri' ); ?> </li>
-        </ul>
-    </div>
+<div class="table-responsive">
+<table class="table dashboard-table table-fit">
+    <thead>
+        <tr class="header-title">
+            <th> <?php echo esc_html__( 'Job Title', 'nokri' ) ?></th>
+            <th> <?php echo esc_html__( 'Status', 'nokri' ) ?></th>
+            <th> <?php echo esc_html__( 'Expired On', 'nokri' ) ?></th>
+            <th> <?php echo esc_html__( 'Resumes', 'nokri' ) ?></th>
+        </tr>
+    </thead>
+    <tbody>   
 <?php
 $query = new WP_Query( $args ); 
 	if ( $query->have_posts() )
@@ -111,16 +102,19 @@ $query = new WP_Query( $args );
 			$query->the_post(); 
 			get_template_part( 'template-parts/layouts/job-style/resume', 'matches');
 	 }
+	 wp_reset_postdata();
 }
 else
-{
-?>
+{ ?>
 <div class="dashboard-posted-jobs">
     <div class="notification-box">
         <h4><?php echo esc_html__( 'No Job Found', 'nokri' ); ?></h4>
     </div>
 </div>
 <?php } ?>
+		</tbody>
+     </table>
+</div>
 </div>
 <div class="pagination-box clearfix">
 <?php echo nokri_job_pagination( $query );?>

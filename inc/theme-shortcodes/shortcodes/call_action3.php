@@ -6,7 +6,7 @@
 function call_action_short3() 
 {
 	vc_map(array(
-		"name" => esc_html__("Call To Action New", 'nokri') ,
+		"name" => esc_html__("Call To Action 3", 'nokri') ,
 		"base" => "call_action_short3_base",
 		"category" => esc_html__("Theme Shortcodes", 'nokri') ,
 		"params" => array(

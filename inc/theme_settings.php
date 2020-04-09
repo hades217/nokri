@@ -15,15 +15,12 @@ add_theme_support( "custom-header", $args2 );
 define( 'NOKRI_ALLOW_EDITING', true );
  posts_nav_link();
  paginate_comments_links();
-
 /* Customize  Excerpt Word Count Lenght */
-
 function nokri_excerpt_length() 
 {
 	return 20;
 }
 add_filter('excerpt_length','nokri_excerpt_length');
-
 /* ========================= */
 /* Add  Theme Support */
 /* ========================= */
@@ -44,9 +41,6 @@ add_image_size( 'nokri_cand_large',1000,1000,true );
 add_image_size( 'nokri_blog_author',45,45,true );
 /* Candidate Portfolio Large */
 add_image_size( 'nokri_jobs_map',80,80,true );
-
-
-
 // Add Feature Image  Theme Support
 add_theme_support('post-formats',array( 'aside', 'gallery', 'link','image','quote ','status','video','audio','chat' ));
 add_action( 'after_setup_theme', 'nokri_child_theme_posts_formats', 11 );
@@ -66,7 +60,6 @@ function nokri_child_theme_posts_formats(){
 /* ========================= */
 /* Registering Side Bar */
 /* ========================= */
-
 function nokri_widgets_init()
 {
 	register_sidebar(array(
@@ -78,8 +71,6 @@ function nokri_widgets_init()
 		'before_title' => '<div class="widget-heading">',
 		'after_title' => '</div>',
 	));
-	
-
 	register_sidebar(array(
 		'name' => esc_html__('Search sidebar', 'nokri') ,
 		'id' => 'search_sidebar',
@@ -89,7 +80,6 @@ function nokri_widgets_init()
 		'before_title' => '',
 		'after_title' => '',
 	));
-	
 	register_sidebar(array(
 		'name' => esc_html__('Candidates sidebar', 'nokri') ,
 		'id' => 'candidates_sidebar',
@@ -99,7 +89,6 @@ function nokri_widgets_init()
 		'before_title' => '',
 		'after_title' => '',
 	));
-	
 	register_sidebar(array(
 		'name' => esc_html__('Employer sidebar', 'nokri') ,
 		'id' => 'employers_sidebar',
@@ -109,22 +98,36 @@ function nokri_widgets_init()
 		'before_title' => '',
 		'after_title' => '',
 	));
-	
-	
-	
 }
 add_action('widgets_init', 'nokri_widgets_init');
-
+/* Remove blog widgets form search sidebar*/
+add_filter( 'sidebars_widgets', 'nokri_remove_search_side_bar_blog_widgets' );
+function nokri_remove_search_side_bar_blog_widgets( $sidebars_widgets )
+{
+	 foreach( $sidebars_widgets as $widget_area => $widget_list )
+	 {
+		if($widget_area == 'search_sidebar')
+		{
+			foreach( $widget_list as $pos => $widget_id )
+			{
+				$arr_w = array('archives-2', 'categories-2', 'meta-2');
+				if(in_array($widget_id, $arr_w))
+				{
+					unset( $sidebars_widgets[$widget_area][$pos] );
+				}
+		   }
+		}
+	}
+        return $sidebars_widgets;
+}
 /*** Registers an editor stylesheet for the theme ****/
 function nokri_theme_add_editor_styles() {
     add_editor_style( 'editor.css' );
 }
 add_action( 'admin_init', 'nokri_theme_add_editor_styles' );
-
 /* register nav menu and footer nav */
 register_nav_menus(
     array(
         'main-nav'   => 'Main Navigation',
-		'small-nav'  => 'Small Navigation (Support Level 1)',
     )
 );

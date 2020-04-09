@@ -41,7 +41,7 @@ if((isset($nokri['footer_full'])) && $nokri['footer_full'] == 1)
               </div>
               <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 hidden-xs hidden-sm">
                 <ul class="footer-menu">
-                  <?php echo nokri_footer_job_taxonomies_links('ad_location','job_locations_copy_links','job_location'); ?>
+                  <?php echo nokri_footer_job_taxonomies_links('ad_location','job_locations_copy_links','job-location'); ?>
                 </ul>
               </div>
             </div>

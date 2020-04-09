@@ -10,7 +10,7 @@ function nokri_candidate_profile()
 	$user_id = get_current_user_id();
 	echo nokri_demo_mode();
 	/*Setting profile option*/
-	$profile_setting_option = isset($nokri['user_profile_setting_option']) ? $nokri['user_profile_setting_option']  : false;
+	$profile_setting_option = isset($nokri['cand_prof_setting']) ? $nokri['cand_prof_setting']  : 'hide';
 	// Getting values From Param
 	$params = array();
     parse_str( stripslashes( $_POST['candidate_data']), $params);
@@ -19,13 +19,16 @@ function nokri_candidate_profile()
 	$cand_headline 		= $params['cand_headline'];
 	$cand_dob      		= $params['cand_dob'];
 	$cand_gender      	= $params['cand_gender'];
-	$cand_last_edu      = $params['cand_last_edu'];
+	$cand_qualification = $params['cand_qualification'];
 	$cand_type          = $params['cand_type']; 
 	$cand_level         = $params['cand_level'];
 	$cand_experience    = $params['cand_experience'];
 	$cand_intro         = $params['cand_intro'];
 	$cand_profile       = $params['cand_profile'];
-	$cand_skill         = $params['cand_skills'];
+	$cand_salary_type   = $params['cand_salary_type'];
+	$cand_salary_range  = $params['cand_salary'];
+	$cand_salary_curren = $params['cand_salary_currency'];
+    $cand_skill         = $params['cand_skills'];
 	$cand_skill_values  = $params['cand_skills_values'];
 	$cand_video         = $params['cand_video'];
 	$cand_fb            = $params['cand_fb'];
@@ -37,12 +40,8 @@ function nokri_candidate_profile()
 	$cand_map_long      = $params['cand_map_long'];
 	$cand_pro_url       = $params['profile_url'];
 	$cand_intro_vid     = $params['cand_intro_video'];
-	$cand_skills_new     = $params['cand_skills_new'];
-	$cand_skills_val     = $params['cand_skills_val'];
-	
-	
-	
-	
+	$cand_skills_new    = $params['cand_skills_new'];
+	$cand_skills_val    = $params['cand_skills_val'];
 	/* Getting Educational Details & Updating Values  */
         $cand_education      = ($params['cand_education']);
 		$edu = array();
@@ -59,23 +58,16 @@ function nokri_candidate_profile()
 			$arr2['degree_end'] 		= sanitize_textarea_field($arr['degree_end'][$i]);
 			$arr2['degree_percent'] 	= sanitize_textarea_field($arr['degree_percent'][$i]);
 			$arr2['degree_grade'] 		= sanitize_textarea_field($arr['degree_grade'][$i]);
-			$arr2['degree_detail'] 		= sanitize_textarea_field($arr['degree_detail'][$i]);
+			$arr2['degree_detail'] 		= wp_kses($arr['degree_detail'][$i], nokri_required_tags());
 			
 			$edu[] = $arr2;
 			}
 		}
-		
 		/* Getting Professional Details & Updating Values  */
 		$cand_profession      = ($params['cand_profession']);
 		$arrp = $profession = array();	
 		$proData = nokri_convert_to_array($cand_profession );	
-		
-		
-			
-				
 		$countNum = ( $proData['count'] == 0 ) ? 0 : $proData['count']-1;
-		
-	
 		for($i=0; $i <= $countNum; $i++)
 		{
 			$arr = $proData['arr'];
@@ -93,19 +85,14 @@ function nokri_candidate_profile()
 				}
 				$arrp['project_role'] 		= isset($arr['project_role'][$i]) ? sanitize_text_field($arr['project_role'][$i]) : '';
 				$arrp['project_organization'] = isset($arr['project_organization'][$i]) ? sanitize_text_field($arr['project_organization'][$i]) : '';
-				$arrp['project_desc'] 		= isset($arr['project_desc'][$i]) ? sanitize_textarea_field($arr['project_desc'][$i]) : '';
+				$arrp['project_desc'] 		= isset($arr['project_desc'][$i]) ? wp_kses($arr['project_desc'][$i], nokri_required_tags()) : '';
 				$profession[] = $arrp;
 			}
-			
 		}
-		
-		
 		if ( count($profession ) > 0)
 		{
 			update_user_meta( $user_id, '_cand_profession', $profession);
 		}
-		
-		
 		/* Getting Certifications & Updating Values  */
 		$cand_certifications      = ($params['cand_certifications']);
 		$arrc = $certifications = array();	
@@ -120,82 +107,54 @@ function nokri_candidate_profile()
 			$arrc['certification_end']		 = sanitize_text_field($arr['certification_end'][$i]);
 			$arrc['certification_duration']  = sanitize_text_field($arr['certification_duration'][$i]);
 			$arrc['certification_institute'] = sanitize_text_field($arr['certification_institute'][$i]);
-			$arrc['certification_desc'] 	 = sanitize_textarea_field($arr['certification_desc'][$i]);
+			$arrc['certification_desc'] 	 = wp_kses($arr['certification_desc'][$i], nokri_required_tags());
 			$certifications[] = $arrc;
 			}
 		}
-		
 		if ($certifications != '')
 		{
 			update_user_meta( $user_id, '_cand_certifications', $certifications);
 		}
-		
-    
-
-   /* Updating Values In User Meta Of Current Candidate */
-   if ($cand_phone != '')
-	{
-		update_user_meta( $user_id, '_sb_contact', sanitize_text_field($cand_phone));
-	}
-   if ($cand_headline != '')
-	{
+		/* Updating Values In User Meta Of Current Candidate */
+		update_user_meta( $user_id, '_cand_salary_type', sanitize_text_field($cand_salary_type));
+		update_user_meta( $user_id, '_cand_salary_range', sanitize_text_field($cand_salary_range));
+		update_user_meta( $user_id, '_cand_salary_curren', sanitize_text_field($cand_salary_curren));
+                update_user_meta( $user_id, '_sb_contact', sanitize_text_field($cand_phone));
 		update_user_meta( $user_id, '_user_headline', sanitize_text_field($cand_headline));
-	}
-	if ($cand_dob != '')
-	{
 		update_user_meta( $user_id, '_cand_dob', sanitize_text_field($cand_dob));
-	} 
-	if ($cand_gender != '')
-	{
 		update_user_meta( $user_id, '_cand_gender', sanitize_text_field($cand_gender));
-	} 
-	if ($cand_last_edu != '')
-	{
-		update_user_meta( $user_id, '_cand_last_edu', sanitize_text_field($cand_last_edu));
-	}
-	if ($cand_type != '')
-	{
-		update_user_meta( $user_id, '_cand_type', sanitize_text_field($cand_type));
-	}
-	if ($cand_level != '')
-	{
-		update_user_meta( $user_id, '_cand_level', sanitize_text_field($cand_level));  
-	}
-	if ($cand_experience != '')
-	{
-		update_user_meta( $user_id, '_cand_experience', sanitize_text_field($cand_experience));  
-	}
-	if ($edu != '')
-	{
-		update_user_meta( $user_id, '_cand_education', $edu);
-	}
-	update_user_meta( $user_id, '_cand_intro', sanitize_textarea_field($cand_intro));
-	/*If allowed */
-	if($profile_setting_option)
-	{
-		update_user_meta( $user_id, '_user_profile_status', sanitize_text_field($cand_profile));
-	}
-	else
-	{
-		update_user_meta( $user_id, '_user_profile_status', sanitize_text_field('pub'));
-	}
-	 
-	
-	update_user_meta( $user_id, '_cand_skills', ($cand_skills_new));
-	
-	
-	if(!empty($cand_skills_new))
-	{
-		if(empty($cand_skills_val))
+		if ($cand_qualification != '')
 		{
-			echo 6;
-			die();
+			update_user_meta( $user_id, '_cand_qualification', sanitize_text_field($cand_qualification));
 		}
-		
+		update_user_meta( $user_id, '_cand_type', sanitize_text_field($cand_type));
+		update_user_meta( $user_id, '_cand_level', sanitize_text_field($cand_level));  
+		update_user_meta( $user_id, '_cand_experience', sanitize_text_field($cand_experience));  
+		if ($edu != '')
+		{
+			update_user_meta( $user_id, '_cand_education', $edu);
+		}
+		update_user_meta( $user_id, '_cand_intro', wp_kses( $cand_intro, nokri_required_tags()));
+		/*If allowed */
+		if($profile_setting_option == 'show' || $profile_setting_option == 'required' )
+		{
+			update_user_meta( $user_id, '_user_profile_status', sanitize_text_field($cand_profile));
+		}
+		else
+		{
+			update_user_meta( $user_id, '_user_profile_status', sanitize_text_field('pub'));
+		}
+	    update_user_meta( $user_id, '_cand_skills', ($cand_skills_new));
+	    if(!empty($cand_skills_new))
+		{
+			if(empty($cand_skills_val))
+			{
+				echo 6;
+				die();
+			}
 		$cand_skill_sanatize = array();
 		if( isset($cand_skills_val) && !empty($cand_skills_val) &&  count($cand_skills_val) > 0 )
 		{		
-			
 			foreach($cand_skills_val as $key)
 			{
 				
@@ -204,8 +163,21 @@ function nokri_candidate_profile()
 		}
 		update_user_meta( $user_id, '_cand_skills_values', ($cand_skill_sanatize)); 
 	}
-	
-
+	/* Updating Custom feilds */
+	if( isset($params['_custom_']) && count( $params['_custom_'] ) > 0)
+	{
+		foreach($params['_custom_'] as $key => $data)
+		{
+			if( is_array($data) )
+			{
+				$dataArr    = array();
+				foreach($data as $k ) 
+				$dataArr[]  = $k; 
+				$data       = stripslashes(json_encode($dataArr, JSON_UNESCAPED_UNICODE));
+			}
+			update_user_meta($user_id, $key, sanitize_text_field($data) );
+		}
+	}
 	update_user_meta( $user_id, '_cand_video',($cand_video));
 	update_user_meta( $user_id, '_cand_fb', sanitize_text_field($cand_fb));
 	update_user_meta( $user_id, '_cand_twiter', sanitize_text_field($cand_twiter));
@@ -223,15 +195,13 @@ function nokri_candidate_profile()
 	{
 		update_user_meta( $user_id, '_cand_map_long', sanitize_text_field($cand_map_long));
 	}
-	
 	/*countries*/
 	$cand_location =	array();
 	if( $params['cand_country'] != "" )        {  $cand_location[]	=	$params['cand_country'];	 }
 	if( $params['cand_country_states'] != "" ) {  $cand_location[]	=	$params['cand_country_states'];}
 	if( $params['cand_country_cities'] != "" ) {  $cand_location[]	=	$params['cand_country_cities']; }
 	if( $params['cand_country_towns'] != "" )  {  $cand_location[]	=	$params['cand_country_towns']; }
-	update_user_meta( $user_id, '_cand_custom_location', sanitize_text_field($cand_location));
-	
+	update_user_meta( $user_id, '_cand_custom_location', ($cand_location));
 	/*Validating youtube url*/
 	$rx = '~
 							  ^(?:https?://)?                           # Optional protocol
@@ -253,13 +223,13 @@ function nokri_candidate_profile()
 			die();
 		}
 	}
-	
-	
+	else
+	{
+		update_user_meta( $user_id, '_cand_intro_vid', sanitize_text_field($cand_intro_vid));
+	}
 	echo 1;
 	die();
-
 }
-
 /************************************/
 /* Ajax handler for Candidate Proifle Picture   */
 /************************************/ 
@@ -314,7 +284,7 @@ if($is_demo)
     $_FILES = array ("candidate_dp" => $file); 
 	
 // Allow certain file formats
-$imageFileType	=	end( explode('.', $file['name'] ) );
+$imageFileType	=	strtolower(end( explode('.', $file['name'] ) ));
 if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
 && $imageFileType != "gif" ) {
     echo '0|' . esc_html__( "Sorry, only JPG, JPEG, PNG & GIF files are allowed.", 'nokri' );
@@ -366,12 +336,9 @@ echo '1|' . $image_link[0];
 
 }
 }
-
-
 /************************************/
 /* Ajax handler for Del Portfolio */
 /************************************/
-
 add_action('wp_ajax_delete_ad_image', 'nokri_delete_ad_image');
 if ( ! function_exists( 'nokri_delete_ad_image' ) ) {
 function nokri_delete_ad_image()
@@ -400,13 +367,10 @@ function nokri_delete_ad_image()
 		die();
 }  
 }
-
 /************************************/
 /* Ajax handler for Adding Portfolio */
 /************************************/
-
 add_action('wp_ajax_nokri_upload_portfolio', 'nokri_upload_portfolio');
-
 if ( ! function_exists( 'nokri_upload_portfolio' ) ) {
 function nokri_upload_portfolio(){
 global $nokri;
@@ -484,16 +448,9 @@ global $nokri;
 	die();
     
 }}
-
-
-
-
 /************************************/
 /* Ajax handler for Getting Portfolio */
 /************************************/
-
-
-
 add_action('wp_ajax_get_uploaded_portfolio_images', 'nokri_get_uploaded_portfolio_images');
 if ( ! function_exists( 'nokri_get_uploaded_portfolio_images' ) ) {
 function nokri_get_uploaded_portfolio_images()
@@ -519,111 +476,193 @@ function nokri_get_uploaded_portfolio_images()
 	die();
 }
 }
-
-
-
 /************************************/
 /* Ajax handler for Adding Resume */
 /************************************/
-
 add_action('wp_ajax_cand_resume', 'nokri_cand_resume');
-
-if ( ! function_exists( 'nokri_cand_resume' ) ) {
-function nokri_cand_resume(){
-global $nokri;
-	
-	 $user_id	    =	 get_current_user_id();
-	
-	
-	
-	/*demo check */
-	$is_demo =  nokri_demo_mode();
-	
-	if($is_demo)
-	{ 
-		echo '0|' . esc_html__( "Edit in demo user not allowed", 'nokri' );
-		die(); 
-	}
-	
-	
-	
-	
-	require_once ABSPATH . 'wp-admin/includes/image.php';
-	require_once ABSPATH . 'wp-admin/includes/file.php';
-	require_once ABSPATH . 'wp-admin/includes/media.php';
-	
-	$size_arr	    =	explode( '-', $nokri['sb_upload_resume_size'] );
-	$display_size	=	$size_arr[1];
-	$actual_size	=	$size_arr[0];
-	
-	// Allow certain file formats
-	$imageFileType	=	strtolower(end( explode('.', $_FILES['my_cv_upload']['name'] ) ));
-	
-	if($imageFileType != "doc" && $imageFileType != "docx"
-	&& $imageFileType != "pdf" )
+if ( ! function_exists( 'nokri_cand_resume' ) ) 
+{
+	function nokri_cand_resume()
 	{
-		echo '0|' . esc_html__( "Sorry, doc, docx &  pdf are allowed.", 'nokri' );
-		die();
-	}
-	 
-	 // Check file size
-	if ($_FILES['my_cv_upload']['size'] > $actual_size) 
-	{
-		echo '0|' . esc_html__( "Max allowd image size is", 'nokri' ) . " " . $display_size;
-		die();
-	}
-	
-	
-	// Check max resume limit
-     $user_resume    =	 get_user_meta( $user_id, '_cand_resume', true );
-     if( $user_resume != "" )
-     {
-      $media =  explode( ',', $user_resume );
-      if( count($media) >= $nokri['sb_upload_resume_limit'] )
-      {
-       echo '0|' . esc_html__( "You can not upload more than ", 'nokri' ) . " " . $nokri['sb_upload_resume_limit']." ".esc_html__( "resumes ", 'nokri' );
-       die();
-      }
-     }
-	
-	
-	$attachment_id  =    media_handle_upload( 'my_cv_upload', 0 );
-	
-	if( is_wp_error($attachment_id) )
-	{
-		echo '0|' . esc_html__( "File is empty.", 'nokri' );
-		die();
-	}
-
-	
-   
-	$user_resume    =	 get_user_meta( $user_id, '_cand_resume', true );
-	
-	if( $user_resume != "" )
-	{
-		$updated_resume	=	$user_resume . ',' . $attachment_id;
-	}
-	else
-	{
-		$updated_resume	=	$attachment_id;
-	}
-	if ( is_numeric( $attachment_id ) )
-	 {
-			update_user_meta( $user_id, '_cand_resume', $updated_resume );
-	 }
-	
-	echo($attachment_id);
-	die();
-    
+     	global $nokri;
+    	$user_id	    =	 get_current_user_id();
+		/*demo check */
+		$is_demo =  nokri_demo_mode();
+		if($is_demo)
+		{ 
+			echo '0|' . esc_html__( "Edit in demo user not allowed", 'nokri' );
+			die(); 
+		}
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/media.php';
+		$size_arr	    =	explode( '-', $nokri['sb_upload_resume_size'] );
+		$display_size	=	$size_arr[1];
+		$actual_size	=	$size_arr[0];
+		// Allow certain file formats
+		$imageFileType	=	strtolower(end( explode('.', $_FILES['my_cv_upload']['name'] ) ));
+		if($imageFileType != "doc" && $imageFileType != "docx"
+		&& $imageFileType != "pdf" )
+		{
+			echo '0|' . esc_html__( "Sorry, doc, docx &  pdf are allowed.", 'nokri' );
+			die();
+		}
+		 // Check file size
+		if ($_FILES['my_cv_upload']['size'] > $actual_size) 
+		{
+			echo '0|' . esc_html__( "Max allowd image size is", 'nokri' ) . " " . $display_size;
+			die();
+		}
+		// Check max resume limit
+		 $user_resume    =	 get_user_meta( $user_id, '_cand_resume', true );
+		 if( $user_resume != "" )
+		 {
+			  $media =  explode( ',', $user_resume );
+			  if( count($media) >= $nokri['sb_upload_resume_limit'] )
+			  {
+			   echo '0|' . esc_html__( "You can not upload more than ", 'nokri' ) . " " . $nokri['sb_upload_resume_limit']." ".esc_html__( "resumes ", 'nokri' );
+			   die();
+			  }
+		 }
+		$attachment_id  =    media_handle_upload( 'my_cv_upload', 0 );
+		if( is_wp_error($attachment_id) )
+		{
+			echo '0|' . esc_html__( "File is empty.", 'nokri' );
+			die();
+		}
+	    $user_resume    =	 get_user_meta( $user_id, '_cand_resume', true );
+		if( $user_resume != "" )
+		{
+			$updated_resume	=	$user_resume . ',' . $attachment_id;
+		}
+		else
+		{
+			$updated_resume	=	$attachment_id;
+		}
+		if ( is_numeric( $attachment_id ) )
+		 {
+				update_user_meta( $user_id, '_cand_resume', $updated_resume );
+		 }
+	     echo($attachment_id);
+	     die();
 }}
-
-
-
-
+/******************************************/
+/* Candidate upload resume from resume list  */
+/******************************************/ 
+add_action('wp_ajax_upload_resume_from_tab', 'nokri_upload_resume_from_tab');
+if( ! function_exists( 'nokri_upload_resume_from_tab' ) )
+{
+	function nokri_upload_resume_from_tab()
+	{
+		 global $nokri;
+		 $user_id	    =	 get_current_user_id();
+		 /*demo check */
+		 $is_demo =  nokri_demo_mode();
+		 if($is_demo)
+		 { 
+			echo '0|' . esc_html__( "Edit in demo user not allowed", 'nokri' );
+			die(); 
+		 }
+		 $condition_img=7;
+		 $img_count = count(explode( ',',$_POST["image_gallery"] )); 
+                 
+                 
+                 
+ 		 if(!empty($_FILES["upload_resume_tab"]))
+		 {
+			 require_once ABSPATH . 'wp-admin/includes/image.php';
+			 require_once ABSPATH . 'wp-admin/includes/file.php';
+			 require_once ABSPATH . 'wp-admin/includes/media.php';
+ 			 $files 			= 	$_FILES["upload_resume_tab"];
+			 $attachment_ids	=	array();
+			 $attachment_idss	=	'';
+			 if($img_count>=1)
+			 {
+			 	$imgcount=$img_count;
+			 }
+			 else
+			 {
+			 	$imgcount=1;
+			 }
+ 			$ul_con='';
+ 			foreach ($files['name'] as $key => $value)
+			{            
+   				if ($files['name'][$key]) 
+				{ 
+					$file = array( 
+					 'name' => $files['name'][$key],
+					 'type' => $files['type'][$key], 
+					 'tmp_name' => $files['tmp_name'][$key], 
+					 'error' => $files['error'][$key],
+					 'size' => $files['size'][$key]
+					); 
+                $_FILES = array ("upload_resume_tab" => $file); 
+				// Allow certain file formats
+				$imageFileType	=	strtolower( end( explode('.', $file['name'] ) ) );
+				if($imageFileType != "pdf" && $imageFileType != "doc" && $imageFileType != "docx"
+				 ) 
+				 {
+					echo '1|' . __( "Sorry, only PDF, DOC, DOCX  files are allowed.", 'nokri' );
+					die();
+				}
+				 /* Check file size*/
+				 $size_arr	    =	explode( '-', $nokri['sb_upload_resume_size'] );
+				 $display_size	=	$size_arr[1];
+				 $actual_size	=	$size_arr[0];
+				if ($_FILES['upload_resume_now']['size'] > $actual_size) 
+				{
+					echo '2|' . esc_html__( "Max allowed resume size is", 'nokri' ) . " " . $display_size;
+					die();
+				}
+				// Check max resume limit
+				 $user_resume    =	 get_user_meta( $user_id, '_cand_resume', true );
+				 if( $user_resume != "" )
+				 {
+					  $media =  explode( ',', $user_resume );
+					  if( count($media) >= $nokri['sb_upload_resume_limit'] )
+					  {
+					   echo '3|' . esc_html__( "You can not upload more than ", 'nokri' ) . " " . $nokri['sb_upload_resume_limit']." ".esc_html__( "resumes ", 'nokri' );
+					   die();
+					  }
+				 }
+				foreach ($_FILES as $file => $array)
+				 {              
+					  if($imgcount>=$condition_img){ break; } 
+					  $attach_id = media_handle_upload( $file, $post_id );
+					  $attachment_ids[] = $attach_id; 
+					  $image_link = wp_get_attachment_image_src( $attach_id, '' );
+					}
+					if($imgcount>$condition_img){ break; } 
+					$imgcount++;
+			   } 
+  			}
+ 		} 
+		/*img upload */
+		$attachment_idss = array_filter( $attachment_ids  );
+		$attachment_idss =  implode( ',', $attachment_idss );  
+		$arr = array();
+		$arr['attachment_idss'] = $attachment_idss;
+		$arr['ul_con'] =$ul_con; 
+		$user_resume    =	 get_user_meta( $user_id, '_cand_resume', true );
+		if( $user_resume != "" )
+		{
+			$updated_resume	=	$user_resume . ',' . $attach_id;
+		}
+		else
+		{
+			$updated_resume	=	$attach_id;
+		}
+		if ( is_numeric( $attach_id ) )
+		 {
+				update_user_meta( $user_id, '_cand_resume', $updated_resume );
+		 }
+	     echo '4|' . esc_html__( "Uploaded Successfully", 'nokri' );
+		 die();
+	}
+}
 /************************************/
 /* Ajax handler for Del Resume */
 /************************************/
-
 add_action('wp_ajax_delete_cand_resume', 'nokri_delete_cand_resume');
 if ( ! function_exists( 'nokri_delete_cand_resume' ) ) {
 function nokri_delete_cand_resume()
@@ -653,15 +692,9 @@ function nokri_delete_cand_resume()
 	die();
 }
 }
-
-
-
 /************************************/
 /* Ajax handler for Getting Resume */
 /************************************/
-
-
-
 add_action('wp_ajax_get_uploaded_cand_resume', 'nokri_get_uploaded_cand_resume');  
 if ( ! function_exists( 'nokri_get_uploaded_cand_resume' ) ) {
 function nokri_get_uploaded_cand_resume()
@@ -709,24 +742,19 @@ function nokri_get_uploaded_cand_resume()
 	die();
 }
 }
-
-
-
-
-
-
 /************************************/
 /* Ajax handler for Candidate Aplly Job Athentication */
 /************************************/
-
 add_action( 'wp_ajax_nopriv_aplly_job', 'nokri_aplly_job' );
 add_action('wp_ajax_aplly_job', 'nokri_aplly_job');
 if ( ! function_exists( 'nokri_aplly_job' ) ) {
 function nokri_aplly_job()
 {
 	global $nokri;
+	$allow = (isset($nokri['allow_questinares']) && $nokri['allow_questinares'] != "") ? $nokri['allow_questinares'] : false;
 	$user_id     =   get_current_user_id();
-	$user_type   =  get_user_meta($user_id, '_sb_reg_type', true);
+	$user_type   =   get_user_meta($user_id, '_sb_reg_type', true);
+	$job_id      =   ($_POST['apply_job_id']);
 	/* Is applying job package base*/
 	$is_apply_pkg_base = ( isset($nokri['job_apply_package_base']) && $nokri['job_apply_package_base'] != ""  ) ? $nokri['job_apply_package_base'] : false;
 	/*Cand package page*/
@@ -748,6 +776,22 @@ function nokri_aplly_job()
 		echo '5';
 		die(); 
 	}
+	$job_questions  = get_post_meta( $job_id, '_job_questions',true);
+	$questions_html = '';
+	$req_mess       = esc_html__( 'This value is required', 'nokri' );
+	if( isset($job_questions) && !empty($job_questions) && $allow)
+	{
+		foreach($job_questions as $questions)
+		{
+			$field_slug      =  preg_replace('/\s+/', '', $questions);
+			if($questions != '')
+			{
+				$questions_html .= '<div class="form-group">
+									<label>'.$questions.'</label>
+									<textarea  name="answers[]" class="form-control" cols="30" rows="2" data-parsley-required="true" '.$req_mess.'></textarea></div>';
+			}
+		}
+	}
 	/* Is without login */
 	$is_without_login = isset($nokri['apply_without_login']) ? $nokri['apply_without_login']  : false;
 	if($is_without_login && !is_user_logged_in())
@@ -765,51 +809,40 @@ function nokri_aplly_job()
                   <h4 class="modal-title">'. esc_html__( "Want to apply for this job?","nokri").'</h4>
                 </div>
                 <div class="modal-body">
-				
-				
 				<div class="col-md-6 col-sm-6 col-xs-12">
 					<div class="form-group">
 					  <label>'.__( 'Your Name','nokri' ). '<span class="color-red">*</span></label>
 					  <input placeholder="'. __( 'Enter your name','nokri' ).'" class="form-control" type="text" name="sb_reg_name"  data-parsley-required="true" data-parsley-error-message="'. __( 'Please enter your name', 'nokri' ) .'">
 				   </div>
 			   </div>
-			   
 			  <div class="col-md-6 col-sm-6 col-xs-12">
 			   <div class="form-group">
 				  <label>'. __( 'Your Email','nokri' ).'<span class="color-red">*</span></label>
 				  <input placeholder="'.  __( 'Enter your email address','nokri' ).'" class="form-control" type="email" data-parsley-type="email" data-parsley-required="true"  data-parsley-error-message="'. __( 'Please enter your valid email', 'nokri' ) .'" data-parsley-trigger="change" name="sb_reg_email">
 			   </div>
 		 </div>
-				
-				
 				<div class="col-md-12 col-sm-12 col-xs-12">
 				<div class="form-group">
 			    <label>'. __( 'Upload Resume','nokri' ).'<span class="color-red">*</span></label>
-				
-				
-				
 				<input id="input-b2" name="input-b2" name="my_file_upload[]" type="file" class="file sb_files-data-doc" data-show-preview="false" data-show-upload="false" data-parsley-required="true"  data-parsley-error-message="'. __( 'Upload resume', 'nokri' ) .'" data-msg-placeholder="'. esc_html__( "Click to upload","nokri").'"  >
-				
 				<input type="hidden" id="_sb_company_doc" value="" name="cand_apply_resume" />
 				</div></div>
-					
+					<div class="col-md-12 col-sm-12 col-xs-12">
+						<div class="form-group">
+							'.$questions_html.'
+						</div>
+					</div>
 					<div class="col-md-12 col-sm-12 col-xs-12">
                 	<div class="form-group">
 					<label>'.esc_html__('Write cover letter (optional)','nokri').'</label>
                         <textarea name="cand_cover_letter" rows="6" class="form-control" placeholder="'. esc_html__( "Write cover letter","nokri").'" ></textarea>
                     </div></div>
-					
-					
 					<div class="col-md-12 col-sm-12 col-xs-12">
-				<div class="form-group">
-                  <button type="submit" name="submit" class="btn n-btn-flat btn-mid btn-block" id="submit_cv_form_btn">'.esc_html__( 'Apply now', 'nokri' ).'</button>
-                </div> </div>
-					
+					<div class="form-group">
+					  <button type="submit" name="submit" class="btn n-btn-flat btn-mid btn-block" id="submit_cv_form_btn">'.esc_html__( 'Apply now', 'nokri' ).'</button>
+					</div> </div>
 				<div class="modal-footer">
 				 </div>
-				
-				
-				
 				<input type="hidden" name="current_job"   id="current_job" value="'.esc_attr($job_id).'" />
 				<input type="hidden" name="current_author" id="current_author" value="'.esc_attr($author_id).'" />
               </form>
@@ -817,7 +850,7 @@ function nokri_aplly_job()
               
             </div>
         </div>';
-				die();
+		die();
 	}
 	/* Dashboard Page */
 	$dashboard_id = '';
@@ -853,49 +886,64 @@ function nokri_aplly_job()
 			$resume_options .=   '<option value="'.$resum.'">'.basename( get_attached_file( $resum ) ).'</option>  ';
 		}
 		$select_resumes = '<div class="form-group">
-					<label>'.esc_html__('Select your resume to apply','nokri').'</label>
-					<select class="select-generat" data-allow-clear="true" data-parsley-required="true" data-parsley-error-message="'. esc_html__('Select your resume to apply','nokri').'" name="cand_apply_resume">
-                            <option value="">'.esc_html__( 'Select your resume', 'nokri' ).'</option>
-                            '.$resume_options.'
-                        </select>
-                    </div>
-                    <div class="form-group">
-					<label>'.esc_html__('Write cover letter (optional)','nokri').'</label>
-                        <textarea name="cand_cover_letter" rows="6" class="form-control" placeholder="'. esc_html__( "Write cover letter","nokri").'" ></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                  <button type="submit" name="submit" class="btn n-btn-flat btn-mid btn-block" id="submit_cv_form_btn">'.esc_html__( 'Apply now', 'nokri' ).'</button>
-                </div>
-                <input type="hidden" name="current_job"   id="current_job" value="'.esc_attr($job_id).'" />
-				<input type="hidden" name="current_author" id="current_author" value="'.esc_attr($author_id).'" />';
+							<label>'.esc_html__('Select your resume to apply','nokri').'</label>
+							<select class="select-generat" data-allow-clear="true" data-parsley-required="true" data-parsley-error-message="'. esc_html__('Select your resume to apply','nokri').'" name="cand_apply_resume">
+									<option value="">'.esc_html__( 'Select your resume', 'nokri' ).'</option>
+									'.$resume_options.'
+								</select>
+							</div>
+							'.$questions_html.'
+							<div class="form-group">
+							<label>'.esc_html__('Write cover letter (optional)','nokri').'</label>
+								<textarea name="cand_cover_letter" rows="6" class="form-control job_textarea" placeholder="'. esc_html__( "Write cover letter","nokri").'" ></textarea>
+							</div>
+						</div>
+						<div class="modal-footer">
+						  <button type="submit" name="submit" class="btn n-btn-flat btn-mid btn-block" id="submit_cv_form_btn">'.esc_html__( 'Apply now', 'nokri' ).'</button>
+						</div>
+						<input type="hidden" name="current_job"   id="current_job" value="'.esc_attr($job_id).'" />
+						<input type="hidden" name="current_author" id="current_author" value="'.esc_attr($author_id).'" />';
 	}
 	else
 	{
-		$select_resumes =  '<h4>'.esc_html__('You have not uploaded resume','nokri').'</h4>
-		<a class="btn n-btn-flat" href="'.get_the_permalink($dashboard_id).'?candidate-page=edit-profile#add-resume" target="_blank">'.esc_html__('Upload Now','nokri').'</a>';
+		$select_resumes =  '<div class="form-group">
+								<label>'.esc_html__('Upload Resume','nokri').'</label>
+								<input id="input-b2"  name="candidate_resume[]" type="file" class="file upload_resume_now" data-show-preview="false" data-show-upload="false" data-parsley-required="true"  data-parsley-error-message="'.__( 'Upload resume', 'nokri' ).'" data-msg-placeholder="'. esc_html__( "Click to upload","nokri").'">
+							</div>
+							'.$questions_html.'
+		                    <div class="form-group">
+					          <label>'.esc_html__('Write cover letter (optional)','nokri').'</label>
+                              <textarea name="cand_cover_letter" rows="6" class="form-control" placeholder="'. esc_html__( "Write cover letter","nokri").'">
+							  </textarea>
+                             </div>
+                
+							<div class="modal-footer">
+							  <button type="submit" name="submit" class="btn n-btn-flat btn-mid btn-block" id="submit_cv_form_btn">'.esc_html__( 'Apply now', 'nokri' ).'</button>
+							</div>
+							
+							<input type="hidden" name="current_job"       id="current_job" value="'.esc_attr($job_id).'" />
+							<input type="hidden" name="cand_apply_resume" id="current_resume" value="" />
+							<input type="hidden" name="current_author"    id="current_author" value="'.esc_attr($author_id).'" />';
 	}
 	$resume_exist  = get_post_meta( $job_id, '_job_applied_status_'.$user_id,true);
-	
 	if ($resume_exist == '')
 	{
 		echo '<div class="cp-loader"></div>
-<div class="modal fade resume-action-modal" id="myModal-job">
-            <div class="modal-dialog">
-              <!-- Modal content-->
-              <div class="modal-content">
-              <form method="post" id="submit_cv_form1" class="apply-job-modal-popup">
-                <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal">&times;</button>
-                  <h4 class="modal-title">'. esc_html__( "Want to apply for this job?","nokri").'</h4>
-                </div>
-                <div class="modal-body">
-                	'.$select_resumes.'
-              </form>
-              </div>
-              
-            </div>
-        </div>';
+				<div class="modal fade resume-action-modal" id="myModal-job">
+				<div class="modal-dialog">
+				  <!-- Modal content-->
+				  <div class="modal-content">
+				  <form method="post" id="submit_cv_form1" class="apply-job-modal-popup">
+					<div class="modal-header">
+					  <button type="button" class="close" data-dismiss="modal">&times;</button>
+					  <h4 class="modal-title">'. esc_html__( "Want to apply for this job?","nokri").'</h4>
+					</div>
+					<div class="modal-body">
+						'.$select_resumes.'
+				  </form>
+				  </div>
+				</div>
+			</div>';
 	}
 	else 
 	{
@@ -905,12 +953,88 @@ function nokri_aplly_job()
 	die();
 }
 }
-
-
+/******************************************/
+/* Candidate upload resume at job apply   */
+/******************************************/ 
+add_action('wp_ajax_upload_resume_now', 'nokri_upload_resume_now');
+if( ! function_exists( 'nokri_upload_resume_now' ) )
+{
+	function nokri_upload_resume_now()
+	{
+		 global $nokri;
+		 $condition_img=7;
+		 $img_count = count(explode( ',',$_POST["image_gallery"] )); 
+ 		 if(!empty($_FILES["upload_resume_now"]))
+		 {
+			 require_once ABSPATH . 'wp-admin/includes/image.php';
+			 require_once ABSPATH . 'wp-admin/includes/file.php';
+			 require_once ABSPATH . 'wp-admin/includes/media.php';
+ 			 $files 			= 	$_FILES["upload_resume_now"];
+			 $attachment_ids	=	array();
+			 $attachment_idss	=	'';
+			 if($img_count>=1)
+			 {
+			 	$imgcount=$img_count;
+			 }
+			 else
+			 {
+			 	$imgcount=1;
+			 }
+ 			$ul_con='';
+ 			foreach ($files['name'] as $key => $value)
+			{            
+   				if ($files['name'][$key]) 
+				{ 
+					$file = array( 
+					 'name' => $files['name'][$key],
+					 'type' => $files['type'][$key], 
+					 'tmp_name' => $files['tmp_name'][$key], 
+					 'error' => $files['error'][$key],
+					 'size' => $files['size'][$key]
+					); 
+                  $_FILES = array ("upload_resume_now" => $file); 
+				// Allow certain file formats
+				$imageFileType	=	strtolower( end( explode('.', $file['name'] ) ) );
+				if($imageFileType != "pdf" && $imageFileType != "doc" && $imageFileType != "docx"
+				 ) 
+				 {
+					echo '0|' . __( "Sorry, only PDF, DOC, DOCX  files are allowed.", 'nokri' );
+					die();
+				}
+				 /* Check file size*/
+				 $size_arr	    =	explode( '-', $nokri['sb_upload_resume_size'] );
+				 $display_size	=	$size_arr[1];
+				 $actual_size	=	$size_arr[0];
+				if ($_FILES['upload_resume_now']['size'] > $actual_size) 
+				{
+					echo '0|' . esc_html__( "Max allowed resume size is", 'nokri' ) . " " . $display_size;
+					die();
+				}
+				foreach ($_FILES as $file => $array)
+				 {              
+					  if($imgcount>=$condition_img){ break; } 
+					  $attach_id = media_handle_upload( $file, $post_id );
+					  $attachment_ids[] = $attach_id; 
+					  $image_link = wp_get_attachment_image_src( $attach_id, '' );
+					}
+					if($imgcount>$condition_img){ break; } 
+					$imgcount++;
+			   } 
+  			}
+ 		} 
+/*img upload */
+$attachment_idss = array_filter( $attachment_ids  );
+$attachment_idss =  implode( ',', $attachment_idss );  
+$arr = array();
+$arr['attachment_idss'] = $attachment_idss;
+$arr['ul_con'] =$ul_con; 
+echo '1|' . $attach_id;
+ die();
+	}
+}
 /*******************************************/
 /* Ajax handler for Candidate resume action status*/
 /******************************************/
-
 add_action( 'wp_ajax_nopriv_candidate_resume_status_action', 'candidate_resume_status_action' );
 add_action('wp_ajax_candidate_resume_status_action', 'candidate_resume_status_action');
 if ( ! function_exists( 'candidate_resume_status_action' ) ) {
@@ -1000,19 +1124,14 @@ function candidate_resume_status_action()
 	
 }
 }
-
-
-
 /*******************************************/
 /* Ajax handler for Candidate short details*/
 /******************************************/
-
 add_action( 'wp_ajax_nopriv_candidate_short_details', 'candidate_short_details' );
 add_action('wp_ajax_candidate_short_details', 'candidate_short_details');
 if ( ! function_exists( 'candidate_short_details' ) ) {
 function candidate_short_details()
 {
-	
 	global $nokri;
 	$user_id            =   get_current_user_id();
 	$candidate_id       =   ($_POST['candidate_id']);
@@ -1026,7 +1145,7 @@ function candidate_short_details()
 	$phone_html = '';
 	if($candidate_phone)
 	{
-		$phone_html = '<p><i class="la la-phone"></i>'.esc_html($candidate_phone).'</p>';
+		$phone_html     = '<p><i class="la la-phone"></i>'.esc_html($candidate_phone).'</p>';
 	}
 	$cand_cover	        =   get_post_meta( $job_id, '_job_applied_cover_'.$candidate_id, true);
 	$cover_html = '';
@@ -1034,11 +1153,18 @@ function candidate_short_details()
 	{
 		$cover_html = '<div class="n-modal-candidate-cover">
                                             <h5> '.esc_html__('Cover Letter','nokri').' </h5>
-                                            <p>'.esc_html($cand_cover).'</p>
+                                            <p>'.wp_kses_post($cand_cover).'</p>
                                     </div>';
 	}
+	/* Getting Questions Answers */
+	$allow      =   (isset($nokri['allow_questinares']) && $nokri['allow_questinares'] != "") ? $nokri['allow_questinares'] : false;
+	$qstn_ans_html = '';
+	if($allow)
+	{
+	   $qstn_ans_html = '<div class="dashboard-questions-box">'.nokri_get_questions_answers($job_id,$candidate_id).'</div>';
+	}
 	/* Getting Candidate Dp */
-   $image_dp_link[0] =  get_template_directory_uri(). '/images/candidate-dp.jpg';
+    $image_dp_link[0] =  get_template_directory_uri(). '/images/candidate-dp.jpg';
    if( isset( $nokri['nokri_user_dp']['url'] ) && $nokri['nokri_user_dp']['url'] != "" )
 	{
 		$image_dp_link = array($nokri['nokri_user_dp']['url']);	
@@ -1051,14 +1177,14 @@ function candidate_short_details()
 	/* Getting resume */
 	 if (is_numeric($attachment_id)) 
 	{
-			$resume_link = '<a href="'.get_permalink( $attachment_id ) . '?attachment_id='. $attachment_id.'&download_file=1"" class="btn btn-default">'.esc_html__( 'Download', 'nokri' ).'</a>';
+			$link        =   nokri_set_url_param(get_the_permalink($attachment_id), 'attachment_id', esc_attr( $attachment_id ));
+			$final_url   =   esc_url(nokri_page_lang_url_callback($link));
+			$resume_link =   '<a href="'.$final_url.'&download_file=1"" class="btn btn-default">'.esc_html__( 'Download', 'nokri' ).'</a>';
 	} 
 	else 
 	{
 			$resume_link = '<a href="'.$attachment_id.'" class="btn btn-default">'.esc_html__( 'View profile', 'nokri' ).'</a>';
 	}
-	
-	
     echo '<div class="modal fade modal-popup" id="short-detail-modal" role="dialog">
             <div class="modal-dialog">
               <!-- Modal content-->
@@ -1073,7 +1199,7 @@ function candidate_short_details()
                             <div class="row">
                                 <div class="col-md-12 col-lg-12 col-xs-12 col-sm-12">
                                     <div class="n-modal-candidate-avatar">
-                                    	<img src="'.esc_url($image_dp_link[0]).'" alt="" class="img-responsive img-circle">
+                                    	<img src="'.esc_url($image_dp_link[0]).'" alt="'.esc_attr__('image','nokri').'" class="img-responsive img-circle">
                                     </div>
                                     <div class="n-modal-candidate-detail">
                                         <h4>'.esc_html($candidate_name).'</h4>
@@ -1081,6 +1207,7 @@ function candidate_short_details()
 										 '.$phone_html.'
                                         '.$resume_link.'
                                     </div>
+									'.$qstn_ans_html.'
                                     '.$cover_html.'
                                   </div>
                             </div>
@@ -1095,11 +1222,9 @@ function candidate_short_details()
 	
 }
 }
-
 /************************************/
 /* Ajax handler for Candidate submitting url */
 /************************************/
-
 add_action( 'wp_ajax_nopriv_submiit_linkedin_url', 'submiit_linkedin_url' );
 add_action('wp_ajax_submiit_linkedin_url', 'submiit_linkedin_url');
 if ( ! function_exists( 'submiit_linkedin_url' ) ) {
@@ -1113,24 +1238,24 @@ function submiit_linkedin_url()
 	$job_id                 =   ($params['apply_job_id']);
 	$applied_job_key_val    =   $user_id.'|'.$profile_url;
 	update_post_meta( $job_id, '_job_applied_resume_'.$user_id,sanitize_text_field($applied_job_key_val));
+	update_user_meta($user_id, '_sb_reg_type', 0);
 	echo get_the_permalink($job_id);
 	die();
 }
 }
-
-
 /************************************/
 /* Ajax handler for Candidate Aplly Job Athentication */
 /************************************/
 add_action( 'wp_ajax_nopriv_submit_cv_action', 'nokri_submit_cv' );
 add_action('wp_ajax_submit_cv_action', 'nokri_submit_cv');
-if ( ! function_exists( 'nokri_submit_cv' ) ) {
-	function nokri_submit_cv() {
+if ( ! function_exists( 'nokri_submit_cv' ) ) {  
+	function nokri_submit_cv() {      
 	global $nokri;
-	$user_id = get_current_user_id();
+	$user_id        =    get_current_user_id();
+	$user_resume    =	 get_user_meta( $user_id, '_cand_resume', true );
 	// Getting values From Param
 	$params = array();
-    parse_str( stripslashes( $_POST['submit_cv_data']), $params);
+    parse_str( stripslashes( $_POST['submit_cv_data']), $params);  
 	$email     = $params['sb_reg_email'];
 	$user_name = $params['sb_reg_name'];
     $exists = email_exists( $email );
@@ -1146,65 +1271,80 @@ if ( ! function_exists( 'nokri_submit_cv' ) ) {
 	{
 		$applied_job_id    	 =   $params['current_job'];
 		$password    		 =   nokri_randomString (10);
-		$user_id             =   nokri_do_register_without_login($params['sb_reg_email'],$user_name,$password);
-		update_user_meta($user_id, '_sb_reg_type', '0');
+		$user_id             =   nokri_do_register_without_login($params['sb_reg_email'],$user_name,$password);                           
+                update_user_meta($user_id, '_sb_reg_type', '0');
 		echo nokri_apply_without_login_password($user_id,$password,$applied_job_id);
 	} 
 	$cand_resume       	 = $params['cand_apply_resume'];
 	$cand_cover        	 = $params['cand_cover_letter'];
-    $applied_job_id    	 = $params['current_job'];
+        $applied_job_id    	 = $params['current_job'];
 	$applied_job_author  = $params['current_author'];
+	$job_answers         = $params['answers'];
 	$applied_job_key_val = $user_id.'|'.$cand_resume;
 	$cand_date           = date("F j, Y");
-	
-	if($cand_resume == "" )
+	/* If resume not uploaded */
+	if(isset($params['cand_apply_resume']) && $params['cand_apply_resume'] == "" )
 	{
 		echo "2";
 		die();
 	}
-	
-	
-	
-	
+	/* If resume not uploaded */
+	if($user_resume == "")
+	{
+		update_user_meta( $user_id, '_cand_resume',$cand_resume);
+	}
 	/* Email On apply to author*/
-    nokri_new_candidate_apply($applied_job_id,$user_id);
-    // Updating User Data In Job Meta
+      if(isset($nokri['sb_send_email_on_apply']) && $nokri['sb_send_email_on_apply'] == '1'){
+        nokri_new_candidate_apply($applied_job_id,$user_id);     
+      }
+	// Updating User Data In Job Meta
 	if( $cand_resume != "" )
 	{
 		update_post_meta( $applied_job_id, '_job_applied_resume_'.$user_id,sanitize_text_field($applied_job_key_val));
 	}
 	if( $cand_cover != "" )
 	{
-		update_post_meta( $applied_job_id, '_job_applied_cover_'.$user_id,sanitize_text_field($cand_cover));
+		update_post_meta( $applied_job_id, '_job_applied_cover_'.$user_id,$cand_cover);
 	}
 		update_post_meta( $applied_job_id, '_job_applied_status_'.$user_id,0);
 		update_post_meta( $applied_job_id, '_job_applied_date_'.$user_id,sanitize_text_field($cand_date));
-		/* Updating candidate job applied package */
-		if($is_apply_pkg_base == '1')
+         
+      
+      /*send notification to employer on mobile*/
+       if(function_exists('adforestAPI_messages_sent_func')){
+       $emp_id = get_post_field( 'post_author', $job_id);
+       adforestAPI_messages_sent_func('Android', $emp_id, $user_id,$applied_job_id ,$cand_date);         
+       }  
+	/* Answers */
+	$answers_sanatize = array();
+	if( isset($job_answers) && !empty($job_answers) )
+	{
+		foreach($job_answers as $key)
 		{
-			$job_applied_rem =  get_user_meta( $user_id, '_candidate_applied_jobs', true );
-			if($job_applied_rem != '0' && $job_applied_rem != '-1' )
-			{
-				update_user_meta( $user_id, '_candidate_applied_jobs',$job_applied_rem - 1);
-			}
+			$answers_sanatize[] = sanitize_text_field($key);
 		}
-		echo "1";
-		die();
+	}
+	update_user_meta( $user_id, '_job_answers'.$user_id, ($answers_sanatize));
+	/* Updating candidate job applied package */
+	if($is_apply_pkg_base == '1')
+	{
+		$job_applied_rem =  get_user_meta( $user_id, '_candidate_applied_jobs', true );
+		if($job_applied_rem != '0' && $job_applied_rem != '-1' )
+		{
+			update_user_meta( $user_id, '_candidate_applied_jobs',$job_applied_rem - 1);
+		}
+	}
+	echo "1";
+	die();
 }
 }
-
 /************************************/
 /*  Candidate Aplly with linkedin */
 /************************************/
-
-
 if ( ! function_exists( 'nokri_apply_by_linkedin' ) ) {
 	function nokri_apply_by_linkedin($job_id,$user_id, $url = '') {
 	$resume_exist  = get_post_meta( $job_id, '_job_applied_resume_'.$user_id,true);
 	$profile_exist = get_post_meta( $job_id, '_job_applied_linked_profile'.$user_id,true);
-	
-	
-	
 	if($resume_exist != ''  || $profile_exist != '' )
 	{
 		return false;	
@@ -1226,54 +1366,118 @@ if ( ! function_exists( 'nokri_apply_by_linkedin' ) ) {
 	}
 }
 }
-
-
-
-
-
+/************************************/
+/* Package updation after accessing resume */
+/************************************/
+add_action('wp_ajax_update_resume_access', 'nokri_resume_access_package_update');
+if( ! function_exists( 'nokri_resume_access_package_update' ) )
+{
+	function nokri_resume_access_package_update()
+	{
+		global $nokri;
+		$package_base     =   isset($nokri['cand_search_mode']) ? $nokri['cand_search_mode']  : '1';
+		$package_page     =   isset($nokri['package_page']) ? $nokri['package_page']  : '';
+		$candidate_id     =   ($_POST['candidate_id']);
+		$attach_id        =   ($_POST['attach_id']);
+		$user_id          =   get_current_user_id();
+		if(current_user_can('administrator') || $package_base == '1')
+		{
+			$link      =   nokri_set_url_param(get_the_permalink($attach_id), 'attachment_id', esc_attr( $attach_id ));
+			$final_url =   esc_url(nokri_page_lang_url_callback($link));
+			echo '4|' . $final_url.'&download_file=1';
+			die();
+		}
+		if( $package_base == '2')
+		{
+			$remaining_searches = get_user_meta($user_id, '_sb_cand_search_value', true);
+			$resumes_viewed     = get_user_meta($user_id, '_sb_cand_viewed_resumes',true);
+			/* Check package */
+			$can_download = nokri_resume_access_package_check();
+			if($can_download == 'ae')
+			{
+				echo '1|' . __( "Please purchase package", 'nokri').'|'.get_permalink( $package_page );
+				die();
+			}
+			else if($can_download == 'pe')
+			{
+				echo '2|' . __( "Please purchase package", 'nokri').'|'.get_permalink( $package_page );
+				die();
+			}
+			else if($can_download == 'np')
+			{
+				echo '3|' . __( "Please purchase package", 'nokri').'|'.get_permalink( $package_page );
+				die();
+			}
+			else if($can_download == 'en')
+			{
+				echo '4|' . get_permalink( $attach_id ).'?attachment_id='.$attach_id.'&download_file=1';
+			    die();
+			}
+			else
+			{
+				$resumes_viewed_array =  (explode(",",$resumes_viewed));
+				if (!in_array($candidate_id, $resumes_viewed_array))
+				  {
+						$candidate_id = $candidate_id;
+						if($resumes_viewed != '')
+						{
+							$candidate_id = $resumes_viewed.','.$candidate_id;
+						}
+						update_user_meta($user_id, '_sb_cand_viewed_resumes', $candidate_id);
+						if($remaining_searches != '0')
+						{
+							update_user_meta($user_id, '_sb_cand_search_value', (int)$remaining_searches - 1);
+						}
+				  }
+				  echo '4|' . get_permalink( $attach_id ).'?attachment_id='.$attach_id.'&download_file=1';
+				  die();
+			}
+		}
+	}
+}
 /************************************/
 /* Ajax handler for Candidate View Application */
 /************************************/
-
 add_action('wp_ajax_view_application', 'nokri_view_application');
 if ( ! function_exists( 'nokri_view_application' ) ) {
 function nokri_view_application()
 {
 	global $nokri;
 	$job_id     =   ($_POST['app_job_id']);
+	$allow      =   (isset($nokri['allow_questinares']) && $nokri['allow_questinares'] != "") ? $nokri['allow_questinares'] : false;
 	$user_id    =   get_current_user_id();
 	$job_cvr	=   get_post_meta($job_id, '_job_applied_cover_'.$user_id, true);
 	$job_cv		=   get_post_meta($job_id, '_job_applied_resume_'.$user_id, true);
-    $array_data	=	explode( '|',  $job_cv );
-    $attachment_id	=	$array_data[1];
-	
-	
-	
-	 if (is_numeric($attachment_id)) 
-		{
-        		$resume_link = '<a href="'.get_permalink( $attachment_id ) . '?attachment_id='. $attachment_id.'&download_file=1"">'.esc_html__( 'Download', 'nokri' ).'</a>';
-				
-				$label = esc_html__('You Applied Against Resume', 'nokri' );
-		} 
-		else 
-		{
-				$resume_link = '<a href="'.$attachment_id.'">'.esc_html__( 'View profile', 'nokri' ).'</a>';
-				
-				$label = esc_html__('You Applied Against Linkedin Profile', 'nokri' );
-		}
-	
+        $array_data	=	explode( '|',  $job_cv );
+        $attachment_id	=	$array_data[1];
+            
+	$qstn_ans_html = '';
+	if($allow)
+	{
+		$qstn_ans_html = nokri_get_questions_answers($job_id,$user_id);
+		$qstn_ans_html = '<div class="dashboard-questions-box">'.$qstn_ans_html.'</div>';
+	}
+	if (is_numeric($attachment_id)) 
+	{
+			$link        =   nokri_set_url_param(get_the_permalink($attachment_id), 'attachment_id', esc_attr( $attachment_id ));
+			$final_url   =   esc_url(nokri_page_lang_url_callback($link));
+			$resume_link =  '<a class="btn btn-custom" href="'.$final_url.'&download_file=1"">'.esc_html__( 'Download', 'nokri' ).'</a>';
+			$label       =   esc_html__('You have Applied Against Resume', 'nokri' );
+	} 
+	else 
+	{
+			$resume_link = '<a href="'.$attachment_id.'">'.esc_html__( 'View profile', 'nokri' ).'</a>';
+			$label       = esc_html__('You have Applied Against Linkedin Profile', 'nokri' );
+	}
 	$filename_only = basename( get_attached_file( $attachment_id ) );
-	
 	if ($job_cvr != '')
 	{
 		$job_cvr_html = '<div class="form-group">
-                        <label class="">'.esc_html__('Your Cover Letter', 'nokri' ).'</label>
-                        <textarea class="form-control rich_textarea" rows="10" name="ckeditor" >'.$job_cvr.'</textarea>
-                    </div>';
+							<label class="">'.esc_html__('Your Cover Letter', 'nokri' ).'</label>
+							<textarea class="form-control rich_textarea" rows="10" name="ckeditor" >'.$job_cvr.'</textarea>
+						 </div>';
 	}
-	
-	
-		echo '<div class="modal fade resume-action-modal" id="appmodel" role="dialog">
+	echo '<div class="modal fade resume-action-modal" id="appmodel" role="dialog">
             <div class="modal-dialog">
               <!-- Modal content-->
               <div class="modal-content">
@@ -1281,6 +1485,7 @@ function nokri_view_application()
                   <button type="button" class="close" data-dismiss="modal">&times;</button>
                   <h4 class="modal-title">'.get_the_title($job_id).'</h4>
                 </div>
+                
                 <div class="modal-body">
                 	<div class="form-group">
                     	<div class="row">
@@ -1294,22 +1499,19 @@ function nokri_view_application()
                             </div>
                         </div>
                     </div>
+                   
+  
+					'.$qstn_ans_html.'
                     '.$job_cvr_html.'
                 </div>
                 <div class="modal-footer">
                 </div>
               </div>
-              
             </div>
         </div>';
-
-	
-	die();
+        die();
 }
 }
-
-
-
 /************************************/
 /* Ajax handler for Candidate Saving Job */
 /************************************/
@@ -1341,11 +1543,9 @@ function nokri_save_my_job()
 		die();
 	}
 }
-
 /************************************/
 /* Ajax handler for Candidate Deleting Saved Job*/
 /************************************/
-
 add_action('wp_ajax_del_saved_job', 'nokri_del_saved_job');
 if ( ! function_exists( 'nokri_del_saved_job' ) ) {
 function nokri_del_saved_job() {
@@ -1368,9 +1568,6 @@ if( $job_id != "" )
 	die();
 	}
 }
-
-
-
 /************************************/
 /* Ajax handler for Candidate Following Company */
 /************************************/
@@ -1401,11 +1598,9 @@ if( $company_id != "" )
 	die();
 	}
 }
-
 /************************************/
 /* Ajax handler for Candidate Un Following Company */
 /************************************/
-
 add_action('wp_ajax_un_following_company', 'nokri_un_following_company');
 if ( ! function_exists( 'nokri_un_following_company' ) ) {
 function nokri_un_following_company() {
@@ -1436,8 +1631,6 @@ echo "0";
 die();
 }
 }
-
-
 /************************************/
 /* Return Followed Companies ID's*/
 /************************************/
@@ -1460,11 +1653,9 @@ if ( ! function_exists( 'nokri_following_company_ids' ) )
 		}
 	}
 }
-
 /**********************/
 /* Return attachment ID */
 /**********************/
-
 add_action( 'wp_ajax_nopriv_sb_upload_user_docs', 'nokri_sb_upload_user_docs' );
 add_action('wp_ajax_sb_upload_user_docs', 'nokri_sb_upload_user_docs');
 if ( ! function_exists( 'nokri_sb_upload_user_docs' ) ) {  
@@ -1474,6 +1665,7 @@ function nokri_sb_upload_user_docs(){
 
  $condition_img=7;
  $img_count = count(explode( ',',$_POST["image_gallery"] )); 
+
 
  if(!empty($_FILES["my_file_upload"])){
 
@@ -1524,7 +1716,7 @@ if($imageFileType != "pdf" && $imageFileType != "doc" && $imageFileType != "docx
  
  // Check file size
 /*if ($file['size'] > 2097152) {
-    echo '0|' . __( "Max allowd image size is 2MB", 'adforest' );
+    echo '0|' . __( "Max allowd image size is 2MB", 'nokri' );
     die();
 }*/
     
@@ -1554,15 +1746,11 @@ $arr = array();
 $arr['attachment_idss'] = $attachment_idss;
 $arr['ul_con'] =$ul_con; 
 
-//$profile	= new adforest_profile();
-//$uid	=	$profile->user_info->ID;
-//update_user_meta($uid, '_sb_user_doc', $attach_id );
 echo '1|' . $attach_id;
  die();
 
 }
 }
-
 /********************************************/
 /* Ajax handler for job alerts subscription */
 /*******************************************/
@@ -1576,53 +1764,49 @@ if ( ! function_exists( 'nokri_job_alert_subscription' ) )
 	// Getting values From Param
 	$params = array();
     parse_str( stripslashes( $_POST['submit_alert_data']), $params);
-	$alert_name      = $params['alert_name'];
-	$alert_email     = $params['alert_email'];
-	$alert_frequency = $params['alert_frequency'];
-	$alert_category  = $params['alert_category'];
-	$random_string   = nokri_randomString(5);
-    $type            = get_user_meta($user_id, '_sb_reg_type', true);
+	$alert_name         = $params['alert_name'];
+	$alert_email        = $params['alert_email'];
+	$alert_frequency    = $params['alert_frequency'];
+	$alert_category     = $params['alert_category'];
+	$alert_type         = $params['alert_type'];
+	$alert_experience   = $params['alert_experience'];
+	$alert_location     = $params['alert_location'];
+	$random_string      = nokri_randomString(5);
+    $type               = get_user_meta($user_id, '_sb_reg_type', true);
 	/*demo check */
 	$is_demo =  nokri_demo_mode();
-	if($is_demo)
-	{ 
-		echo '2';
-		die(); 
-	}
+	if($is_demo){echo '2';die();}
 	/* Not login */
-	if($user_id == '')
-	{
-		echo "3"; 
-	    die();
-	}
+	if($user_id == ''){echo "3"; die();}
 	/* Not cand */
-    if ( $type != '0' ) 
-	{
-      echo "4"; 
-	  die();
-    } 
+    if ( $type != '0' ){echo "4"; die();} 
     /*countries*/
 	$cand_alert =	array();
 	if( $params['alert_name'] != "" )        {  $cand_alert[]	=	$params['alert_name'];	    }
 	if( $params['alert_email'] != "" )       {  $cand_alert[]	=	$params['alert_email'];     }
 	if( $params['alert_frequency'] != "" )   {  $cand_alert[]	=	$params['alert_frequency']; }
-	if( $params['alert_category'] != "" )    {  $cand_alert[]	=	$params['alert_category'];  } 
+	if( $params['alert_category'] != "" )    {  $cand_alert[]	=	$params['alert_category'];  }
+	if( $params['alert_type'] != "" )        {  $cand_alert[]	=	$params['alert_type'];  }
+	if( $params['alert_experience'] != "" )  {  $cand_alert[]	=	$params['alert_category'];  }
+	if( $params['alert_location'] != "" )    {  $cand_alert[]	=	$params['alert_location'];  } 
 	if( $params['alert_start'] != "" )       {  $cand_alert[]	=	$params['alert_start'];  }
     $my_alert = json_encode($params);
+    
+      
 	update_user_meta( $user_id, '_cand_alerts_'.$user_id.$random_string, ($my_alert));
+        
 	if(get_user_meta( $user_id, '_cand_alerts_en', true) == '')
 	{
-		update_user_meta( $user_id, '_cand_alerts_en', 1);
-	}
+            update_user_meta( $user_id, '_cand_alerts_en', 1);
+            }
+        
 	echo "1";
 	die();
  }
 }
-
 /************************************/
 /* Ajax handler for Candidate del job alert */
 /************************************/
-
 add_action('wp_ajax_del_job_alerts', 'nokri_del_job_alerts');
 if ( ! function_exists( 'nokri_del_job_alerts' ) ) {
 function nokri_del_job_alerts() {
@@ -1652,4 +1836,122 @@ if( $alert_id != "" )
 echo "0";
 die();
 }
+}
+/************************************/
+/* Ajax handler for Candidate external job package*/
+/************************************/
+add_action( 'wp_ajax_nopriv_external_apply_package_base', 'nokri_external_apply_package_base' );
+add_action('wp_ajax_external_apply_package_base', 'nokri_external_apply_package_base');
+if ( ! function_exists( 'nokri_external_apply_package_base' ) ) 
+{
+	function nokri_external_apply_package_base() 
+	{
+		global $nokri;
+		$user_id       = get_current_user_id();
+		$apply_job_id  = $_POST['apply_job_id'];
+		/*demo check */
+		$is_demo =  nokri_demo_mode();
+		if($is_demo) {echo  '1|' . __( "Demo mode activated", 'nokri'); die(); }
+		/* Is applying job package base*/
+		$is_apply_pkg_base = ( isset($nokri['job_apply_package_base']) && $nokri['job_apply_package_base'] != ""  ) ? $nokri['job_apply_package_base'] : false;
+		/*signin page*/
+		$sign_in = ( isset($nokri['sb_sign_in_page']) && $nokri['sb_sign_in_page'] != ""  ) ? $nokri['sb_sign_in_page'] : '';
+		if($is_apply_pkg_base == '1')
+		{
+			/*signin page*/
+			$sign_in = ( isset($nokri['sb_sign_in_page']) && $nokri['sb_sign_in_page'] != ""  ) ? $nokri['sb_sign_in_page'] : '';
+			if($is_apply_pkg_base == '1' && $user_id == '')
+			{
+				echo '2|' . __( "Please Login To Apply ", 'nokri') .'|' . get_the_permalink($sign_in);
+				die();
+			}
+			/*Cand package page*/
+			$cand_package_page = ( isset($nokri['cand_package_page']) && $nokri['cand_package_page'] != ""  ) ? $nokri['cand_package_page'] : '';
+			/* Validating candidate job package */
+			if($is_apply_pkg_base == '1' && $user_type != '1')
+			{
+				$is_package = nokri_candidate_package_expire_notify();
+				if($is_package == 'ae' || $is_package == 'pe' || $is_package == 'np')
+				{
+					echo '3|' . __( "Please Purchase Package", 'nokri') .'|' . get_the_permalink($cand_package_page);
+					delete_user_meta( $user_id, '_job_applied_external_'.$apply_job_id);
+					die();
+				}
+			}
+			/*Cand external jobs*/
+			$cand_external_jobs    =  get_user_meta($user_id, '_job_applied_external_'.$apply_job_id,true);
+			$external_jobs_array   =  (explode(",",$cand_external_jobs));
+			if (!in_array($apply_job_id, $external_jobs_array))
+			{
+				if($cand_external_jobs != '')
+				{
+					$apply_job_id = $cand_external_jobs.','.$apply_job_id;
+				}
+				update_user_meta( $user_id, '_job_applied_external_'.$apply_job_id,($apply_job_id));
+				if($is_apply_pkg_base == '1')
+				{
+					$job_applied_rem =  get_user_meta( $user_id, '_candidate_applied_jobs', true );
+					if($job_applied_rem != '0' && $job_applied_rem != '-1' )
+					{
+						update_user_meta( $user_id, '_candidate_applied_jobs',$job_applied_rem - 1);
+					}
+				}
+				echo '4';
+				die();
+			}
+			else
+			{
+				echo '4';
+				die();
+			}
+		}
+		else
+		{
+			/*with login or not*/
+		    $with_log = ( isset($nokri['job_apply_package_base_wl']) && $nokri['job_apply_package_base_wl'] != ""  ) ? $nokri['job_apply_package_base_wl'] : '2';
+			if($with_log == '1' && $user_id == '' )
+			{
+				echo '2|' . __( "Please Login To Apply ", 'nokri') .'|' . get_the_permalink($sign_in);
+				die();
+			}
+			else
+			{
+				echo '4';
+			    die();
+		    }
+		}
+	}
+}
+
+
+
+function nokri_send_email_new_rating($sender_id, $receiver_id, $rating = '', $comments = '') {
+    global $carspot_theme;
+    $receiver_info = get_userdata($receiver_id);
+    $to = $receiver_info->user_email;
+    $subject = __('New Rating', 'redux-framework') . '-' . get_bloginfo('name');
+
+
+    $body = '<html><body><p>' . __('Got new Rating', 'redux-framework') . ' <a href="' . get_author_posts_url($receiver_id) . '">' . get_author_posts_url($receiver_id) . '</a></p></body></html>';
+    $from = get_bloginfo('name');
+
+    if (isset($carspot_theme['sb_new_rating_from']) && $carspot_theme['sb_new_rating_from'] != "") {
+        $from = $carspot_theme['sb_new_rating_from'];
+    }
+    $headers = array('Content-Type: text/html; charset=UTF-8', "From: $from");
+    if (isset($carspot_theme['sb_new_rating_message']) && $carspot_theme['sb_new_rating_message'] != "") {
+        $subject_keywords = array('%site_name%');
+        $subject_replaces = array(get_bloginfo('name'));
+
+        $subject = str_replace($subject_keywords, $subject_replaces, $carspot_theme['sb_new_rating_subject']);
+
+        // Rator info
+        $sender_info = get_userdata($sender_id);
+
+        $msg_keywords = array('%site_name%', '%receiver%', '%rator%', '%rating%', '%comments%', '%rating_link%');
+        $msg_replaces = array(get_bloginfo('name'), $receiver_info->display_name, $sender_info->display_name, $rating, $comments, get_author_posts_url($receiver_id));
+
+        $body = str_replace($msg_keywords, $msg_replaces, $carspot_theme['sb_new_rating_message']);
+    }
+    wp_mail($to, $subject, $body, $headers);
 }

@@ -14,6 +14,18 @@ a:hover, a:focus {
 .select2-container--default .select2-results__option--highlighted[aria-selected] {
     background-color: #f58936;
 }
+.n-jobs-recomend3 .nav-tabs > li.active a {
+	background-color: #f58936;
+}
+.n-hero-8 .n-8-container .n-8-product ul li i {
+	background-color: #f58936;
+}
+.n-hero-8 .n-8-container .n-8-content h1 span {
+   color: #f58936;
+}
+.n-job-listing5 .nav-tabs > li.active > a {
+	background-color: #f58936;
+}
 .n-btn-rounded { 
 	background-color: #f58936; 
 	border-color:#f58936;
@@ -21,6 +33,9 @@ a:hover, a:focus {
 .n-btn-flat { 
 	background-color: #f58936; 
 	border-color:#f58936;
+} 
+.mega-menu .drop-down-multilevel li:hover > a, .mega-menu .drop-down-multilevel li:focus > a {
+    color: #f58936;
 } 
 .heading-title h2::after {
 	background-color:#f58936;
@@ -463,4 +478,14 @@ aside .app-deadline {
 }
 aside .apply-buttons .btn-theme {
 	color:#f58936;
+}
+.dashboard-new .main-body .file-upload-wrapper:before {
+    background-color: #f58936;
+    border: 1px solid #f58936;
+}
+.dashboard-new .main-body .file-upload-wrapper:hover:before {
+  background-color: #f58936;
+}
+.counter-active { 
+    color: #f58936 !important;
 }

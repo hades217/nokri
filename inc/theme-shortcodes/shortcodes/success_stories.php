@@ -117,55 +117,54 @@ require trailingslashit( get_template_directory () ) . "inc/theme-shortcodes/sho
 		'story_img' => '', 
 		'section_desc' => '', 
 	) , $atts));
-	
-	
-	
-
-$rows = vc_param_group_parse_atts( $atts['stories'] );
-$stories_html = '';
-if( (array)count( $rows ) > 0 )
-{
-	foreach($rows as $row ) 
+if(isset($atts['stories']) && !empty($atts['stories']) != '')
+{	
+	$rows = vc_param_group_parse_atts( $atts['stories'] );
+	$stories_html = '';
+	if( (array)count( $rows ) > 0 )
 	{
-		$img_html = '';
-		if(isset( $row['story_img']) &&  $row['story_img'] !='') 
+		foreach($rows as $row ) 
 		{
-			$img  = wp_get_attachment_image_src($row['story_img'], '');
-			$img  = $img[0];
-			$img_html = '<img  src="'.$img.'" class="img-responsive" alt="'.esc_attr__("image", "nokri").'">';
-		}
-/*Story Title */
-$astory_title = (isset($row['story_title']) && $row['story_title'] != "") ? ' <h3>'.$row['story_title'].'</h3>' : "";	
-/*Story Description */
-$astory_desc = (isset($row['story_description']) && $row['story_description'] != "") ? $row['story_description'] : "";	
-$paras = explode("|", $astory_desc);
-$paragraph_html = '';
-foreach($paras as $para)
-{
-	$paragraph_html .= '<p>'.$para.'</p>';
-} 	
-/*Story client */
-$story_designation = (isset($row['story_designation']) && $row['story_designation'] != "") ? ' <p>'.$row['story_designation'].'</p>' : "";			
-
-/*Story Html */		
-$stories_html .= '<div class="item">
-                        <div class="n-single_testimonial">
-                           <div class="n-testimoial-text">
-                              '.$paragraph_html.'
-                              <i class="fa fa-quote-right"></i>
-                           </div>
-                           <div class="n-user-meta">
-                              <div class="n-user-avatar">
-                                 '.$img_html.'
-                              </div>
-                              <div class="n-user-detail">
-                                 '.$astory_title.'
-                                 '.$story_designation.'
-                              </div>
-                           </div>
-                        </div>
-                     </div>';
-     }
+			$img_html = '';
+			if(isset( $row['story_img']) &&  $row['story_img'] !='') 
+			{
+				$img  = wp_get_attachment_image_src($row['story_img'], '');
+				$img  = $img[0];
+				$img_html = '<img  src="'.$img.'" class="img-responsive" alt="'.esc_attr__("image", "nokri").'">';
+			}
+	/*Story Title */
+	$astory_title = (isset($row['story_title']) && $row['story_title'] != "") ? ' <h3>'.$row['story_title'].'</h3>' : "";	
+	/*Story Description */
+	$astory_desc = (isset($row['story_description']) && $row['story_description'] != "") ? $row['story_description'] : "";	
+	$paras = explode("|", $astory_desc);
+	$paragraph_html = '';
+	foreach($paras as $para)
+	{
+		$paragraph_html .= '<p>'.$para.'</p>';
+	} 	
+	/*Story client */
+	$story_designation = (isset($row['story_designation']) && $row['story_designation'] != "") ? ' <p>'.$row['story_designation'].'</p>' : "";			
+	
+	/*Story Html */		
+	$stories_html .= '<div class="item">
+							<div class="n-single_testimonial">
+							   <div class="n-testimoial-text">
+								  '.$paragraph_html.'
+								  <i class="fa fa-quote-right"></i>
+							   </div>
+							   <div class="n-user-meta">
+								  <div class="n-user-avatar">
+									 '.$img_html.'
+								  </div>
+								  <div class="n-user-detail">
+									 '.$astory_title.'
+									 '.$story_designation.'
+								  </div>
+							   </div>
+							</div>
+						 </div>';
+		 }
+	}
 }
   /*Section Color */
 $section_clr = (isset($success_stories_clr) && $success_stories_clr != "") ? $success_stories_clr : "";
@@ -173,8 +172,6 @@ $section_clr = (isset($success_stories_clr) && $success_stories_clr != "") ? $su
 $section_title = (isset($section_title) && $section_title != "") ? '<h2>'.$section_title.'</h2>' : "";
  /*Section desc */
 $section_desc = (isset($section_desc) && $section_desc != "") ? '<p>'.$section_desc.'</p>' : "";
-
-
 /*View All  Link */
 $read_more = '';
 if( isset( $link) )
@@ -182,7 +179,6 @@ if( isset( $link) )
 	$read_more = nokri_ThemeBtn($link, 'btn n-btn-rounded',false);
 	$read_more = 	'<span class="view-more">'.$read_more.'</span>';
 }
-
    return  '<section class="n-testimonials '.esc_attr($section_clr).'">
          <div class="container">
             <div class="row">

@@ -1,7 +1,7 @@
 /*
 Template Name: Nokri Job Board Theme
 Author: ScriptsBundle
-Version: 1.2.0
+Version: 1.3.1
 Designed and Development by: ScriptsBundle
 
 ====================================
@@ -53,8 +53,6 @@ Designed and Development by: ScriptsBundle
 	});
 	
 	
-	
-	
 	$('.new-sidebar .panel-collapse').on('show.bs.collapse', function () {
 		$(this).siblings('.panel-heading').addClass('active');
 	  });
@@ -69,10 +67,14 @@ Designed and Development by: ScriptsBundle
 	$('.js-example-basic-single').select2({
 		width:'100%',
 		dir: "rtl",
+		language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    }
+  }
 	});
  
 // Log In Model
-
   $('.search_company').on( "click", function() {
 	$('form#company_form').submit();
 });
@@ -93,8 +95,280 @@ $('.skills-gen').multifield({
           }
         }
 });
+
+/* add more questions */
+$('.questions').multifield({
+section: '.group',
+btnAdd: '#question_btn',
+btnRemove: '.btnRemove',
+locale: {
+"multiField": {
+"messages": {
+ "removeConfirmation": get_strings.content,
+}
+}
+}
+});
+
+// Candidate saving job alerts model
+ $(".job_alert").click(function() {
+  $("#job-alert-subscribtion").modal();
+  $(".select-generat").select2({
+   placeholder: get_strings.option_select,
+   allowClear: true,
+   maximumSelectionLength: 15,
+   language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    }
+  }
+  });
+ });
+
+ /* Candidate Subscribing job alerts */
+ $(document).on('click', '#job_alerts', function() {
+  $('#alert_job_form').parsley().on('field:validated', function() {
+    var ok = $('.parsley-error').length === 0;
+   })
+   .on('form:submit', function() {
+    $('.cp-loader').show();
+    // Ajax Submitting Resume
+    $.post(nokri_ajax_url, {
+     action: 'job_alert_subscription',
+     submit_alert_data: $("form#alert_job_form").serialize(),
+    }).done(function(response) {
+     $('.cp-loader').hide();
+     if ($.trim(response) == '1') {
+      $.dialog({
+       title: get_strings.success,
+       content: get_strings.action_success,
+       icon: 'fa fa-smile-o',
+       theme: 'modern',
+       closeIcon: true,
+       animation: 'zoom',
+       closeAnimation: 'scale',
+       type: 'blue',
+      });
+      setTimeout(function() {
+       location.reload();
+      }, 2000);
+     } else if ($.trim(response) == '2') {
+      toastr.warning($('#demo_mode').val(), '', {
+       timeOut: 2500,
+       "closeButton": true,
+       "positionClass": "toast-top-right"
+      });
+     } else if ($.trim(response) == '3') {
+      toastr.warning($('#not_log_in').val(), '', {
+       timeOut: 2500,
+       "closeButton": true,
+       "positionClass": "toast-top-right"
+      });
+     } else if ($.trim(response) == '4') {
+      toastr.warning($('#not_cand').val(), '', {
+       timeOut: 2500,
+       "closeButton": true,
+       "positionClass": "toast-top-right"
+      });
+     } else {
+      toastr.error(response, '', {
+       timeOut: 2500,
+       "closeButton": true,
+       "positionClass": "toast-top-right"
+      });
+     }
+    });
+    return false;
+   });
+ });
+ 
+/* Candidate Upload resume at apply time */
+
+  // Upload Candidate resume at apply time 
+ $('body').on('change', '.upload_resume_now', function(e) {
+  var fd = new FormData();
+  var files_data = $('.form-group .upload_resume_now');
+  $.each($(files_data), function(i, obj) {
+   $.each(obj.files, function(j, file) {
+    fd.append('upload_resume_now[' + j + ']', file);
+   });
+  });
+  fd.append('action', 'upload_resume_now');
+  $('.cp-loader').show();
+  $.ajax({
+   type: 'POST',
+   url: nokri_ajax_url,
+   data: fd,
+   contentType: false,
+   processData: false,
+   success: function(res) {
+    $('.cp-loader').hide();
+    var res_arr = res.split("|");
+    if ($.trim(res_arr[0]) == "1") {
+     toastr.success($('#resume_save_success').val(), '', {
+      timeOut: 2500,
+      "closeButton": true,
+      "positionClass": "toast-top-right"
+     });
+     //$('#current_resume').attr('src', res_arr[1]);
+     $("#current_resume").val(res_arr[1]);
+    } else if ($.trim(res_arr[0]) == "2") {
+     toastr.warning($('#demo_mode').val(), '', {
+      timeOut: 2500,
+      "closeButton": true,
+      "positionClass": "toast-top-right"
+     });
+    } else {
+     toastr.error(res_arr[1], '', {
+      timeOut: 2500,
+      "closeButton": true,
+      "positionClass": "toast-top-right"
+     });
+    }
+
+   }
+  });
+
+
+ });
+ /* Candidate Upload resume from resume tabs */
+$('body').on('change', '.upload_resume_tab', function(e) {
+  var fd = new FormData();
+  var files_data = $('.form-group .upload_resume_tab');
+  $.each($(files_data), function(i, obj) {
+   $.each(obj.files, function(j, file) {
+    fd.append('upload_resume_tab[' + j + ']', file);
+   });
+  });
+  fd.append('action', 'upload_resume_from_tab');
+  $('.cp-loader').show();
+  $.ajax({
+   type: 'POST',
+   url: nokri_ajax_url,
+   data: fd,
+   contentType: false,
+   processData: false,
+   success: function(res) {
+    $('.cp-loader').hide();
+    var res_arr = res.split("|");
+    if ($.trim(res_arr[0]) == "0") 
+	{
+     toastr.warning(res_arr[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+    } 
+	else if ($.trim(res_arr[0]) == "1") 
+	{
+     toastr.warning(res_arr[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+    } 
+	else if ($.trim(res_arr[0]) == "2") 
+	{
+     toastr.warning(res_arr[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+    } 
+	else if ($.trim(res_arr[0]) == "3") 
+	{
+     toastr.warning(res_arr[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+    } 
+	else if ($.trim(res_arr[0]) == "4") 
+	{
+     toastr.success(res_arr[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+	location.reload();
+    } 
+   }
+  });
+
+
+ }); 
+ 
+ $("#input-b1").fileinput({
+ browseLabel: get_strings.browse_btn,
+ removeLabel: get_strings.remove_btn,
+ msgPlaceholder:get_strings.select_btn,
+});
+ $("#imgdp").fileinput({
+ browseLabel: get_strings.browse_btn,
+ removeLabel: get_strings.remove_btn,
+ msgPlaceholder:get_strings.select_btn,
+});
+ 
+ /* Candidate Deleting Saved alerts */
+ $(".del_save_alert").on("click", function() {
+  var alert_id = $(this).attr("data-value");
+  $.confirm({
+   animationBounce: 1.5,
+   closeAnimation: 'rotateXR',
+   title: get_strings.confirmation,
+   content: get_strings.content,
+   type: 'red',
+   buttons: {
+    tryAgain: {
+     text: get_strings.btn_cnfrm,
+     btnClass: 'btn-red',
+     action: function() {
+      $('.cp-loader').show();
+      $.post(nokri_ajax_url, {
+       action: 'del_job_alerts',
+       alert_id: alert_id,
+      }).done(function(response) {
+       $('.cp-loader').hide();
+       if ($.trim(response) == "1") {
+        $.dialog({
+         title: get_strings.success,
+         content: get_strings.action_success,
+         icon: 'fa fa-smile-o',
+         theme: 'modern',
+         closeIcon: true,
+         animation: 'scale',
+         type: 'blue',
+        });
+        $("#alert-box-" + alert_id).remove();
+       } else if ($.trim(response) == '2') {
+        toastr.warning($('#demo_mode').val(), '', {
+         timeOut: 2500,
+         "closeButton": true,
+         "positionClass": "toast-top-right"
+        });
+       } else {
+        toastr.error($('#job_cv_action_fail').val(), '', {
+         timeOut: 2500,
+         "closeButton": true,
+         "positionClass": "toast-top-right"
+        });
+       }
+      });
+     }
+    },
+    cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
+            }
+        },
+   }
+  });
+ });
+
+
 /*iCheck for others*/
-$(document).ready(function(){
+ $(window).load(function() {
   $('.input-icheck-others').iCheck({
 	checkboxClass: 'icheckbox_square',
 	radioClass: 'iradio_square',
@@ -247,6 +521,11 @@ $(".job_alert").click(function(){
 		placeholder: get_strings.option_select,
 		allowClear: true,
 		maximumSelectionLength: 15,
+		language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    }
+  }
 	});
   });
 
@@ -358,7 +637,12 @@ $(".del_save_alert").on("click", function () {
 						});
 					}
 				},
-				close: function () {}
+				cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
+            }
+        },
 			}
 		});
 	});
@@ -466,6 +750,27 @@ $('.n-client-box').owlCarousel({
 				}
 			}
 		});
+	/*--- Hiring carousel---*/
+		$('.hiring-slider').owlCarousel({
+			loop:true,
+			margin:10,
+			autoplay:true,	
+			nav:true,
+			rtl:true,
+			responsive:{
+				0:{
+					items:1
+				},
+				600:{
+					items:3
+				},
+				1000:{
+					items:5
+				}
+			}
+		});	
+
+
 	/* ======= Candidate slider ======= */
 	$('.n-candidatel-2').owlCarousel({
 			loop: true,
@@ -559,7 +864,24 @@ $(".featured-cat").owlCarousel({
 		}
     });
 	
-	
+$('.success1-slider').owlCarousel({
+loop:true,
+margin:10,
+nav:true,
+rtl:true,
+autoplay:false,
+responsive:{
+	0:{
+		items:1
+	},
+	600:{
+		items:3
+	},
+	1000:{
+		items:3
+	}
+}
+});
 	
 	/*--- TESTIMONIAL 1---*/
 	$("#owl-testimonial").owlCarousel({
@@ -671,36 +993,46 @@ $(".featured-cat").owlCarousel({
     });
 
 /******** Start New JS **********/
-
 $(".select-generat ").select2({
         placeholder: get_strings.option_select,
         allowClear: true,
         maximumSelectionLength: 10,
 		dir: "rtl",
-		
+		language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    }
+  }
     });
-    
-    
-    /* ======= Progress bars ======= */
-			$('.progress-bar > span').each(function() {
-					var $this = $(this);
-					var width = $(this).data('percent');
-					$this.css({
-						'transition': 'width 3s'
-					});
-					setTimeout(function() {
-						$this.appear(function() {
-							$this.css('width', width + '%');
-						});
-					}, 500);
-				});
-
-		/*MOBILD DASHBOARD MENU*/
-			$(".menu-dashboard").on('click',function(){
-				$(".profile-menu").toggleClass("position");
-			});	
-
-
+/* Youtube popup */
+if ($("#is_intro_vid").val() == 1)
+{
+	$("a.bla-1").YouTubePopUp();
+}
+$(document).ready(function()
+{
+	if ( $( "a.hero-video" ).length ) 
+	{
+		$("a.hero-video").YouTubePopUp();
+	}
+});	
+/* ======= Progress bars ======= */
+$('.progress-bar > span').each(function() {
+		var $this = $(this);
+		var width = $(this).data('percent');
+		$this.css({
+			'transition': 'width 3s'
+		});
+		setTimeout(function() {
+			$this.appear(function() {
+				$this.css('width', width + '%');
+			});
+		}, 500);
+	});
+/*MOBILD DASHBOARD MENU*/
+	$(".menu-dashboard").on('click',function(){
+		$(".profile-menu").toggleClass("position");
+	});	
 /*MOBILD DASHBOARD MENU*/
  $('#dashboard-bar-right').theiaStickySidebar({
   additionalMarginTop: 80
@@ -709,6 +1041,27 @@ $(".select-generat ").select2({
  $('#side-fix').theiaStickySidebar({
   additionalMarginTop: 80
  });
+ 
+ /*--- job cand cat slider---*/
+ $('.job-cat-cand-slider').owlCarousel({
+    loop:true,
+    margin:10,
+    nav:true,
+	rtl:true,
+    navText: ["<i class='fa fa-angle-left'></i>","<i class='fa fa-angle-right'></i>"],
+    autoplay:false,
+    responsive:{
+        0:{
+            items:1
+        },
+        600:{
+            items:1
+        },
+        1000:{
+            items:1
+        }
+    }
+}); 
  
  /*Premium Jobs vertical slider*/
  $(document).ready(function(){
@@ -733,6 +1086,52 @@ $(".select-generat ").select2({
 	 });
 });
  
+/* Call to action 4 counter */
+function Counter(data) {
+	var _default = {
+	  fps: 20,
+	  from: 0,
+	  time: 2000,
+	}
+	
+	for (var attr in _default) {
+	  if (typeof data[attr] === 'undefined') {
+		data[attr] = _default[attr];
+	  }
+	}
+	
+	if (typeof data.to === 'undefined')
+	  return;
+	
+	data.fps = typeof data.fps === 'undefined' ? 20 : parseInt(data.fps);
+	data.from = typeof data.from === 'undefined' ? 0 : parseFloat(data.from);
+	
+	var frames = data.time / data.fps,
+		inc = (data.to - data.from) / frames,
+		val = data.from;
+	
+	if (typeof data.start === 'function') {
+	  data.start(data.from, data)
+	}
+	var interval = setInterval(function() {
+	  frames--;
+	  val += inc;
+	  
+	  if (val >= data.to) {
+		if (typeof data.complete === 'function') {
+		  console.log('complete');
+		  data.complete(data.to, data)
+		}
+		console.log(interval);
+		clearInterval(interval);
+	  } else if (typeof data.progress === 'function') {
+		data.progress(val, data)
+	  }
+	}, data.fps);
+  
+  }
+
+
  
  $(document).ready(function() {
 	 $('#hero-cat-parralex').show();
@@ -756,13 +1155,6 @@ $('.main-hero-cat').owlCarousel({
 	}
 });
 });
-
-/* Youtube popup */
-if($("#is_intro_vid").val() ==  1)
-{
-	$("a.bla-1").YouTubePopUp();
-}
-
 /******** End New JS **********/
 $('#tags_tag').tagEditor({
 placeholder: get_strings.select_tags,
@@ -805,26 +1197,46 @@ if(is_accordion)
         placeholder: get_strings.option_select,
         allowClear: true,
         maximumSelectionLength: 15,
-		dir: "rtl"
+		dir: "rtl",
+		language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    }
+  }
     });
 
     $(".select-category ").select2({
         placeholder: get_strings.option_select,
         allowClear: true,
         maximumSelectionLength: 13,
-		dir: "rtl"
+		dir: "rtl",
+		language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    }
+  }
     });
     $(".select-location").select2({
         placeholder: get_strings.option_select,
         allowClear: true,
         maximumSelectionLength: 13,
-		dir: "rtl"
+		dir: "rtl",
+		language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    }
+  }
     });
 
     $(".select-resume").select2({
         placeholder: get_strings.option_select,
         allowClear: true,
-		dir: "rtl"
+		dir: "rtl",
+		language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    }
+  }
     });
 	
 	$(".select-generat").select2({
@@ -832,8 +1244,116 @@ if(is_accordion)
         allowClear: true,
         maximumSelectionLength: 15,
 		dir: "rtl",
+		language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    }
+  }
     });
-
+	
+	 /*--- Drop Zone For company gallery---*/
+	 function sbDropzone_comp_image() {
+	  Dropzone.autoDiscover = false;
+	  var acceptedFileTypes = "image/*"; //dropzone requires this param be a comma separated list
+	  var fileList = new Array;
+	  var i = 0;
+	  $("#company-dropzone").dropzone({
+	   addRemoveLinks: true,
+	   paramName: "my_file_upload",
+	   maxFiles: $('#sb_upload_limit').val(), //change limit as per your requirements
+	   acceptedFiles: '.jpeg,.jpg,.png',
+	   dictMaxFilesExceeded: $('#adforest_max_upload_reach').val(),
+	   /*acceptedFiles: acceptedFileTypes,*/
+	   url: nokri_ajax_url + "?action=nokri_upload_comp_image&is_update=" + $('#is_update').val(),
+	   parallelUploads: 1,
+	   dictDefaultMessage: $('#dictDefaultMessage').val(),
+	   dictFallbackMessage: $('#dictFallbackMessage').val(),
+	   dictFallbackText: $('#dictFallbackText').val(),
+	   dictFileTooBig: $('#dictFileTooBig').val(),
+	   dictInvalidFileType: $('#dictInvalidFileType').val(),
+	   dictResponseError: $('#dictResponseError').val(),
+	   dictCancelUpload: $('#dictCancelUpload').val(),
+	   dictCancelUploadConfirmation: $('#dictCancelUploadConfirmation').val(),
+	   dictRemoveFile: get_strings.remove_btn,
+	   dictRemoveFileConfirmation: null,
+	   init: function() {
+		var thisDropzone = this;
+		$.post(nokri_ajax_url, {
+		 action: 'get_uploaded_company_images',
+		}).done(function(data) {
+		 if (data != 0) {
+		  $.each(data, function(key, value) {
+		   var mockFile = {
+			name: value.name,
+			size: value.size
+		   };
+		   thisDropzone.options.addedfile.call(thisDropzone, mockFile);
+		   thisDropzone.options.thumbnail.call(thisDropzone, mockFile, value.name);
+		   $('a.dz-remove:eq(' + i + ')').attr("data-dz-remove", value.id);
+		   i++;
+		  });
+		 }
+		 if (i > 0)
+		  $('.dz-message').hide();
+		 else
+		  $('.dz-message').show();
+		});
+		this.on("addedfile", function(file) {
+		 $('.dz-message').hide();
+		});
+		this.on("success", function(file, responseText) {
+		 var res_arr = responseText.split("|");
+		 if ($.trim(res_arr[0]) != "0") {
+		  $('a.dz-remove:eq(' + i + ')').attr("data-dz-remove", responseText);
+		  i++;
+		  $('.dz-message').hide();
+		 } else {
+		  if (i == 0)
+		   $('.dz-message').show();
+		  this.removeFile(file);
+		  toastr.error(res_arr[1], '', {
+		   timeOut: 2500,
+		   "closeButton": true,
+		   "positionClass": "toast-top-right"
+		  });
+		 }
+		});
+		this.on("removedfile", function(file) {
+		 var img_id = file._removeLink.attributes[2].value;
+		 if (img_id != "") {
+		  i--;
+		  if (i == 0)
+		   $('.dz-message').show();
+		  $.post(nokri_ajax_url, {
+		   action: 'delete_comp_image',
+		   img: img_id,
+		   is_update: $('#is_update').val(),
+		  }).done(function(response) {
+		   if ($.trim(response) == "1") {
+			toastr.success($('#del_msg').val(), '', {
+			 timeOut: 2500,
+			 "closeButton": true,
+			 "positionClass": "toast-top-right"
+			});
+		   } else {
+			toastr.warning($('#demo_mode').val(), '', {
+			 timeOut: 2500,
+			 "closeButton": true,
+			 "positionClass": "toast-top-right"
+			});
+		   }
+		  });
+		 }
+		});
+	
+	   },
+	
+	  });
+	 }
+	 sbDropzone_comp_image();
+	 /*--- End Drop Zone company gallery---*/
+	
+	
     /*--- Drop Zone For Portfolio---*/
     function sbDropzone_image() {
         Dropzone.autoDiscover = false;
@@ -939,7 +1459,6 @@ if(is_accordion)
     /*--- End Drop Zone For Portfolio---*/
 
     /*--- Drop Zone For Resumes---*/
-
     function sbDropzone_resume() {
         Dropzone.autoDiscover = false;
         var acceptedFileTypes = "image/*"; //dropzone requires this param be a comma separated list
@@ -1040,9 +1559,7 @@ if(is_accordion)
     sbDropzone_resume();
     /*--- End Drop Zone For Resumes---*/
 
-
-
-   /*--- Drop Zone For Custom feilds---*/
+    /*--- Drop Zone For Custom feilds---*/
 	function sbDropzone_custom() {
 		Dropzone.autoDiscover = false;
 		var acceptedFileTypes = "image/*"; //dropzone requires this param be a comma separated list
@@ -1052,7 +1569,7 @@ if(is_accordion)
 			addRemoveLinks: true,
 			paramName: "custom_upload",
 			maxFiles: $('#sb_upload_limit').val(), //change limit as per your requirements
-			acceptedFiles: '.txt,.doc,.docx,.pdf,.png',
+			acceptedFiles: '.txt,.doc,.docx,.pdf,.png,.jpg,.gif,.jpeg',
 			dictMaxFilesExceeded: $('#adforest_max_upload_reach').val(),
 			/*acceptedFiles: acceptedFileTypes,*/
 			url: nokri_ajax_url + "?action=job_attachments&is_update=" + $('#is_update').val(),
@@ -1072,7 +1589,11 @@ if(is_accordion)
 				$.post(nokri_ajax_url, {
 					action: 'get_uploaded_job_attachments', is_update:$('#is_update').val()
 				}).done(function (data) {
-					$.each(data, function (key, value) {
+					var is_update = $('#is_update').val();
+					var is_attachment = $('#is_attachment').val();
+					if(is_update && is_attachment == '1')
+					{
+						$.each(data, function (key, value) {
 						var mockFile = {
 							name: value.display_name,
 							size: value.size
@@ -1082,6 +1603,7 @@ if(is_accordion)
 						$('a.dz-remove:eq(' + i + ')').attr("data-dz-remove", value.id);
 						i++;
 					});
+					}
 					if (i > 0)
 						$('.dz-message').hide();
 					else
@@ -1183,14 +1705,17 @@ if(is_accordion)
         });
                 }
             },
-            close: function () {
+            cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
             }
+        },
         }
     });
     });
 
 	 /* Candidate  Deleting Saved Jobs */
-
     $(".del_saved_job").on("click", function() {
         var del_job_id = $(this).attr("data-value");
 		$.confirm({
@@ -1231,9 +1756,12 @@ if(is_accordion)
         });
                 }
             },
-            close: function () {
-				 $('.cp-loader').hide();
+            cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
             }
+        },
         }
     });
     });
@@ -1810,8 +2338,12 @@ if (is_stick == 1 && is_dashboard_page != 1)
         });
                 }
             },
-            close: function () {
+            cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
             }
+        },
         }
     });
 		
@@ -2009,6 +2541,11 @@ if ($('#candidate-profile').length > 0)
 						allowClear: true,
 						maximumSelectionLength: 5,
 						dir: "rtl",
+						language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    }
+  }
 						});
             			$("#myModal-job").modal("show");
 						$("#input-b2").fileinput({
@@ -2077,6 +2614,32 @@ $(".submit_linkedin_url").on("click", function () {
 			});
 	});
 
+
+/* Toggle for questionares */
+if ($('#job_qstns_enable').val() == 1)
+{
+	$('.job_qstns').hide(); 
+	var exist = $('#job_qstns_exist').val();
+	if(exist)
+	{
+		$('.job_qstns').show();
+	}
+	$(function() {
+	  $(document).on('change', '#job_qstns_toggle', function() {
+	   var is_ad_qstns = $(this).prop('checked');
+	   if (!is_ad_qstns)
+		{
+		   $('.job_qstns').hide();
+		   $('.jobs_questions').val(''); 
+	   } 
+	   else
+		{
+			$('.job_qstns').show();
+	   }
+	  });
+	 });
+ }
+
 // Candidate short details popups
 $(".candidate_short_det").on( "click", function() {
 	$('.cp-loader').show();
@@ -2131,7 +2694,6 @@ $(".candidate_resume_action").on( "click", function() {
                     } 
 					else {
                        $("#status_action_data").html(response);
-					   
 					   $(function() {
 						$('#email_send_toggle').bootstrapToggle();
 					  });
@@ -2140,6 +2702,11 @@ $(".candidate_resume_action").on( "click", function() {
 						placeholder: get_strings.resume_select,
 						allowClear: true,
 						maximumSelectionLength: 5,
+						language: {
+    noResults: function (params) {
+      return get_strings.no_res;
+    }
+  }
 						});
             			$("#myModalaction").modal("show");
 						$("#myModalaction").modal("show");
@@ -2229,10 +2796,73 @@ $(".candidate_resume_action").on( "click", function() {
                     "closeButton": true,
                     "positionClass": "toast-top-right"
                 });
+				window.location = get_r[2];
             }
         });
 
     });
+	// Add to Cart for candidate
+   $('body').on('click', '.sb_add_cart_cand', function() {
+  $('.cp-loader').show();
+  $.post(nokri_ajax_url, {
+   action: 'sb_add_cart_cand',
+   product_id: $(this).attr('data-product-id'),
+   qty: $(this).attr('data-product-qty'),
+   is_free: $(this).attr('data-product-is-free'),
+  }).done(function(response) {
+   $('.cp-loader').hide();
+   var get_r = response.split('|');
+   if ($.trim(get_r[0]) == '3') {
+    toastr.success(get_r[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+    window.location = get_r[2];
+   } else if ($.trim(get_r[0]) == '5') {
+    toastr.warning(get_r[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+
+   } else if ($.trim(get_r[0]) == '7') {
+    toastr.warning(get_r[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+
+   } else if ($.trim(get_r[0]) == '4') {
+    toastr.error(get_r[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+
+   } else if ($.trim(get_r[0]) == '6') {
+    toastr.warning(get_r[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+
+   } else if ($.trim(get_r[0]) == '1') {
+    toastr.success(get_r[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+    window.location = get_r[2];
+   } else {
+    toastr.error(get_r[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+   }
+  });
+ });
 
     if ($('#facebook_key').val() != "" && $('#google_key').val() != "" ) {
         // Hello JS
@@ -2381,7 +3011,12 @@ $(".del-this-resume").on("click", function () {
 						});
 					}
 				},
-				close: function () {}
+				cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
+            }
+        },
 			}
 		});
 	});
@@ -2557,7 +3192,6 @@ $(".del-this-resume").on("click", function () {
                         window.location	=	response;
                     }
                 });
-
                 return false;
             });
 
@@ -2594,9 +3228,12 @@ $(".del-this-resume").on("click", function () {
                     $('#third_level').hide();
                     $('#forth_level').hide();
                 }
-			  /*For Category Templates*/
-			  getCustomTemplate(nokri_ajax_url, $( "#job_cat" ).val(), $( "#is_update" ).val(), true );
-			  /*For Category Templates*/
+				if(get_strings.is_cat_temp == '1')
+				{
+				  /*For Category Templates*/
+				  getCustomTemplate(nokri_ajax_url, $( "#job_cat" ).val(), $( "#is_update" ).val(), true );
+				  /*For Category Templates*/
+				}
             });
         });
 
@@ -2616,9 +3253,12 @@ $(".del-this-resume").on("click", function () {
                     $('#third_level').hide();
                     $('#forth_level').hide();
                 }
-			  /*For Category Templates*/
-			  getCustomTemplate(nokri_ajax_url, $( "#job_cat" ).val(), $( "#is_update" ).val(), true );
-			  /*For Category Templates*/
+				if(get_strings.is_cat_temp == '1')
+				{
+				  /*For Category Templates*/
+				  getCustomTemplate(nokri_ajax_url, $( "#job_cat" ).val(), $( "#is_update" ).val(), true );
+				  /*For Category Templates*/
+				}
             });
         });
 
@@ -2638,9 +3278,12 @@ $(".del-this-resume").on("click", function () {
                 } else {
                     $('#forth_level').hide();
                 }
-				/*For Category Templates*/
-			   getCustomTemplate(nokri_ajax_url, $( "#job_cat" ).val(), $( "#is_update" ).val(), true );
-			   /*For Category Templates*/
+				if(get_strings.is_cat_temp == '1')
+				{
+					/*For Category Templates*/
+				   getCustomTemplate(nokri_ajax_url, $( "#job_cat" ).val(), $( "#is_update" ).val(), true );
+				   /*For Category Templates*/
+				}
             });
         });
 
@@ -2744,7 +3387,80 @@ $('body').on('change', '.sb_files-data-doc', function(e){
 				return false;
 			});
 	});
-
+	
+/* Validating external email */
+function nokriValidateEmail($email) {
+  var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+  return emailReg.test( $email );
+}
+/* External Apply package update */
+$(".external_apply").on("click", function() {
+  var apply_job_id = $(this).attr('data-job-id');
+  var external = $(this).attr('data-job-exter');
+  $.confirm({
+   animationBounce: 1.5,
+   closeAnimation: 'rotateXR',
+   title: get_strings.confirmation,
+   content: get_strings.external_apply,
+   type: 'blue',
+   buttons: {
+    tryAgain: {
+     text: get_strings.btn_cnfrm,
+     btnClass: 'btn-red',
+     action: function() {
+      $('.cp-loader').show();
+      $.post(nokri_ajax_url, {
+       action: 'external_apply_package_base',
+	   'apply_job_id': apply_job_id,
+      }).done(function(response) {
+       $('.cp-loader').hide();
+	   var get_r = response.split('|');
+       if ($.trim(get_r[0]) == "4") {
+		if( nokriValidateEmail(external)) 
+		{
+			window.open("mailto:"+external);
+		}  
+		else
+		{
+			window.open(external, '_blank');
+		}
+       }
+       else if ($.trim(get_r[0]) == '2') {
+       toastr.warning(get_r[1], '', {
+       timeOut: 2500,
+       "closeButton": true,
+       "positionClass": "toast-top-right"
+      });
+	   window.location = get_r[2];
+     }
+	   else if ($.trim(get_r[0]) == '3') {
+       toastr.warning(get_r[1], '', {
+       timeOut: 2500,
+       "closeButton": true,
+       "positionClass": "toast-top-right"
+      });
+	   window.location = get_r[2];
+     }
+	 else if ($.trim(get_r[0]) == '1') {
+       toastr.warning(get_r[1], '', {
+       timeOut: 2500,
+       "closeButton": true,
+       "positionClass": "toast-top-right"
+      });
+	   window.location = get_r[2];
+     }
+	   });
+     }
+    },
+	somethingElse: {
+            text: get_strings.btn_cancel,
+            btnClass: 'btn-blue',
+            action: function(){
+            }
+        },
+   }
+  });
+ });
 
     /* Candidate Saving  Job */
    $(".save_job").click(function() {
@@ -2774,7 +3490,8 @@ $('body').on('change', '.sb_files-data-doc', function(e){
 			else if ($.trim(response) == "3")
 			{
                 toastr.info($('#not_cand').val(), '', {
-                    timeOut: 2500,
+                    timeOut: 0,
+	                extendedTimeOut: 0,
                     "closeButton": true,
                     "positionClass": "toast-top-right"
                 });
@@ -2899,8 +3616,12 @@ $('body').on('change', '.sb_files-data-doc', function(e){
         });
                 }
             },
-            close: function () {
+            cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
             }
+        },
         }
     });
     });
@@ -2976,7 +3697,46 @@ $(document).on('click', '#email_this_job_btn', function () {
 				return false;
 			});
 	});
-
+// Update resume access package
+ $(".update_pkg").on("click", function() {
+  var candidate_id = $(this).attr('data-candId');  
+  var attach_id = $(this).attr('data-attachId');
+  $.post(nokri_ajax_url, {
+   action: 'update_resume_access',
+   'candidate_id': candidate_id,
+   'attach_id': attach_id,
+  }).done(function(response) {
+   $('.cp-loader').hide();
+   var get_r = response.split('|');
+   if ($.trim(get_r[0]) == '1') {
+	 toastr.error(get_r[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+	window.location = get_r[2];
+   } 
+   else if ($.trim(get_r[0]) == '2') {
+    toastr.error(get_r[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+	window.location = get_r[2];
+   }
+   else if ($.trim(get_r[0]) == '3') {
+    toastr.error(get_r[1], '', {
+     timeOut: 2500,
+     "closeButton": true,
+     "positionClass": "toast-top-right"
+    });
+	window.location = get_r[2];
+   }
+   else if ($.trim(get_r[0]) == '4') {
+    window.location = get_r[1];
+   }
+  });
+ });
 /* Company Deleting saved resumes */
 $(".del_saved_resume").on("click", function () {
 		var resume_id = $(this).attr("data-id");
@@ -2988,7 +3748,7 @@ $(".del_saved_resume").on("click", function () {
 			type: 'red',
 			buttons: {
 				tryAgain: {
-					text: 'Confirm',
+					text: get_strings.btn_cnfrm,
 					btnClass: 'btn-red',
 					action: function () {
 						$('.cp-loader').show();
@@ -3024,7 +3784,12 @@ $(".del_saved_resume").on("click", function () {
 						});
 					}
 				},
-				close: function () {}
+				cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
+            }
+        },
 			}
 		});
 	});
@@ -3040,7 +3805,7 @@ $(".del_saved_resume").on("click", function () {
         type: 'red',
         buttons: {
             tryAgain: {
-                text: 'Confirm',
+                text: get_strings.btn_cnfrm,
                 btnClass: 'btn-red',
                 action: function(){
 		 $('.cp-loader').show();
@@ -3078,8 +3843,7 @@ $(".del_saved_resume").on("click", function () {
         });
                 }
             },
-            close: function () {
-            }
+            somethingElse: { text: get_strings.btn_cancel,action: function(){}}
         }
     });    });
 
@@ -3151,7 +3915,7 @@ $(".del_saved_resume").on("click", function () {
 				});
 			}
 			else if ($.trim(response) == "5") {
-				toastr.success($('#resume_save_success').val(), '', {
+				toastr.success($('#emp_resume_save').val(), '', {
 					timeOut: 2500,
 					"closeButton": true,
 					"positionClass": "toast-top-right"
@@ -3276,9 +4040,12 @@ $(".del_saved_resume").on("click", function () {
         });
                 }
             },
-            close: function () {
-				 $('.cp-loader').hide();
+            cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
             }
+        },
         }
     });
     });
@@ -3311,46 +4078,38 @@ else
 });
 /* Employer Sending Email */
 $(document).on('click', '.send_email', function() {
-                $('.cp-loader').show();
-                // Ajax for Registration
-                $.post(nokri_ajax_url, {
-                    action: 'sending_email',
-                    email_data: $("form#email_template_action").serialize(),
-                }).done(function(response) {
-                    $('.cp-loader').hide();
-                    if ($.trim(response) == '1') {
-                        $.dialog({
-					        title: get_strings.success,
-							content: get_strings.action_success,
-                            icon: 'fa fa-smile-o',
-                            theme: 'modern',
-                            closeIcon: true,
-                            animation: 'scale',
-                            type: 'blue',
-				}); 
-				setTimeout(function(){
-								//location.reload();
-								},2000);  
-                    }
-					else if ($.trim(response) == '2') {
-		toastr.warning($('#demo_mode').val(), '', {
+$('.cp-loader').show();
+// Ajax for Registration
+$.post(nokri_ajax_url, {
+	action: 'sending_email',
+	email_data: $("form#email_template_action").serialize(),
+}).done(function(response) {
+	$('.cp-loader').hide();
+	if ($.trim(response) == '1') {
+		$.dialog({
+			title: get_strings.success,
+			content: get_strings.action_success,
+			icon: 'fa fa-smile-o',
+			theme: 'modern',
+			closeIcon: true,
+			animation: 'scale',
+			type: 'blue',
+}); 
+setTimeout(function(){location.reload();},1500);}
+else if ($.trim(response) == '2') {toastr.warning($('#demo_mode').val(), '', {
+timeOut: 2500,
+"closeButton": true,
+"positionClass": "toast-top-right"
+});
+} else {toastr.error(response, '', {
 			timeOut: 2500,
 			"closeButton": true,
 			"positionClass": "toast-top-right"
 		});
-	} 
-					else {
-                        toastr.error(response, '', {
-                            timeOut: 2500,
-                            "closeButton": true,
-                            "positionClass": "toast-top-right"
-                        });
-                    }
-                });
-
-                return false;
-           
-       });
+	}
+});
+	return false;
+});
 /*-- Getting Date Picker Value --*/
 var is_candidate = $("#is_candidate").val();
 	if(is_candidate)
@@ -3439,9 +4198,12 @@ $.confirm
 						});
 						}
 					},
-					close: function () {
-						    $('.cp-loader').hide();
-					}
+					cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
+            }
+        },
 				}
 			});
 	 });
@@ -3635,57 +4397,59 @@ return false;
 });
 
 /* user del acount */
+$(".del_acount").on("click", function() {
+    $.confirm({
+        animationBounce: 1.5,
+        closeAnimation: 'rotateXR',
+        title: get_strings.confirmation,
+        content: get_strings.content,
+        type: 'red',
+        buttons: {
+            tryAgain: {
+                text: get_strings.btn_cnfrm,
+                btnClass: 'btn-red',
+                action: function() {
+                    $('.cp-loader').show();
+                    $.post(nokri_ajax_url, {
+                        action: 'delete_myaccount',
+                    }).done(function(response) {
+                        $('.cp-loader').hide();
+                        if ($.trim(response) == "0") {
+                            $.dialog({
+                                title: get_strings.success,
+                                content: get_strings.action_success,
+                                icon: 'fa fa-smile-o',
+                                theme: 'modern',
+                                closeIcon: true,
+                                animation: 'scale',
+                                type: 'blue',
+                            });
+                        } else if ($.trim(response) == '4') {
+                            toastr.warning($('#demo_mode').val(), '', {
+                                timeOut: 2500,
+                                "closeButton": true,
+                                "positionClass": "toast-top-right"
+                            });
+                        } else {
+                            toastr.error($('#superadmin').val(), '', {
+                                timeOut: 2500,
+                                "closeButton": true,
+                                "positionClass": "toast-top-right"
+                            });
+                        }
+                    });
+                }
+            },
+            cancel: {
+                text: get_strings.btn_cancel, // text for button
+                action: function(cancelButton) {
+                    $('.cp-loader').hide();
+                }
+            },
+        }
+    });
+});
 
-$(".del_acount").on("click", function() {  
-	$.confirm({
-	animationBounce: 1.5,
-	closeAnimation: 'rotateXR',
-	title: get_strings.confirmation,
-	content: get_strings.content,
-	type: 'red',
-	buttons: {
-		tryAgain: {
-			text: get_strings.btn_cnfrm,
-			btnClass: 'btn-red',
-			action: function(){
-	 $('.cp-loader').show();
-	$.post(nokri_ajax_url, {
-		action: 'delete_myaccount',
-	}).done(function(response) {
-		$('.cp-loader').hide();
-		if ($.trim(response) == "0") {
-			  $.dialog({
-						title: get_strings.success,
-						content: get_strings.action_success,
-						icon: 'fa fa-smile-o',
-						theme: 'modern',
-						closeIcon: true,
-						animation: 'scale',
-						type: 'blue',
-			});
-		} else if ($.trim(response) == '4') {
-		toastr.warning($('#demo_mode').val(), '', {
-			timeOut: 2500,
-			"closeButton": true,
-			"positionClass": "toast-top-right"
-		});
-	} else {
-			toastr.error($('#superadmin').val(), '', {
-				timeOut: 2500,
-				"closeButton": true,
-				"positionClass": "toast-top-right"
-			});
-		}
-	});
-			}
-		},
-		close: function () {
-			 $('.cp-loader').hide();
-		}
-	}
-});
-});
-	
 
 /* Newsletter function  */
 function nokri_validateEmail(sEmail) 
@@ -3700,7 +4464,6 @@ function nokri_validateEmail(sEmail)
 		return false;
 	}
 }
-
 $('#processing_req').hide();
 $('#save_email').on('click', function() {
         var sb_email	=	$('#sb_email').val();
@@ -3743,54 +4506,65 @@ $('#save_email').on('click', function() {
 						"positionClass": "toast-top-right"
 					});
 		}
+    });  
+ $('.cand-view-prof').on('click',function(){   
+   var canStatus = $(this).data('cand_status');
+   var canID     = $(this).data('cand_id');
+   var jobID     = $(this).data('job_id'); 
+  if(canStatus == '0'){
+  
+    $.ajax({
+   type: 'POST',
+   url: nokri_ajax_url,
+   data : {
+       action: "can_set_auto_viewed",
+       cand_status : canStatus,
+       cand_id    : canID,
+       job_id     : jobID,
+   },
+   success: function(res) {
+    
+    if(res == '1'){
+     toastr.success(
+    get_strings.cand_status_change, '', {
+      timeOut: 2500,
+      "closeButton": true,
+      "positionClass": "toast-top-right"
+     });
+    location.reload();    
+    }
+   
+   }
+  });
+  }
 
-    });
-
-
-
+});  
 })(jQuery);
-
-
-
-
-
-
-
 jQuery(document).ready(function($) {
-	
 	if($('#spinner').length > 0) {
         	document.getElementById('spinner').style.display = 'none';
 		}
-	
      var Accordion = function(el, multiple) {
      this.el = el || {};
      this.multiple = multiple || false;
-   
      // Variables privadas
      var links = this.el.find('.profile-menu-link');
      // Evento
      links.on('click', {el: this.el, multiple: this.multiple}, this.dropdown);
     };
-   
     Accordion.prototype.dropdown = function(e) {
      var $el = e.data.el;
       $this = $(this),
       $next = $this.next();
-   
      $next.slideToggle();
      $this.parent().toggleClass('open');
-   
      if (!e.data.multiple) {
       $el.find('.submenu').not($next).slideUp().parent().removeClass('open');
      }
     } ;
-   
     var accordion = new Accordion($('#accordion'), false);
-
 });
-
 function my_g_map(markers1) {
-	
 	var my_map;
 			var marker;
 			var markers = [
@@ -3800,7 +4574,6 @@ function my_g_map(markers1) {
 					"lng": "-95.712891",
 				},
 			];
-	
 	var mapOptions = {
 		center: new google.maps.LatLng(markers1[0].lat, markers1[0].lng),
 		zoom: 15,
@@ -3820,16 +4593,12 @@ function my_g_map(markers1) {
 		draggable: true,
 		animation: google.maps.Animation.DROP
 	});
-
-
 	(function (marker, data) {
 
 		google.maps.event.addListener(marker, "click", function (e) {
 			infoWindow.setContent(data.description);
 			infoWindow.open(map, marker);
 		});
-
-
 		google.maps.event.addListener(marker, "dragend", function (e) {
 			jQuery('.cp-loader').show();
 			//document.getElementById("sb_loading").style.display	= "block";
@@ -3846,7 +4615,6 @@ function my_g_map(markers1) {
 					document.getElementById("sb_user_address").value = address;
 					jQuery('.cp-loader').hide();
 				}
-
 			});
 		});
 	})(marker, data);
@@ -3880,8 +4648,6 @@ function my_g_map(markers1) {
 			
 				});
 }
-
-
 /*-- Add More Educational Degrees --*/
 var room = 1;
 function nokri_textarea_initial(call) {
@@ -3909,27 +4675,63 @@ function nokri_textarea_initial(call) {
 		title: false,
 	});
 }
-
 function education_fields() {
-	"use strict";
-
-	var my_Divs = Math.floor((Math.random() * 1000000000) + 1);
-	var room    = my_Divs + 1;
-	var end_date_class    = my_Divs + 2;
-	var objTo   = document.getElementById('education_fields');
-	var divtest = document.createElement("div");
-	var date_class = 'date-here-' + room;
-	divtest.setAttribute("class", "form-group removeclass_edu" + room); 
-	var rdiv = 'removeclass_edu' + (room);
-	
-	
-	divtest.innerHTML = '<div class= "removeclass_edu"><div class= "ad-more-box-single"><div class="col-md-12 col-sm-12"><h4 class="dashboard-heading">' + get_strings.deghead + '</h4></div><div class="col-md-6 col-sm-6"> <div class="form-group"> <label>' + get_strings.degtitle + '<span class="required">*</span></label> <input type="text"  placeholder="' + get_strings.degtitle + '" name="cand_education[\'degree_name\'][]" class="form-control"></div></div><div class="col-md-6 col-sm-6"> <div class="form-group"> <label>' + get_strings.deginsti + '<span class="required">*</span></label> <input type="text"  placeholder="' + get_strings.deginsti + '" name="cand_education[\'degree_institute\'][]" class="form-control"></div></div><div class="col-md-6 col-xs-12 col-sm-6"> <div class="form-group"><label class="">' + get_strings.degstart + '</label><input type="text"  name="cand_education[\'degree_start\'][]" class="' + date_class + ' form-control" /></div></div><div class="col-md-6 col-xs-12 col-sm-6"> <div class="form-group"><label class="">' + get_strings.degend + '</label><input type="text"  name="cand_education[\'degree_end\'][]" class="' + end_date_class + ' form-control"/></div></div><div class="col-md-6 col-sm-6"> <div class="form-group"> <label>' + get_strings.degpercnt + '<span class="required">*</span></label> <input type="text"  placeholder="' + get_strings.degpercntplc + '" name="cand_education[\'degree_percent\'][]" class="form-control"> </div></div><div class="col-md-6 col-sm-6"> <div class="form-group"> <label>' + get_strings.deggrad + '<span class="required">*</span></label> <input type="text" placeholder="' + get_strings.deggradplc + '"  name="cand_education[\'degree_grade\'][]" class="form-control"> </div></div><div class="col-md-12 col-sm-12 col-xs-12"> <div class="form-group"> <label>' + get_strings.degdesc + '</label> <textarea rows="6"  class="form-control rich_textarea" name="cand_education[\'degree_detail\'][]" id="ad_description"></textarea> </div></div><div class="input-group-btn remove-btn"><button class="btn btn-danger" type="button" onclick="remove_education_fields(' + room + ');" data-remove-type="' + room + '"> <span class="ti-minus" aria-hidden="true"></span>' + get_strings.degremov + '</button></div></div><div class="clearfix"></div></div>';
-	objTo.appendChild(divtest);
-
-	nokri_get_date_picker_start('months', date_class, 'MM yyyy',end_date_class);
-	nokri_textarea_initial(room);
+ "use strict";
+ var my_Divs = Math.floor((Math.random() * 1000000000) + 1);
+ var room = my_Divs + 1;
+ var end_date_class = my_Divs + 2;
+ var objTo = document.getElementById('education_fields');
+ var divtest = document.createElement("div");
+ var date_class = 'date-here-' + room;
+ divtest.setAttribute("class", "form-group removeclass_edu" + room);
+ var rdiv = 'removeclass_edu' + (room);
+ /* Institute name */
+ var inst     = get_strings.quali_inst;
+ if(inst)
+ {
+	 var inst_html = '<div class="col-md-6 col-sm-6"><div class="form-group"><label>'+get_strings.inst_title+'</label><input type="text"  placeholder="'+ get_strings.inst_plc+'" name="cand_education[\'degree_institute\'][]" class="form-control" '+get_strings.inst_req+'></div></div>';
+ }
+ else  { var inst_html = ''; }
+ /* Start date */
+ var s_date = get_strings.s_date;
+ if(s_date)
+ {
+	 var s_date_html = '<div class="col-md-6 col-xs-12 col-sm-6"><div class="form-group"><label class="">'+get_strings.sdate_title + '</label><input type="text" '+get_strings.sdate_req+' name="cand_education[\'degree_start\'][]" class="'+date_class+' form-control"/></div></div>';
+ }
+ else  { var s_date_html = ''; }
+ /* End date */
+ var e_date = get_strings.e_date;
+ if(e_date)
+ {
+	 var e_date_html = '<div class="col-md-6 col-xs-12 col-sm-6"> <div class="form-group"><label class="">' + get_strings.edate_title + '</label><input type="text" '+get_strings.edate_req+'  name="cand_education[\'degree_end\'][]" class="' + end_date_class + ' form-control"/></div></div>';
+ }
+ else  { var e_date_html = ''; }
+ /* Percentage */
+ var percentage = get_strings.percent;
+ if(percentage)
+ {
+	 var percentage_html = '<div class="col-md-6 col-sm-6"> <div class="form-group"> <label>' + get_strings.perc_title + '</label> <input type="text"  placeholder="' + get_strings.perc_plc + '" name="cand_education[\'degree_percent\'][]" class="form-control" '+get_strings.perc_req+'> </div></div>';
+ }
+ else  { var percentage_html = ''; }
+ /* Grades */
+ var grades = get_strings.grade;
+ if(grades)
+ {
+	 var grades_html = '<div class="col-md-6 col-sm-6"> <div class="form-group"> <label>' + get_strings.grad_title + '</label> <input type="text" placeholder="' + get_strings.grad_plc + '"  name="cand_education[\'degree_grade\'][]" class="form-control" '+get_strings.grad_req+'></div></div>';
+ }
+ else  { var grades_html = ''; }
+ /* Description */
+ var desc = get_strings.desc;
+ if(desc)
+ {
+	 var desc_html = '<div class="col-md-12 col-sm-12 col-xs-12"><div class="form-group"><label>'+ get_strings.desc_title + '</label><textarea rows="6" '+get_strings.desc_req+' class="form-control rich_textarea" name="cand_education[\'degree_detail\'][]" id="ad_description"></textarea></div></div>';
+ }
+ else  { var desc_html = ''; }
+ divtest.innerHTML = '<div class= "removeclass_edu"><div class= "ad-more-box-single"><div class="col-md-12 col-sm-12"><h4 class="dashboard-heading">' + get_strings.deghead + '</h4></div><div class="col-md-6 col-sm-6"><div class="form-group"><label>' + get_strings.degtitle + '<span class="required">*</span></label><input type="text"  placeholder="' + get_strings.deg_plc + '" name="cand_education[\'degree_name\'][]" class="form-control" '+get_strings.deg_req+'></div></div>'+inst_html +''+s_date_html+''+e_date_html+''+percentage_html+''+grades_html+''+desc_html+'<div class="input-group-btn remove-btn"><button class="btn btn-danger" type="button" onclick="remove_education_fields(' + room + ');" data-remove-type="' + room + '"> <span class="ti-minus" aria-hidden="true"></span>' + get_strings.degremov + '</button></div></div><div class="clearfix"></div></div>';
+ objTo.appendChild(divtest);
+ nokri_get_date_picker_start('months', date_class, 'MM yyyy', end_date_class);
+ nokri_textarea_initial(room);
 }
-
 function remove_education_fields(rid) {
 	"use strict";
 	$.confirm({
@@ -3945,14 +4747,17 @@ function remove_education_fields(rid) {
 					jQuery('.removeclass_edu' + rid).remove();
 				}
 			},
-			close: function () {}
+			cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
+            }
+        },
 		}
 	});
 }
-
 /*-- Add More Professional Projects --*/
 var room = 1;
-
 function nokri_textarea_initial(call) {
 	call= typeof call !== 'undefined' ? call : '';
 	$('button[data-remove-type=' + call + '] ').parent().parent().closest('div').find(".rich_textarea").jqte({
@@ -3978,38 +4783,58 @@ function nokri_textarea_initial(call) {
 		title: false,
 	});
 }
-
-
 function professional_fields() {
-	"use strict";
+ "use strict";
+ var my_Divs = Math.floor((Math.random() * 1000000000) + 1);
+ var room = my_Divs + 1;
+ var end_date_class = my_Divs + 2;
+ var objTo = document.getElementById('professional_fields');
+ var divtest = document.createElement("div");
+ divtest.setAttribute("class", "form-group removeclass_pro" + room);
+ var rdiv = 'removeclass_pro' + room;
+ var date_class_pro = 'date-here-pro' + room;
+ /* Your Role */
+ var role     = get_strings.prof_role;
+ if(role)
+ {
+	 var role_html = '<div class="col-md-6 col-sm-12"><div class="form-group"><label>' + get_strings.role_title + '</label><input type="text"   placeholder="' + get_strings.role_plc + '" name="cand_profession[\'project_role\'][]" class="form-control" '+get_strings.role_req+'></div></div>';
+ }
+ else  { var role_html = ''; }
+ /* Start date */
+ var s_date = get_strings.strt_show;
+ if(s_date)
+ {
+	 var s_date_html = '<div class="col-md-6 col-xs-12 col-sm-6"><div class="form-group"><label class="">' + get_strings.strt_title + '</label><input type="text" '+get_strings.strt_req+'  name="cand_profession[\'project_start\'][]" class="' + date_class_pro + '  form-control" /></div></div>';
+ }
+ else  { var s_date_html = ''; }
+ /* End date */
+ var e_date = get_strings.edate_show;
+ if(e_date)
+ {
+	 var e_date_html = '<div class="col-md-6 col-xs-12 col-sm-6"><div class="form-group"><label class="">' + get_strings.edate_title + '</label><input type="text"  name="cand_profession[\'project_end\'][]" class="' + end_date_class + '  form-control end-hide"  /><input type="hidden"  value="0" name="cand_profession[\'project_name\'][]"  class="checked-input-hide" /><input type="checkbox" name="checked"  class="icheckbox_minimal control-class-' + room + '">' + get_strings.edate_curr + '</div></div>';
+ }
+ else  { var e_date_html = ''; }
+ /* Description */
+ var desc = get_strings.desc_show;
+ if(desc)
+ {
+	 var desc_html = '<div class="col-md-12 col-sm-12 col-xs-12"><div class="form-group"><label>' + get_strings.desc_title + '</label><textarea rows="6"  class="form-control rich_textarea" name="cand_profession[\'project_desc\'][]" id="ad_description"></textarea></div></div>';
+ }
+ else  { var desc_html = ''; }
+ 
+
+divtest.innerHTML = '<div class= "ad-more-box-single"><div class="col-md-12 col-sm-12"><h4 class="dashboard-heading">' + get_strings.prof_head + '</h4></div><div class="col-md-6 col-sm-12"><div class="form-group"><label>' + get_strings.org_title + '<span class="required">*</span></label><input type="text"  placeholder="' + get_strings.org_plc + '" name="cand_profession[\'project_organization\'][]" class="form-control" '+get_strings.org_req+'></div></div>'+role_html+''+s_date_html+''+e_date_html+''+desc_html+'</div></div><div class="input-group-btn remove-btn"><button class="btn btn-danger" type="button" onclick="remove_professional_fields(' + room + ');" data-remove-type="' + room + '"> <span class="ti-minus" aria-hidden="true"></span>' + get_strings.prof_remov + '</button></div></div></div><div class="clearfix"></div></div></div>';
 
 
-	var my_Divs = Math.floor((Math.random() * 1000000000) + 1);
-	var room    = my_Divs + 1;
-	var end_date_class    = my_Divs + 2;
-
-	var objTo = document.getElementById('professional_fields');
-	var divtest = document.createElement("div");
-
-	divtest.setAttribute("class", "form-group removeclass_pro" + room);
-	var rdiv = 'removeclass_pro' + room;
-
-	var date_class_pro = 'date-here-pro' + room;
-
-
-	divtest.innerHTML = '<div class= "ad-more-box-single"><div class="col-md-12 col-sm-12"><h4 class="dashboard-heading">' + get_strings.projthead + '(' + get_strings.new_btn + ')</h4></div><div class="col-md-6 col-sm-12"><div class="form-group"><label>' + get_strings.projorg + '<span class="required">*</span></label><input type="text"  placeholder="' + get_strings.projorg + '" name="cand_profession[\'project_organization\'][]" class="form-control"></div></div><div class="col-md-6 col-sm-12"><div class="form-group"><label>' + get_strings.projdesign + '<span class="required">*</span></label><input type="text"   placeholder="' + get_strings.projdesign + '" name="cand_profession[\'project_role\'][]" class="form-control"></div></div><div class="col-md-6 col-xs-12 col-sm-6"><div class="form-group"><label class="">' + get_strings.projstrt + '</label><input type="text"   name="cand_profession[\'project_start\'][]" class="' + date_class_pro + '  form-control" /></div></div><div class="col-md-6 col-xs-12 col-sm-6"><div class="form-group"><label class="">' + get_strings.projend + '</label><input type="text"  name="cand_profession[\'project_end\'][]" class="' + end_date_class + '  form-control end-hide"  /><input type="hidden"  value="0" name="cand_profession[\'project_name\'][]"  class="checked-input-hide" /><input type="checkbox" name="checked"  class="icheckbox_minimal control-class-' + room + '">' + get_strings.projtitle + '</div></div><div class="col-md-12 col-sm-12 col-xs-12"><div class="form-group"><label>' + get_strings.projdesc + '</label><textarea rows="6"  class="form-control rich_textarea" name="cand_profession[\'project_desc\'][]" id="ad_description"></textarea></div></div></div></div><div class="input-group-btn remove-btn"><button class="btn btn-danger" type="button" onclick="remove_professional_fields(' + room + ');" data-remove-type="' + room + '"> <span class="ti-minus" aria-hidden="true"></span>' + get_strings.degremov + '</button></div></div></div><div class="clearfix"></div></div></div>';
-
-
-	objTo.appendChild(divtest);
-	var class_name = 'control-class-' + room;
-	nokri_get_date_picker_start('months', date_class_pro, 'MM yyyy',end_date_class)
-	$('input').iCheck({
-		checkboxClass: 'icheckbox_minimal',
-		/*increaseArea: '20%' // optional*/
-	});
-	nokri_textarea_initial(room);
+ objTo.appendChild(divtest);
+ var class_name = 'control-class-' + room;
+ nokri_get_date_picker_start('months', date_class_pro, 'MM yyyy', end_date_class)
+ $('input').iCheck({
+  checkboxClass: 'icheckbox_minimal',
+  /*increaseArea: '20%' // optional*/
+ });
+ nokri_textarea_initial(room);
 }
-
 function remove_professional_fields(rid) {
 	"use strict";
 	$.confirm({
@@ -4025,15 +4850,17 @@ function remove_professional_fields(rid) {
 					jQuery('.removeclass_pro' + rid).remove();
 				}
 			},
-			close: function () {}
+			cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
+            }
+        },
 		}
 	});
 }
-
 /*-- Add More Certifications --*/
-
 var room = 1;
-
 function nokri_textarea_initial(call) {
 	call= typeof call !== 'undefined' ? call : '';
 	$('button[data-remove-type=' + call + '] ').parent().parent().closest('div').find(".rich_textarea").jqte({
@@ -4059,7 +4886,6 @@ function nokri_textarea_initial(call) {
 		title: false,
 	});
 }
-
 function certification_fields() {
 	"use strict";
 
@@ -4082,7 +4908,6 @@ function certification_fields() {
 	nokri_get_date_picker_start('months', date_class_certi, 'MM yyyy',end_date_class);
 	nokri_textarea_initial(room);
 }
-
 function remove_certification_fields(rid) {
 	"use strict";
 	$.confirm({
@@ -4099,11 +4924,15 @@ function remove_certification_fields(rid) {
 					jQuery('.removeclass_cert' + rid).remove();
 				}
 			},
-			close: function () {}
+			cancel: {
+            text: get_strings.btn_cancel, // text for button
+            action: function(cancelButton){
+                $('.cp-loader').hide();
+            }
+        },
 		}
 	});
 }
-
 var $ = jQuery.noConflict();
 jQuery(document).ready(function () {
 	"use strict";
@@ -4117,10 +4946,10 @@ jQuery(document).ready(function () {
 		trigger: 'hover',
 	});
 	nokri_get_date_picker_dob('days', 'datepicker-cand-dob', 'mm/dd/yyyy');
+	nokri_get_date_picker_custom('days', 'datepicker-custom-feilds', 'mm/dd/yyyy');
 	nokri_get_date_picker('days', 'datepicker-job-post', 'mm/dd/yyyy');
+	nokri_get_date_picker_job_post('days', 'datepicker-job-post', 'mm/dd/yyyy');
 });
-
-
 $(document).one('ready', function () {
 	$('.datepicker-here-canidate').datepicker({
 		view: 'months',
@@ -4291,6 +5120,48 @@ function nokri_get_date_picker_dob(c_view, apl_class, date_format,end_class) {
 	
 	
 }
+function nokri_get_date_picker_custom(c_view, apl_class, date_format, end_class) {
+ $('.' + apl_class).datepicker({
+  view: c_view,
+  minView: c_view,
+  dateFormat: date_format,
+  //maxDate: new Date(),
+  language: {
+   days: [get_strings.Sunday, get_strings.Monday, get_strings.Tuesday, get_strings.Wednesday, get_strings.Thursday, get_strings.Friday, get_strings.Saturday],
+   daysShort: [get_strings.Sun, get_strings.Mon, get_strings.Tue, get_strings.Wed, get_strings.Thu, get_strings.Fri, get_strings.Sat],
+   daysMin: [get_strings.Su, get_strings.Mo, get_strings.Tu, get_strings.We, get_strings.Th, get_strings.Fr, get_strings.Sa],
+   months: [get_strings.January, get_strings.February, get_strings.March, get_strings.April, get_strings.May, get_strings.June, get_strings.July, get_strings.August, get_strings.September, get_strings.October, get_strings.November, get_strings.December],
+   monthsShort: [get_strings.Jan, get_strings.Feb, get_strings.Mar, get_strings.Apr, get_strings.May, get_strings.Jun, get_strings.Jul, get_strings.Aug, get_strings.Sep, get_strings.Oct, get_strings.Nov, get_strings.Dec],
+   today: get_strings.Today,
+   clear: get_strings.Clear,
+   timeFormat: 'hh:ii aa',
+   firstDay: 0
+  },
+ });
+
+
+}
+function nokri_get_date_picker_job_post(c_view, apl_class, date_format) {
+	$('.' + apl_class).datepicker({
+		view: c_view,
+		minView: c_view,
+		dateFormat: date_format,
+		minDate: new Date(),
+		language: {
+			days: [get_strings.Sunday, get_strings.Monday, get_strings.Tuesday, get_strings.Wednesday, get_strings.Thursday, get_strings.Friday, get_strings.Saturday],
+			daysShort: [get_strings.Sun, get_strings.Mon, get_strings.Tue, get_strings.Wed, get_strings.Thu, get_strings.Fri, get_strings.Sat],
+			daysMin: [get_strings.Su, get_strings.Mo, get_strings.Tu, get_strings.We, get_strings.Th, get_strings.Fr, get_strings.Sa],
+			months: [get_strings.January, get_strings.February, get_strings.March, get_strings.April, get_strings.May, get_strings.June, get_strings.July, get_strings.August, get_strings.September, get_strings.October, get_strings.November, get_strings.December],
+			monthsShort: [get_strings.Jan, get_strings.Feb, get_strings.Mar, get_strings.Apr, get_strings.May, get_strings.Jun, get_strings.Jul, get_strings.Aug, get_strings.Sep, get_strings.Oct, get_strings.Nov, get_strings.Dec],
+			today: get_strings.Today,
+			clear: get_strings.Clear,
+			timeFormat: 'hh:ii aa',
+			firstDay: 0
+		},
+	});
+	
+	
+}
 var $ = jQuery.noConflict();
 jQuery(document).ready(function () {
 	"use strict";
@@ -4304,7 +5175,6 @@ jQuery(document).ready(function () {
 		trigger: 'hover',
 	});
 });
-
 jQuery(document).ready(function () {
 	"use strict";
 	jQuery(".rich_textarea").on("paste", function (e) {
@@ -4314,7 +5184,6 @@ jQuery(document).ready(function () {
 		document.execCommand("insertText", false, text);
 	});
 });
-
 $(window).on('load', function () {
 	//*MASONRY */
 	$('.mansi').masonry();

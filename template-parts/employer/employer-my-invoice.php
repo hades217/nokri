@@ -1,5 +1,5 @@
 <?php 
-global $nokri;
+global $nokri;$product;
 $rtl_class = '';
 if(is_rtl())
  {
@@ -12,6 +12,18 @@ if( isset( $_GET['order_id'] ) )
  }
 $order_new  =   wc_get_order( $order_id );
 $data       =   $order_new->get_data();
+ $order_total =   $data['total']; 
+if(wc_tax_enabled()){ 
+ 
+    $subtotal = $order_new->get_subtotal();
+}
+else{
+  
+    $subtotal =  $data['total']; 
+}
+
+
+
 $items      =   $order_new->get_items(); 
 foreach ( $items as $item ) 
 {
@@ -20,7 +32,9 @@ foreach ( $items as $item )
 $adress		=	$data['billing']['address_1'];
 $comp_name	=	$data['billing']['first_name'];
 $order_date =   $data['date_created']->date('F j, Y'); 
-$order_total =   $data['total']; 
+
+
+$cart_tax    =  $data['cart_tax'];
 $order_status =   $data['status'];
 if($order_status == 'processing')
 {
@@ -81,8 +95,15 @@ $address_invoice = isset($nokri['user_address_invoice']) ? $nokri['user_address_
                 <tr>
                   <td>1</td>
                   <td><?php echo esc_html($product_name); ?></td>
-                  <td><?php echo wc_price($order_total); ?></td>
+                  <td><?php echo wc_price($subtotal); ?></td>               
                 </tr>
+                <?php if(wc_tax_enabled()){ ?> 
+                <tr>
+                  <td></td>
+                  <td><?php echo esc_html__('VAT','nokri'); ?></td>                 
+                  <td><?php echo wc_price($cart_tax); ?>                
+                </tr>
+                <?php } ?>
               </tbody>
             </table>
         </div>
@@ -111,6 +132,9 @@ $address_invoice = isset($nokri['user_address_invoice']) ? $nokri['user_address_
     <a href="#" class="btn n-btn-flat pull-right <?php echo esc_attr($rtl_class); ?>" onclick="printDiv('printableArea')"><?php echo esc_html__( 'Print', 'nokri' ); ?></a>
   </div>
 </div>
+
+
+
 <script>
 	function printDiv(printableArea) {
      var printContents = document.getElementById(printableArea).innerHTML;

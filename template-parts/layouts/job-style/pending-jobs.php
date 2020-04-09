@@ -37,13 +37,14 @@ if( count((array)$single_job_badges ) > 0)
 			$job_badge_text .= '<a href="javascript:void(0)">'.esc_html(ucfirst($job_badge)).'</a>';
 		}
 }
-
+$link      = nokri_set_url_param(get_the_permalink($nokri['sb_post_ad_page']), 'id', esc_attr( $job_id ));
+$final_url = esc_url(nokri_page_lang_url_callback($link));
 ?>
 <div class="cp-loader"></div>
 <div class="posted-job-list" id="all-jobs-list-box2-<?php echo esc_attr($job_id); ?>">
     <ul class="list-inline">
         <li class="posted-job-title"> 
-            <a href="<?php echo get_the_permalink($job_id); ?>"><?php the_title(); ?></a>
+            <a href="<?php echo get_the_permalink($job_id); ?>"><?php echo get_the_title(); ?></a>
             <p><strong><?php echo esc_html__( 'Posted Date', 'nokri' ); ?>: </strong><?php echo get_the_date(); ?></p>
             <div class="job-class"> 
                <?php echo "".$job_badge_text ?>
@@ -54,7 +55,7 @@ if( count((array)$single_job_badges ) > 0)
         <li class="posted-job-expiration"><?php echo date_i18n(get_option('date_format'), strtotime($job_expiry)); ?></li>
         <li class="posted-job-action"> 
             <ul class="list-inline">
-                <li class="tool-tip" title="<?php echo esc_html__( 'Edit Job', 'nokri' ); ?>"><a href="<?php echo get_the_permalink( $nokri['sb_post_ad_page'] ); ?>?id=<?php echo esc_attr( $job_id );  ?>" class="label label-info"> <i class="ti-pencil-alt"></i></a></li>
+                <li class="tool-tip" title="<?php echo esc_html__( 'Edit Job', 'nokri' ); ?>"><a href="<?php echo $final_url;  ?>" class="label label-info"> <i class="ti-pencil-alt"></i></a></li>
                 <li class="tool-tip" title="<?php echo esc_html__( 'Delete Job', 'nokri' ); ?>"><a href="javascript:void(0)" data-value="<?php echo esc_attr( $job_id );?>" class="label label-danger del_my_job"><i class="ti-trash"></i></a></li>
             </ul>
         </li>

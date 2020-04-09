@@ -104,7 +104,7 @@ $emp_linkedin  = get_user_meta($user_id, '_emp_linked', true);
 /* Emp dashboard text */
 $user_profile_dashboard_txt = ( isset($nokri['user_profile_dashboard_txt']) && $nokri['user_profile_dashboard_txt'] != ""  ) ? $nokri['user_profile_dashboard_txt'] : "";
 ?> 
-<section class="dashboard-new <?php echo esc_attr($top_bar_class); ?>">
+<section class="dashboard-new emp_dashboard  <?php echo esc_attr($top_bar_class); ?>">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12 col-sm-12 col-xs-12 nopadding">
@@ -185,4 +185,3 @@ $user_profile_dashboard_txt = ( isset($nokri['user_profile_dashboard_txt']) && $
     </div>
     <input type="hidden" id="is_accordion" value="1">
 </section>
-

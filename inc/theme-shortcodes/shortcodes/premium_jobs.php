@@ -53,14 +53,26 @@ function premium_jobs()
 			esc_html__('DESC', 'nokri') => 'desc',
 			) ,
 		),
-			array(
+			array
+		(
 			"group" => esc_html__("Job Class", "nokri"),
-			"type" => "dropdown",
-			"heading" => esc_html__("Select Your Desired ones", 'nokri') ,
-			"param_name" => "job_class",
-			"admin_label" => true,
-			"value" => nokri_job_class('job_class'),
-			),
+			'type' => 'param_group',
+			'heading' => esc_html__( 'Select Job Class', 'nokri' ),
+			'param_name' => 'job_classes',
+			'value' => '',
+			'params' => array
+			(
+				array(
+				"group" => esc_html__("Job Class", "nokri"),
+				"type" => "dropdown",
+				"heading" => esc_html__("Select Your Desired ones", 'nokri') ,
+				"param_name" => "job_class",
+				"admin_label" => true,
+				"value" => nokri_job_class('job_class'),
+				),
+
+			)
+		),
 			array(
 			'group' => esc_html__( 'Link', 'nokri' ),
 			"type" => "vc_link",
@@ -84,11 +96,31 @@ function premium_jobs_short_base_func($atts, $content = '')
 		'section_clr' => '',
 		'section_title' => '',
 		'section_description' => '',
-		'job_class' => '',
+		'job_classes' => '',
 		'job_class_no' => '',   
 		'link' => '', 
 	) , $atts));
-$args = array(
+global $nokri;
+$job_class_array = array();
+
+if(isset($atts['job_classes']) && !empty($atts['job_classes']) != '')
+{       
+	$rows = vc_param_group_parse_atts( $atts['job_classes'] );  
+		
+	if( (array)count( $rows ) > 0 )
+	{     
+		foreach($rows as $row ) 
+		{                                                           
+			$job_class           = nokri_show_taxonomy_all($row['job_class'],'job_class');                     
+                        if( $job_class  != ''){
+                            
+                            $job_class_array[] =    $job_class;
+                          
+                            }                      			
+		}
+	}
+}
+$args      = array(
 	'post_type'   		=> 'job_post',
 	'order'       		=> 'date',
 	'orderby'     		=> $job_order,
@@ -98,7 +130,7 @@ $args = array(
             array(
                 'taxonomy' => 'job_class',
                 'field' => 'term_id',
-                'terms' => $job_class,
+                'terms' => $job_class_array,
             )
         ), 
 	 'meta_query' 		=> array(
@@ -111,8 +143,9 @@ $args = array(
 );
 
 global $nokri;
+$args            = nokri_wpml_show_all_posts_callback($args);
 $job_class_query = new WP_Query( $args ); 
-$job_class_html = '';
+$job_class_html  = '';
 if ( $job_class_query->have_posts() )
 	{
 	  while ( $job_class_query->have_posts()  )
@@ -173,10 +206,10 @@ if ( $job_class_query->have_posts() )
 				$last_cat        =  '';
 				foreach($job_categories as $c)
 				{
-				   $project = '<a href="'.get_the_permalink($nokri['sb_search_page']).'?cat_id='.$c->term_id.'">'.$c->name.'</a>';
+					$search_url    = nokri_set_url_param(get_the_permalink($nokri['sb_search_page']), 'cat-id',$c->term_id);
+				    $project = '<a href="'.esc_url(nokri_page_lang_url_callback($search_url)).'">'.$c->name.'</a>';
 				}
 			}
-			
 			/* Getting Last country value*/
 			$job_locations  = array();
 			$last_location        =  '';
@@ -184,14 +217,12 @@ if ( $job_class_query->have_posts() )
 			if ( ! empty( $job_locations ) ) { 
 				foreach($job_locations as $location)
 				{
-				   $last_location = '<a href="'.get_the_permalink($nokri['sb_search_page']).'?job_location='.$location->term_id.'">'.$location->name.'</a>';
+				   $search_url    = nokri_set_url_param(get_the_permalink($nokri['sb_search_page']), 'job-location',$location->term_id);
+				   $last_location = '<a href="'.esc_url(nokri_page_lang_url_callback($search_url)).'">'.$location->name.'</a>';
 				}
 			}
-			
-			
-			
-			
-			
+			/* Jobs aplly with */
+			$exter_apply_btn = nokri_apply_with_external_source($job_id);
 			$job_class_html .= '<div class="n-job-single">
                     <div class="n-job-img">
                         <img src="'.esc_url($rel_image_link[0]).'" alt="'.esc_attr__( 'logo', 'nokri' ).'" class="img-responsive">
@@ -210,8 +241,8 @@ if ( $job_class_query->have_posts() )
                                 <span> <strong>'.esc_html__( 'Time:', 'nokri' ).'</strong>'.nokri_time_ago().'</span>
                             </li>
                             <li class="n-job-btns">
-							<a href="javascript:void(0)" class="btn n-btn-rounded apply_job" data-toggle="modal" data-target="#myModal"  data-job-id ='.esc_attr( $job_id ).'>'.esc_html__( 'Apply Now', 'nokri' ).' </a>
-                                '."".($save_job).'
+							'.$exter_apply_btn.'
+                             '."".($save_job).'
                             </li>
                         </ul>
                     </div>

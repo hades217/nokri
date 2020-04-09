@@ -56,8 +56,8 @@ if ( $the_query->have_posts() ) { ?>
         $rel_post_author_id   =  get_post_field( 'post_author', $rel_post_id );
          /* Getting Company  Profile Photo */
         $comp_img_html = '';
-    $rel_image_link[0]   =   get_template_directory_uri(). '/images/candidate-dp.jpg';
-     if( isset( $nokri['nokri_user_dp']['url'] ) && $nokri['nokri_user_dp']['url'] != "" )
+        $rel_image_link[0]   =   get_template_directory_uri(). '/images/candidate-dp.jpg';
+        if( isset( $nokri['nokri_user_dp']['url'] ) && $nokri['nokri_user_dp']['url'] != "" )
         {
             $rel_image_link = array($nokri['nokri_user_dp']['url']);
         }
@@ -93,7 +93,6 @@ if( count((array)  $single_job_badges ) > 0)
             $term_vals =  get_term_meta($val);
             $bg_color  =  get_term_meta( $val, '_job_class_term_color_bg', true );
              $color    =  get_term_meta( $val, '_job_class_term_color', true );
-            
             $style_color = '';
             if($color != "" )
             {
@@ -102,17 +101,12 @@ if( count((array)  $single_job_badges ) > 0)
             $job_badge_text .= '<li><a href="'.get_the_permalink($nokri['sb_search_page']).'?job_class='.$val.'" class="job-class-tags-anchor" '.$style_color.'><span>'.esc_html(ucfirst($job_badge)).'</span></a></li>';
         }  
 }
-
+$user_id = '';
 if(is_user_logged_in())
 {
     $user_id         =  get_current_user_id();
 }
-else
-{
-    $user_id = '';
-}
 $job_bookmark = get_post_meta( $rel_post_id, '_job_saved_value_'.$user_id, true);
-
 if ( $job_bookmark == '' ) 
 {
     $save_job = '<a class="n-job-saved save_job" href="javascript:void(0)" data-value = "'.$rel_post_id.'"><i class="ti-heart"></i></a> ';
@@ -128,7 +122,7 @@ else
                      <ul class="list-inline">
                         <li class="n-job-title-box">
                            <h4><a href="<?php echo the_permalink($rel_post_id); ?>" class="job-title"><?php echo the_title(); ?></a></h4>
-                           <p><i class="ti-location-pin"></i><?php echo " ".nokri_job_country($rel_post_id); ?></p>
+                           <p><i class="ti-location-pin"></i><?php echo " ".nokri_job_country($rel_post_id,''); ?></p>
                         </li>
                         <li class="n-job-short">
                            <span> <strong><?php echo esc_html__('Type:', 'nokri' ); ?></strong><?php echo nokri_job_post_single_taxonomies('job_type', $job_type); ?></span>
@@ -141,7 +135,7 @@ else
                   </div>
                </div>
 <?php } ?>
-</div>
+            </div>
          </div>
       </div>
    </div>

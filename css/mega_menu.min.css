@@ -437,6 +437,10 @@
 .transparent-header-1 .mega-menu .menu-mobile-collapse-trigger::before, .transparent-header-1 .mega-menu .menu-mobile-collapse-trigger::after, .transparent-header-1 .mega-menu .menu-mobile-collapse-trigger span {
     background: #fff;
 }
+.transparent-header-1 .mega-menu.n-admin-header .menu-mobile-collapse-trigger::before, .transparent-header-1 .mega-menu.n-admin-header .menu-mobile-collapse-trigger::after, .transparent-header-1 .mega-menu.n-admin-header .menu-mobile-collapse-trigger span {
+    background: #242424;
+}
+
 
 /*.mega-menu.n-header-trabsparent .menu-mobile-collapse-trigger:before,
 .mega-menu.n-header-trabsparent .menu-mobile-collapse-trigger:after,

@@ -95,46 +95,50 @@ function about_us_tabs_short_base_func($atts, $content = '')
 		'section1_qoute' => '',
 		'faq_qstns' => '',
 	) , $atts));
-	$rows = vc_param_group_parse_atts( $atts['faq_qstns'] );
-	$faq_html = '';
-	$tabs_no = 1;
-	if( count( $rows ) > 0) {
-   foreach($rows as $row )
-   {	
-   		 $open_tab = 'false';
-		 $is_in = '';
-		 $tab_closed = '';
-   		 if ($tabs_no == 1) { $open_tab = 'true'; $is_in = ' in'; $tab_closed = 'tab-';} 
-		
-		/*Question Title */
-		$qstn_title = (isset($row['faq_qstn_title']) && $row['faq_qstn_title'] != "") ? $row['faq_qstn_title'] : "";
-		/*Question Details */
-		$qstn_details = (isset($row['faq_qstn_details']) && $row['faq_qstn_details'] != "") ? $row['faq_qstn_details'] : "";
-		/*Icons*/
-		$icon_html = '';	
-		if( isset( $row['icon']) )
-		$icon_html = '<div class="panel-body-icon"><i class="'.esc_attr($row['icon'] ).'"></i></div>';
-		$tabs_no++;
-		$faq_html .='<div class="panel panel-default">
-                                    <div class="panel-heading tab-collapsed" role="tab" id="heading'.esc_attr($tabs_no).'">
-                                        <h4 class="panel-title">
-                                    <a class="collapse-controle" data-toggle="collapse" data-parent="#accordion" href="#collapse'.esc_attr($tabs_no).'" aria-expanded="true" aria-controls="collapse'.esc_attr($tabs_no).'">
-                                       '.$qstn_title.'
-                                        <span class="expand-icon-wrap"><i class="fa expand-icon"></i></span>
-                                    </a>
-                                  </h4>
-                                    </div>
-                                    <div id="collapse'.esc_attr($tabs_no).'" class="panel-collapse collapse '.esc_attr($is_in).'" role="tabpanel" aria-labelledby="headingOne" aria-expanded="true">
-                                        <div class="panel-body">
-                                            <div class="panel-body-icon"><i class="fa fa-magic"></i></div>
-                                            '.$qstn_details.'
-                                        </div>
-                                    </div>
-                                </div>';
-								
-   }
-   
-  }
+	if(isset($atts['faq_qstns']) && $atts['faq_qstns'] != '')
+	{
+		$rows = vc_param_group_parse_atts( $atts['faq_qstns'] );
+		$faq_html = '';
+		$tabs_no = 1;
+		if( count( $rows ) > 0) 
+		{
+	   foreach($rows as $row )
+	   {	
+			 $open_tab = 'false';
+			 $is_in = '';
+			 $tab_closed = '';
+			 if ($tabs_no == 1) { $open_tab = 'true'; $is_in = ' in'; $tab_closed = 'tab-';} 
+			
+			/*Question Title */
+			$qstn_title = (isset($row['faq_qstn_title']) && $row['faq_qstn_title'] != "") ? $row['faq_qstn_title'] : "";
+			/*Question Details */
+			$qstn_details = (isset($row['faq_qstn_details']) && $row['faq_qstn_details'] != "") ? $row['faq_qstn_details'] : "";
+			/*Icons*/
+			$icon_html = '';	
+			if( isset( $row['icon']) )
+			$icon_html = '<div class="panel-body-icon"><i class="'.esc_attr($row['icon'] ).'"></i></div>';
+			$tabs_no++;
+			$faq_html .='<div class="panel panel-default">
+										<div class="panel-heading tab-collapsed" role="tab" id="heading'.esc_attr($tabs_no).'">
+											<h4 class="panel-title">
+										<a class="collapse-controle" data-toggle="collapse" data-parent="#accordion" href="#collapse'.esc_attr($tabs_no).'" aria-expanded="true" aria-controls="collapse'.esc_attr($tabs_no).'">
+										   '.$qstn_title.'
+											<span class="expand-icon-wrap"><i class="fa expand-icon"></i></span>
+										</a>
+									  </h4>
+										</div>
+										<div id="collapse'.esc_attr($tabs_no).'" class="panel-collapse collapse '.esc_attr($is_in).'" role="tabpanel" aria-labelledby="headingOne" aria-expanded="true">
+											<div class="panel-body">
+												<div class="panel-body-icon"><i class="fa fa-magic"></i></div>
+												'.$qstn_details.'
+											</div>
+										</div>
+									</div>';
+									
+	   }
+	   
+	  }
+	}
   /*Section Color */
 $section_clr = (isset($faq_qstn_section_clr) && $faq_qstn_section_clr != "") ? $faq_qstn_section_clr : "";
 /*Section Title */
