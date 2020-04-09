@@ -5,7 +5,7 @@
                <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
                         <?php echo ($job_badge_ul); ?>
                   <div class="n-single-title">
-                     <h4><?php the_title(); ?></h4>
+                     <h1><?php the_title(); ?></h1>
                      <ul>
                         <?php if(!empty($job_type)) { ?>
                         <li> <i class="fa fa-folder-open"></i><?php echo $project; ?></li>

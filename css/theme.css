@@ -3519,7 +3519,11 @@ aside.n-single-sidebar .apply-buttons .n-btn-custom-two {
 .n-single-job.n-single-job-transparent .n-single-title {
 	margin-bottom:0;	
 }
-
+.n-single-job-transparent .n-single-title h1 {
+	color:#FFF;
+	font-size:24px;
+	margin-bottom:15px;	
+}
 .n-single-job-transparent .n-single-title h4 {
 	color:#FFF;
 	font-size:24px;

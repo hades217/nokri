@@ -13,7 +13,7 @@
                   <?php } ?>
                 <?php echo "".($job_badge_ul); ?>
                   <div class="n-single-title">
-                     <h4><?php the_title(); ?></h4>
+                     <h1><?php the_title(); ?></h1>
                      <ul>
                         <li><i class="fa fa-folder-open"></i> <?php echo $project; ?></li>
                         <?php if(!empty($job_type)) { ?>
