@@ -4,7 +4,7 @@
             <div class="row">
                <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
                         <?php echo ($job_badge_ul); ?>
-                  <div class="n-single-title">
+                  <div class="n-single-title job-title">
                      <h1><?php the_title(); ?></h1>
                      <ul>
                         <?php if(!empty($job_type)) { ?>

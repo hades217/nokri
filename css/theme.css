@@ -13115,3 +13115,8 @@ right: -10%;
 .emp_dashboard .dashboard-job-filters table td.counter-active a {
     color: #FFF !important;
 }
+.job-title h1{
+	color:#FFF;
+	font-size:24px;
+	margin-bottom:15px;
+}
